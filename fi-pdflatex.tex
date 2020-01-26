@@ -69,7 +69,7 @@
 
       span multiple paragraphs.
     },
-    bib           = example.bib,
+    bib           = example.bib, %bibliography.bib
     %% Uncomment the following line (by removing the % symbol at
     %% the beginning) and replace `assignment.pdf` with the
     %% filename of your scanned thesis assignment.
@@ -143,6 +143,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\usepackage{mathtools}
 \usepackage{braket}
 
 %% We will define several mathematical sectioning commands.
@@ -191,12 +192,12 @@ popisat co je DQBF (ist od BF->QBF->DQBF?), neviem ci pridavat aj nonprenex, pop
 
 In this chapter we give needed ... theory for our problem... definition of dependency quantified Boolean formulas??? and BDDs?? citacie odkial vychadzam??
 
-\section{Dependency Quantified Boolean Formula}
+\section{Boolean Formulas}
 In this section we will define dependency quantified Boolean formulas building up from Boolean formulas and adding quantifications followed by adding dependencies for these quantifications.
 
 %definicia boolean formula (rekurzivna)
 
-We first start with defining Boolean formulas. For these we need a set of variables $V = \set{x_1, \dots, x_n}$ for which we can define a valuation function $v\colon V \mapsto \{0,1\}$ which says whether each variable is true or false. Now we can define Boolean formulas as variables connected using logical operatives \emph{and} (${\land}$), \emph{or} (${\lor}$) and \emph{negation} (${\neg}$).
+We first start with defining Boolean formulas. For these we need a set of variables $V = \set{x_1, \dots, x_n}$ for which we can define a valuation function $v\colon V \mapsto \{0,1\}$ that says whether each variable is true or false. Now we can define Boolean formulas as variables connected using logical operatives \emph{and} (${\land}$), \emph{or} (${\lor}$) and \emph{negation} (${\neg}$).
 
 \begin{definition}
 Let $V = \set{x_1, \dots, x_n}$ be a set of variables. \emph{Boolean formula} (BF) over $V$ is ...(a word??)... recursively defined as (has a form ?????)
@@ -204,43 +205,137 @@ Let $V = \set{x_1, \dots, x_n}$ be a set of variables. \emph{Boolean formula} (B
     \item $x_i$, where $x_i \in V$,
     \item $\phi_1 \land \phi_2$, where $\phi_1$ and $\phi_2$ are both Boolean formulas,
     \item $\phi_1 \lor \phi_2$, where $\phi_1$ and $\phi_2$ are both Boolean formulas,
-    \item $\neg\phi$, where $\phi$ is Boolean formula.
+    \item $\neg\phi$, where $\phi$ is a Boolean formula.
 \end{itemize}
 \end{definition}
-Let $BF(V)$ be a set of all Boolean formulas over $V$ and $v\colon V \mapsto \set{0,1}$ a valuation over the set of variables $V$. We can extend this valuation to $BF(V)$ as $u\colon BF(V) \mapsto \{0,1\}$ where
-\begin{itemize}
-    \item $u(x_i) = v(x_i)$ for $x_i \in V$,
-    \item $u(\phi_1 \land \phi_2) = 1$ if both $u(\phi_1) = 1$ and $u(\phi_2) = 1$, otherwise $u(\phi_1 \land \phi_2) = 0$,
-    \item $u(\phi_1 \lor \phi_2) = 1$ if either $u(\phi_1) = 1$ and $u(\phi_2) = 1$, otherwise $u(\phi_1 \lor \phi_2) = 0$ and
-    \item $u(\neg\phi) = 1$ if $u(\phi) = 0$ otherwise $u(\neg\phi) = 0$.
-\end{itemize}
-We will abuse notation and use $v(\phi)$ for extended $v$?????
-
-
 %definicia semantiky BF (+splnitelnost)
-For 
+Let $BF(V)$ be the set of all Boolean formulas over $V$ and $v\colon V \mapsto \set{0,1}$ a valuation over the set of variables $V$. We can extend this valuation to $BF(V)$, $v\colon BF(V) \mapsto \set{0,1}$ where
+\begin{itemize}
+    \item for $x_i \in V$ $v(x_i)$ stays the same
+    \item $v(\phi_1 \land \phi_2) = 1$ if both $v(\phi_1) = 1$ and $v(\phi_2) = 1$, otherwise $v(\phi_1 \land \phi_2) = 0$,
+    \item $v(\phi_1 \lor \phi_2) = 1$ if either $v(\phi_1) = 1$ or $v(\phi_2) = 1$, otherwise $v(\phi_1 \lor \phi_2) = 0$ and
+    \item $v(\neg\phi) = 1$ if $v(\phi) = 0$ otherwise $v(\neg\phi) = 0$.
+\end{itemize}
+%We will abuse notation and use $v(\phi)$ for extended $v$????? 
+%mozno napisat ako ze ten extend nejak oznacime (napr u_v) ale ak je to jasne tak abusneme notation a budeme pod $v(\phi)$ mysliet $u_v(\phi)$
+
+
+An important thing for BFs is satisfiability. We say that BF $\phi$ over variables $V$ is satisfiable if there exists valuation $v$ over $V$ in which $\phi$ is true, that is $v(\phi) = 1$. Let $\phi_1, \phi_2 \in BF(V)$. We say that they are \emph{equivalent} ($\phi_1 = \phi_2$) if for all valuations $v$, $v(\phi_1) = v(\phi_2)$. If they are either both satisfiable or they are both unsatisfiable, we call them \emph{equisatisfiable}. vysetlit ze equisatisfiable znmmena ze tam mozu byt ine variables
+
+priklad
 
 %definovat negation normal form + cnf
+\subsection{Conjuctive Normal Form}
+To work with formulas algorithmically it is usually easier to have them in some special forms. The first one we define is called conjuctive normal form.
+\begin{definition}
+We say that boolean formula $\phi \in BF(V)$ is in conjuctive normal form (CNF) if there exist BFs $\psi_1,\dots,\psi_n \in BF(V)$ where
+\[\phi = \psi_1 \land \dots \land \psi_n\]
+and
+\[\psi_i = l_{i1} \lor \dots \lor l_{i{m_i}}\]
+where $i \in \set{1, \dots, n}$ and either $l_ij = x_ij$ or $l_ij = \neg x_ij$ where $x_ij \in V$.
+\end{definition}
+%it is a conjuction of disjuncts of literal where literal is either variable or negation of variable
+For every BF $\phi$ there exists an equivalent formula in CNF which can be exponentially larger than $\phi$. However, there exists a construction that by adding some new variables results in an equisatisfiable BF $\phi_{CNF}$ which is only polynomially larger than the original BF $\phi$ (citedacotu).
+
+\subsection{Negative Normal Form????}
+toto asi zadefinujem pre QBF/DQBF ak vobec
+
+\section{Quantified Boolean Formulas}
+
+Having defined BFs, we can move to the next step on our way to defining DQBF by adding quantifiers. We add existential (${\exists}$) and universal (${\forall}$) quantifiers which will be bounded to variables. %Existential quantifier $\exists x_i$ will then tell us that at least for one of $x_i = 0$, $x_i = 1$ formula holds, while for universal quantifier $\forall x_i$ for both $x_i = 0$ and $x_i = 1$ formula holds.
+
+%definicia QBF (ak budem robit aj non-prenex DQBF tak rekurzivna + nahradzovanie, inak prenex)
+\begin{definition}
+Let $V$ be a set of variables and $\phi \in BF(V)$ a BF over $V$. A \emph{quantified Boolean formula} (QBF) $\psi$ has the form
+\[\psi \coloneqq Q_1 x_1 Q_2 x_2 \dots Q_n x_n \phi\]
+where $Q_i \in \set{{\exists}, {\forall}}$ for all $i \in \set{1,2,\dots,n}$.
+\end{definition}
+
+%definicia semantiky (+splnitelnost)
+Let $QBF(V)$ be the set of all quantified Boolean formulas over $V$ and $v\colon V \mapsto \set{0,1}$ a valuation over the set of variables $V$. Again, we can extend $v$ to $QBF(V)$ where 
+\begin{itemize}
+    \item for $\phi \in BF(V)$, $v(\phi)$ behaves like $v$ extended to $BF(V)$ as explained in section TODO
+    \item $v(\forall x Q_2 x_2 \dots Q_n x_n \phi) = 1$ if both $v(Q_2 x_2 \dots Q_n x_n \phi) = 1$ and ... TODO definovat nahrazdovanie + doplnit do definicie BF 1 a 0 konstanty
+\end{itemize}
+%mozno pisat skor ze pre \psi z QBF, v(psi) je definovana pre tvar \psi = itemize ...
+%definovat bounded
+Notice that in this definition of semantics the variables that are bounded with some quantifier do not care what they are evaluated to. That is priklad It can be seen that if addded $\exists x$ to unbounded variables $x$ to the beginning of any QBF, we would not need any valuation etcetc
+
+We can also define satisfiability on QBF, similarly to BF. We say that QBF $\psi$ is satisfiable if there exists valuation $v$ such that $v(\psi) = 1$.
 
 priklad
 
-definicia QBF (ak budem robit aj non-prenex DQBF tak rekurzivna + nahradzovanie, inak prenex)
+\section{Dependency Quantified Boolean Formulas}
+Quantifiers have expanded BFs quite considerably (mozno nieco ako expressibality???). However, there is still one drawback of QBFs - quantified variable $x$ depends on all variables that are quantified before $x$. The problem with this dependency relation is that it is given by how quantifiers follow each other. vysvetlit na priklade z predchadzajucej sekcie But what if we want nonlinear dependencies? And what would they even mean? This is where dependency quantified Boolean formulas will shine!
 
-definicia semantiky (+splnitelnost)
+%definicia DQBF -ak robim nonprenex tak zacat s prenex ale vysvetlit ze pre jednoduchost zacneme s tym + semantika prenex + priklady
+\begin{definition}
+Let $V = \set{x_1, \dots, x_n, y_1, \dots, y_m}$ be a set of variables and $\phi \in BF(V)$ a BF over $V$. A \emph{dependency quantified Boolean formula} (DQBF) $\psi$ has the form
+\[\psi \coloneqq \forall x_1 \dots \forall x_n \exists (D_1) y_1 \dots \exists (D_m) y_m \phi\]
+where $D_i \subseteq \set{x_1, \dots, x_n}$, $i \in \set{1,\dots,m}$, is a \emph{dependency sets} of variable $y_i$.
+\end{definition}
+Let use an example to explain the meaning behind dependency sets. Let 
+\[\psi = \forall x_1 \forall x_2 \exists (x1) y_1 \exists (x_2) y_2 : (x_1 \land x_2) \iff (y1 \iff y2)\]
+be a DQBF. Both $y_1$ and $y_2$ depend only on one variable, $x_1$ and $x_2$ respectively. TODO + citovat odkial som vzal priklad
 
-priklad
+tu dat nonprenex ak robim, semantika + priklady + dokazy o nahradzovani a eliminovani kvantifikatorov
 
-definicia DQBF -ak robim nonprenex tak zacat s prenex ale vysvetlit ze pre jednoduchost zacneme s tym + semantika prenex + priklady
 
-tu dat nonprenex ak robim, semantika + priklady + dokazy o nahradzovani
 
 \section{Binary Decision Diagrams}
+Having defined DQBFs we can now turn our attention to their representation. We have already defined some normal forms in section blabla, but algorithmically, working with them in text form would not be very effective (why?). For this reason binary decision diagrams were introduced. These structures allow for ??effective?? represantion of BFs and operations on them???
 
+\begin{definition}
+???
+\end{definition}
 
-\chapter{The Problem and Current Solutions????}
-problem - vytvorit algoritmus ktory zisti ze ci dana DQBF formula je splnitelna alebo nie pomocou BDDcok alebo jej podobnym strukturam (mozno dat do teorie)
+nieco o ROBDD, ze pre kazde BF existuje prave jedno unikatne pre kazde zoradenie + ze vyber zoradenia je dolezity + ze da sa dynamicky preukladat???
 
-ake solvre existuju (vybrat tie s ktorymi budem porovnavat?), trocha viac popisat HQS a ze ako funguje aj HQSpre (lebo ho pouzivam) - ale fakt len zopar veci spomenut, mozno aj to ze mozme pouzit vytvaranie log. gates pretoze to menim do BDD ako to robia v HQS
+\chapter{The Problem and Current Solutions???? state of the art}
+%problem - vytvorit algoritmus ktory zisti ze ci dana DQBF formula je splnitelna alebo nie pomocou BDDcok alebo jej podobnym strukturam (mozno dat do teorie)
+
+Having laid out all the necessary theory we can now define the problem we are trying to solve and current implementations solving it.
+
+\section{The Problem of Satisfiability}
+Let $\psi$ be DQBF. The problem we are trying to solve is to tell whether this formula is satisfiable, that is if there exists model in which it is true. For BF, this problem belongs to NP-complete class of problems cite. If we move to QBF, the problem gets harder and belongs to PSPACE-complete class. As was shown in CITE, this problem for DQBF belongs in NEXPTIME-complete class of problems, that is it is even harder.
+
+\section{State of the Art}
+%ake solvre existuju (vybrat tie s ktorymi budem porovnavat?), trocha viac popisat HQS a ze ako funguje aj HQSpre (lebo ho pouzivam) - ale fakt len zopar veci spomenut, mozno aj to ze mozme pouzit vytvaranie log. gates pretoze to menim do BDD ako to robia v HQS
+In this section I will give an overview of existing solvers which tackle the problem. The ... of solvers can be found in ... and in .... that is why I will give only a short overiew of some solvers (maybe name them here). However I will explain into more details solver HQS, because the methods we used for developing our solver are based on the workings of this solver.
+%current solutions, that already exist
+
+%nieco o tom ze vacsina funguje na CNF, ale HQS a moje bude na NNF
+
+%fast DQBF refutation - ze premienaju na QBF abo daco
+
+\subsection{First Solution - DQDPLL}
+The first solver~\cite{DPLLalgorithm} that tackled the satisfiability problem for DQBF was based on DPLL(TODO cite) algorithm which is succesfully used for BF and QBF solvers(TODO cite??). This algorithm works on formulas in CNF by  recursively trying to set variables to either true or false while checking if the disjuncts in CNF stay consistent. ??popisat nejak lepsie??? An adaptation called DQDPLL was introduced for DQBF, however it did not result in competitive solver.
+
+\subsection{iDQ??}
+The first ...dostatocne silny??efficient??.. DQBF solver (called iDQ(cite)) is based on the fact that Effectively Propositional Logic (cite) (EPR) is also NEXPTIME-complete, which means there exists a polynomial reduction from DQBF to EPR. The iDQ solver can then use techniques used for solving EPR logic but reduced to the more specific case of DQBF.
+
+\subsection{dCAQE}
+
+\subsection{HQS}
+The next solver HQS is based on quantifier elimination. This solver's basic premise is easy - it iteratively chooses some universal quantifier that is eliminated using theorem ???? and then remove all existential quantifiers that are dependent on all leftover universal quantifiers (theroem???).
+%nejak vysvetlit ze pouzivaju AIG
+
+In (citeprvynaivnyalgclanok) the authors introduced the basic algorithm for solving DQBF in this way. ...vlozit algoritmus???... They first choose the blabla. The universal variable is chosen based on the number of existential ones that depend on it - they choose the maximal.
+
+Following this technique, in (citeqe) they introduce solver HQS which was enhanced by using QBF solver as subprocedure. They still eliminate quantifiers in similar fashion, but now they do it until the formula results in QBF form. On this QBF they then run already existing solver for QBF called AIG-solver(cite) which is much more optimized and effective. Universal quantifiers to eliminate are chosen in the beginning in such a way that the number of universal eliminations is small as possible while still the resulting formula is QBF. For this they build a dependency graph where nodes are existential variables and they are connected only if the dependency sets are not subsets. They noticed that if this graph is acyclic, the formula can be seen as QBF and so they solve the problem of finding minimum set of universal variables that when they are removed the graph is acyclic. For this they use MaxSAT????
+
+This was good and all, but in (depelim) they zaoberat sa whether it is possible to remove only some universal variables from dependency sets. They showed it is possible ....tu asi dat cely ten teorem ak som ho nedal do teorie...
+
+Last but not least in (quantlocalization) the authors have given  a theorethical foundations for non-prenex DQBFs and a possibility to push qunatifiers inside formulas. They also showed how to remove existential quantifiers inside formulas.????????????
+
+\subsection{HQSpre}
+HQS solver has a succesfull run soadfnosue??? winning tu sutaz dvakrat. However, the solver partially owes its success to the effeciency of the prepropcessor. The preprocessor HQSpre is able to solve a lot of DQBFs from the go, without need for using more complex techniques. First introduced in ... it took many techniques used for QBF preprocessing and ...it to the DQBF case. asipopisat ake?? + mozno spomenut ten approximations??
+
+% vysvetlit prve dve clanky, ze ide o jednoducho univ. expansion -> exist. elimination pouzitim AIG a pridanim nejakych zaujimavych drobnosti sa vytvori QBF ktory sa hodi do nejakeho existujuceho solvru (pridat obrazok toho cyklu + naivny alg.), tu spomenut aj preprocessor ze je vysvetleny niekde
+% potom vysvetlit ze je dolezity spravny vyber univ. kv. na expansion a vysvetlit ze v naivnom alg. to je jednoduche proste tie na ktore zavisia najviac, v tych dalsich clankoch vytvoreny dependency graf ktory sa nejak riesi, neskor sa odstranuje priamo jedna zavislost pre exist. kvantifikatory
+% potom zacat hovorit o tom ze ako pchat kvantifikatory do vnutra, kde to nejak zrobili
+% vysvetlit preprocessor (hlavne gate reduction alebo jak to nazvat)
+% spomenut asi aj overapproximations
 
 \chapter{Implementation/my solution??}
 
