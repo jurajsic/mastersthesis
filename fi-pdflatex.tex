@@ -236,6 +236,7 @@ where $i \in \set{1, \dots, n}$ and either $l_ij = x_ij$ or $l_ij = \neg x_ij$ w
 \end{definition}
 %it is a conjuction of disjuncts of literal where literal is either variable or negation of variable
 For every BF $\phi$ there exists an equivalent formula in CNF which can be exponentially larger than $\phi$. However, there exists a construction that by adding some new variables results in an equisatisfiable BF $\phi_{CNF}$ which is only polynomially larger than the original BF $\phi$ (citedacotu).
+%TODO explain clause, literal...
 
 \subsection{Negative Normal Form????}
 toto asi zadefinujem pre QBF/DQBF ak vobec
@@ -306,15 +307,20 @@ In this section I will give an overview of existing solvers which tackle the pro
 
 %nieco o tom ze vacsina funguje na CNF, ale HQS a moje bude na NNF
 
-%fast DQBF refutation - ze premienaju na QBF abo daco
+%fast DQBF refutation - ze premienaju na QBF abo daco (bunsat)
 
 \subsection{First Solution - DQDPLL}
-The first solver~\cite{DPLLalgorithm} that tackled the satisfiability problem for DQBF was based on DPLL(TODO cite) algorithm which is succesfully used for BF and QBF solvers(TODO cite??). This algorithm works on formulas in CNF by  recursively trying to set variables to either true or false while checking if the disjuncts in CNF stay consistent. ??popisat nejak lepsie??? An adaptation called DQDPLL was introduced for DQBF, however it did not result in competitive solver.
+The first solver that tackled the satisfiability problem for DQBF was based on DPLL(TODO cite) algorithm which is succesfully used for BF and QBF solvers(TODO cite??). This algorithm works on formulas in CNF by  recursively trying to set variables to either true or false while checking if the disjuncts in CNF stay consistent. ??popisat nejak lepsie??? An adaptation called DQDPLL~\cite{DPLLalgorithm} was introduced for DQBF, however it did not result in competitive solver.
 
-\subsection{iDQ??}
-The first ...dostatocne silny??efficient??.. DQBF solver (called iDQ(cite)) is based on the fact that Effectively Propositional Logic (cite) (EPR) is also NEXPTIME-complete, which means there exists a polynomial reduction from DQBF to EPR. The iDQ solver can then use techniques used for solving EPR logic but reduced to the more specific case of DQBF.
+\subsection{iDQ??(+iProver??)}
+The first ??efficient?? DQBF solver (called iDQ(cite)) is based on instantiation technique used for solving Effectively Propositional Logic (cite). This solver also works on formulas in CNF where in each step of the algorithm it tries to create a BF that is an overapproximation of input DQBF by instanciating each clause .... This BF is then checked if it is satisfiable, if it is not, then the input DQBF is not satisfiable. If it is, they check whether resulting valuation is valid for the input DQBF. If it is not, then it is used to create more clause instances which are then used to refine this overapproximation.
+
+iProver - just turn DQBF to EPR instance and run EPR solver
+
+%is also NEXPTIME-complete, which means there exists a polynomial reduction from DQBF to EPR. The iDQ solver can then use techniques used for solving EPR logic but reduced to the more specific case of DQBF.
 
 \subsection{dCAQE}
+zalozene na abstraction refinement (viacmenej iDQ je tiez abstraction refinement)
 
 \subsection{HQS}
 The next solver HQS is based on quantifier elimination. This solver's basic premise is easy - it iteratively chooses some universal quantifier that is eliminated using theorem ???? and then remove all existential quantifiers that are dependent on all leftover universal quantifiers (theroem???).
