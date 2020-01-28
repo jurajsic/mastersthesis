@@ -1,5 +1,38 @@
 @inproceedings{DPLLalgorithm,
   title={A DPLL Algorithm for Solving DQBF},
   author={Andreas Fr{\"o}hlich and Gergely Kov{\'a}sznai and Armin Biere},
-  year={2012}
+  booktitle={Pragmatics of SAT (PoS 2012, aff. to SAT 2012)},
+  %year={2012}
+}
+
+@InProceedings{dCAQE,
+author="Tentrup, Leander
+and Rabe, Markus N.",
+editor="Janota, Mikol{\'a}{\v{s}}
+and Lynce, In{\^e}s",
+title="Clausal Abstraction for DQBF",
+booktitle="Theory and Applications of Satisfiability Testing -- SAT 2019",
+year="2019",
+publisher="Springer International Publishing",
+address="Cham",
+pages="388--405",
+abstract="Dependency quantified Boolean formulas (DQBF) is a logic admitting existential quantification over Boolean functions, which allows us to elegantly state synthesis problems in verification such as the search for invariants, programs, or winning regions of games. In this paper, we lift the clausal abstraction algorithm for quantified Boolean formulas (QBF) to DQBF. Clausal abstraction for QBF is an abstraction refinement algorithm that operates on a sequence of abstractions that represent the different quantifier levels. For DQBF we need to generalize this principle to partial orders of abstractions. The two challenges to overcome are: (1) Clauses may contain literals with incomparable dependencies, which we address by the recently proposed proof rule called Fork Extension, and (2) existential variables may have spurious dependencies, which we prevent by tracking consistency requirements during the execution. Our implementation {\$}{\$}{\backslash}textsc {\{}dCAQE{\}}{\$}{\$}solves significantly more formulas than the existing DQBF algorithms.",
+doi="10.1007/978-3-030-24258-9_27",
+isbn="978-3-030-24258-9"
+}
+
+@inproceedings{iDQandDQDIMACS,
+  author    = {Andreas Fr{\"o}hlich and Gergely Kov{\'a}sznai and Armin Biere and Helmut Veith},
+  title     = {iDQ: Instantiation-Based DQBF Solving},
+  booktitle = {POS-14. Fifth Pragmatics of SAT workshop},
+  editor    = {Daniel Le Berre},
+  series    = {EPiC Series in Computing},
+  volume    = {27},
+  pages     = {103--116},
+  year      = {2014},
+  publisher = {EasyChair},
+  bibsource = {EasyChair, https://easychair.org},
+  issn      = {2398-7340},
+  url       = {https://easychair.org/publications/paper/PRV},
+  doi       = {10.29007/1s5k}
 }

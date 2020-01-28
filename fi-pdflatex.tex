@@ -69,7 +69,7 @@
 
       span multiple paragraphs.
     },
-    bib           = example.bib, %bibliography.bib
+    bib           = bibliography.bib
     %% Uncomment the following line (by removing the % symbol at
     %% the beginning) and replace `assignment.pdf` with the
     %% filename of your scanned thesis assignment.
@@ -312,17 +312,19 @@ In this section I will give an overview of existing solvers which tackle the pro
 \subsection{First Solution - DQDPLL}
 The first solver that tackled the satisfiability problem for DQBF was based on DPLL(TODO cite) algorithm which is succesfully used for BF and QBF solvers(TODO cite??). This algorithm works on formulas in CNF by  recursively trying to set variables to either true or false while checking if the disjuncts in CNF stay consistent. ??popisat nejak lepsie??? An adaptation called DQDPLL~\cite{DPLLalgorithm} was introduced for DQBF, however it did not result in competitive solver.
 
-\subsection{iDQ??(+iProver??)}
-The first ??efficient?? DQBF solver (called iDQ(cite)) is based on instantiation technique used for solving Effectively Propositional Logic (cite). This solver also works on formulas in CNF where in each step of the algorithm it tries to create a BF that is an overapproximation of input DQBF by instanciating each clause .... This BF is then checked if it is satisfiable, if it is not, then the input DQBF is not satisfiable. If it is, they check whether resulting valuation is valid for the input DQBF. If it is not, then it is used to create more clause instances which are then used to refine this overapproximation.
+\subsection{Instatiation - iDQ??(+iProver??)}
+The first ??efficient?? DQBF solver (called iDQ~\cite{iDQandDQDIMACS}) is based on instantiation technique used for solving Effectively Propositional Logic (EPR)(cite). This solver also works on formulas in CNF where in each step of the algorithm it tries to create a BF that is an overapproximation of input DQBF by instanciating each clause .... This BF is then checked if it is satisfiable, if it is not, then the input DQBF is not satisfiable. If it is, they check whether resulting valuation is valid for the input DQBF. If it is not, then it is used to create more clause instances which are then used to refine this overapproximation.
 
-iProver - just turn DQBF to EPR instance and run EPR solver
+However, EPR can be also used direclty. Because same as DQBF it belongs to NEXPTIME class, there exists a polynomial ... from DQBF to EPR (cite). This can be used by some EPR solver to transform DQBF to EPR and then solve resulting EPR. The EPR solver iProver uses this technique to solve DQBF.
+
+%iProver - just turn DQBF to EPR instance and run EPR solver
 
 %is also NEXPTIME-complete, which means there exists a polynomial reduction from DQBF to EPR. The iDQ solver can then use techniques used for solving EPR logic but reduced to the more specific case of DQBF.
 
-\subsection{dCAQE}
-zalozene na abstraction refinement (viacmenej iDQ je tiez abstraction refinement)
+\subsection{Abstraction Refinement - dCAQE}
+\cite{dCAQE} zalozene na abstraction refinement (viacmenej iDQ je tiez abstraction refinement). rozdelia si kvantifikatory na nejake urovne podla zavislosti a pouzitim 
 
-\subsection{HQS}
+\subsection{Quanfier Elimination - HQS}
 The next solver HQS is based on quantifier elimination. This solver's basic premise is easy - it iteratively chooses some universal quantifier that is eliminated using theorem ???? and then remove all existential quantifiers that are dependent on all leftover universal quantifiers (theroem???).
 %nejak vysvetlit ze pouzivaju AIG
 
@@ -824,7 +826,7 @@ automatic tool -- such as \LaTeX MK -- all commands are executed
 automatically. When you omit the \verb"\printbibliography" command,
 its location will be decided by the template.
 
-  \printbibliography[heading=bibintoc] %% Print the bibliography.
+  %\printbibliography[heading=bibintoc] %% Print the bibliography.
 
 \chapter{Inserting the index}
 After using the \verb"\makeindex" macro and loading the
