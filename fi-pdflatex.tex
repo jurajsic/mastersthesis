@@ -302,7 +302,7 @@ Let $\psi$ be DQBF. The problem we are trying to solve is to tell whether this f
 
 \section{State of the Art}
 %ake solvre existuju (vybrat tie s ktorymi budem porovnavat?), trocha viac popisat HQS a ze ako funguje aj HQSpre (lebo ho pouzivam) - ale fakt len zopar veci spomenut, mozno aj to ze mozme pouzit vytvaranie log. gates pretoze to menim do BDD ako to robia v HQS
-In this section I will give an overview of existing solvers which tackle the problem. The ... of solvers can be found in ... and in .... that is why I will give only a short overiew of some solvers (maybe name them here). However I will explain into more details solver HQS, because the methods we used for developing our solver are based on the workings of this solver.
+In this section we give an overview of existing solvers which tackle the problem. An overview of existing solvers can be found in~\cite{DQBFStateOfArtTalk,DQBFStateOfArt} (mozno tu dat aj ten talk z 2015) that is why we just give a short updated overview here (short for DQDPLL, iDQ, iProver and dCAQE). However we go into more details for solver HQS, because the methods we used for developing our solver are based on the workings of this solver.
 %current solutions, that already exist
 
 %nieco o tom ze vacsina funguje na CNF, ale HQS a moje bude na NNF
@@ -316,6 +316,8 @@ The first solver that tackled the satisfiability problem for DQBF was based on D
 The first ??efficient?? DQBF solver (called iDQ~\cite{iDQandDQDIMACS}) is based on instantiation technique used for solving Effectively Propositional Logic (EPR)(cite). This solver also works on formulas in CNF where in each step of the algorithm it tries to create a BF that is an overapproximation of input DQBF by instanciating each clause .... This BF is then checked if it is satisfiable, if it is not, then the input DQBF is not satisfiable. If it is, they check whether resulting valuation is valid for the input DQBF. If it is not, then it is used to create more clause instances which are then used to refine this overapproximation.
 
 However, EPR can be also used direclty. Because same as DQBF it belongs to NEXPTIME class, there exists a polynomial ... from DQBF to EPR (cite). This can be used by some EPR solver to transform DQBF to EPR and then solve resulting EPR. The EPR solver iProver uses this technique to solve DQBF.
+
+mozno povedat ze iProver sa ukazal lepsi
 
 %iProver - just turn DQBF to EPR instance and run EPR solver
 
@@ -826,7 +828,7 @@ automatic tool -- such as \LaTeX MK -- all commands are executed
 automatically. When you omit the \verb"\printbibliography" command,
 its location will be decided by the template.
 
-  %\printbibliography[heading=bibintoc] %% Print the bibliography.
+  \printbibliography[heading=bibintoc] %% Print the bibliography.
 
 \chapter{Inserting the index}
 After using the \verb"\makeindex" macro and loading the
