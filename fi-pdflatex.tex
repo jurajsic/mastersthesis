@@ -154,6 +154,7 @@
                                %% share the counter with theorems.
 \theoremstyle{definition}
 \newtheorem{definition}{Definition}
+\newtheorem{example}{Example}
 \theoremstyle{remark}
 \newtheorem*{remark}{Remark}
 
@@ -195,12 +196,13 @@ In this chapter we give needed ... theory for our problem... definition of depen
 \section{Boolean Formulas}
 In this section we will define dependency quantified Boolean formulas building up from Boolean formulas and adding quantifications followed by adding dependencies for these quantifications.
 
+
 %definicia boolean formula (rekurzivna)
 
 We first start with defining Boolean formulas. For these we need a set of variables $V = \set{x_1, \dots, x_n}$ for which we can define a valuation function $v\colon V \mapsto \{0,1\}$ that says whether each variable is true or false. Now we can define Boolean formulas as variables connected using logical operatives \emph{and} (${\land}$), \emph{or} (${\lor}$) and \emph{negation} (${\neg}$).
 
 \begin{definition}
-Let $V = \set{x_1, \dots, x_n}$ be a set of variables. \emph{Boolean formula} (BF) over $V$ is ...(a word??)... recursively defined as (has a form ?????)
+Let $V = \set{x_1, \dots, x_n}$ be a set of variables. \emph{Boolean formula} (BF) over $V$ has one of these forms
 \begin{itemize}
     \item $x_i$, where $x_i \in V$,
     \item $\phi_1 \land \phi_2$, where $\phi_1$ and $\phi_2$ are both Boolean formulas,
@@ -209,9 +211,10 @@ Let $V = \set{x_1, \dots, x_n}$ be a set of variables. \emph{Boolean formula} (B
 \end{itemize}
 \end{definition}
 %definicia semantiky BF (+splnitelnost)
-Let $BF(V)$ be the set of all Boolean formulas over $V$ and $v\colon V \mapsto \set{0,1}$ a valuation over the set of variables $V$. We can extend this valuation to $BF(V)$, $v\colon BF(V) \mapsto \set{0,1}$ where
+Let $BF(V)$ be the set of all Boolean formulas over $V$ and $v\colon V \mapsto \set{0,1}$ a valuation over the set of variables $V$. We can extend this valuation to $BF(V)$%, $v\colon BF(V) \mapsto \set{0,1}$
+where
 \begin{itemize}
-    \item for $x_i \in V$ $v(x_i)$ stays the same
+    \item for $x_i \in V$, $v(x_i)$ stays the same
     \item $v(\phi_1 \land \phi_2) = 1$ if both $v(\phi_1) = 1$ and $v(\phi_2) = 1$, otherwise $v(\phi_1 \land \phi_2) = 0$,
     \item $v(\phi_1 \lor \phi_2) = 1$ if either $v(\phi_1) = 1$ or $v(\phi_2) = 1$, otherwise $v(\phi_1 \lor \phi_2) = 0$ and
     \item $v(\neg\phi) = 1$ if $v(\phi) = 0$ otherwise $v(\neg\phi) = 0$.
@@ -220,26 +223,34 @@ Let $BF(V)$ be the set of all Boolean formulas over $V$ and $v\colon V \mapsto \
 %mozno napisat ako ze ten extend nejak oznacime (napr u_v) ale ak je to jasne tak abusneme notation a budeme pod $v(\phi)$ mysliet $u_v(\phi)$
 
 
-An important thing for BFs is satisfiability. We say that BF $\phi$ over variables $V$ is satisfiable if there exists valuation $v$ over $V$ in which $\phi$ is true, that is $v(\phi) = 1$. Let $\phi_1, \phi_2 \in BF(V)$. We say that they are \emph{equivalent} ($\phi_1 = \phi_2$) if for all valuations $v$, $v(\phi_1) = v(\phi_2)$. If they are either both satisfiable or they are both unsatisfiable, we call them \emph{equisatisfiable}. vysetlit ze equisatisfiable znmmena ze tam mozu byt ine variables
+An important notion for BFs is satisfiability. We say that BF $\phi$ over variables $V$ is satisfiable if there exists valuation $v$ over $V$ in which $\phi$ is true, that is $v(\phi) = 1$. Let $\phi_1, \phi_2 \in BF(V)$. We say that they are \emph{equivalent}, denoted $\phi_1 = \phi_2$, if for all valuations $v$ it holds that $v(\phi_1) = v(\phi_2)$. If they are either both satisfiable or they are both unsatisfiable, we call them \emph{equisatisfiable}. Notice that equisatisfiability of two formulas is just talking about their satisfiability, which means that these formulas can be over different sets of variables.
 
-priklad
+\begin{example}
+dat tu priklad nejakych formul?? a ukazat ze v akych valuaciach su splnene/nesplnene, priklad equal, equisatisfiable
+\end{example}
 
 %definovat negation normal form + cnf
 \subsection{Conjuctive Normal Form}
-To work with formulas algorithmically it is usually easier to have them in some special forms. The first one we define is called conjuctive normal form.
+To work with BFs it is usually easier to have them in some special forms. The first one we define is called conjuctive normal form.
+
 \begin{definition}
 We say that boolean formula $\phi \in BF(V)$ is in conjuctive normal form (CNF) if there exist BFs $\psi_1,\dots,\psi_n \in BF(V)$ where
 \[\phi = \psi_1 \land \dots \land \psi_n\]
 and
 \[\psi_i = l_{i1} \lor \dots \lor l_{i{m_i}}\]
-where $i \in \set{1, \dots, n}$ and either $l_ij = x_ij$ or $l_ij = \neg x_ij$ where $x_ij \in V$.
+for each $i = 1, \dots, n$ and for each $l_{ij}$ where $j \in \set{1,\dots,m_i}$ either $l_{ij} = x$ or $l_{ij} = \neg x$ for some $x \in V$.
 \end{definition}
-%it is a conjuction of disjuncts of literal where literal is either variable or negation of variable
+BFs $\psi_1,\dots,\psi_n$ are called clauses and $l_ij$ are called literals. That is BF is in CNF if it is a conjuction of clauses which are disjuncts of literals, where literal is either a variable or negation of a variable.
+
+\begin{example}
+priklad nejakej formule co je cnf a co neni abo daco
+\end{example}
+
 For every BF $\phi$ there exists an equivalent formula in CNF which can be exponentially larger than $\phi$. However, there exists a construction that by adding some new variables results in an equisatisfiable BF $\phi_{CNF}$ which is only polynomially larger than the original BF $\phi$ (citedacotu).
 %TODO explain clause, literal...
 
-\subsection{Negative Normal Form????}
-toto asi zadefinujem pre QBF/DQBF ak vobec
+\subsection{Negation ci jak sa to vola Normal Form????}
+toto asi zadefinujem pre QBF/DQBF ak vobec - alebo mozno to treba fakt tu, ked budem chciet hovorit ze HQSpre meni formulu????
 
 \section{Quantified Boolean Formulas}
 
@@ -284,16 +295,36 @@ tu dat nonprenex ak robim, semantika + priklady + dokazy o nahradzovani a elimin
 
 
 \section{Binary Decision Diagrams}
-Having defined DQBFs we can now turn our attention to their representation. We have already defined some normal forms in section blabla, but algorithmically, working with them in text form would not be very effective (why?). For this reason binary decision diagrams were introduced. These structures allow for ??effective?? represantion of BFs and operations on them???
+Having defined DQBFs we can now turn our attention to their representation. We have already defined some normal forms in section blabla, but algorithmically, working with them in this form would not be very effective (why?). For this reason binary decision diagrams (BDDs) were introduced. These structures allow for a succinct representation of BFs with an effecient polynomial time implementation of logical operations.
 
-\begin{definition}
-???
-\end{definition}
+Let $V$ be a set of variables. A binary decision diagram over $V$ is a binary tree like structure with two terminal nodes 0 and 1 and a set of non-terminal nodes each representing a variable from $V$. Each non-terminal node has two child nodes with edges connecting them labeled with 0 and 1 respectively.
 
-nieco o ROBDD, ze pre kazde BF existuje prave jedno unikatne pre kazde zoradenie + ze vyber zoradenia je dolezity + ze da sa dynamicky preukladat???
+Let $v\colon V \mapsto \{0,1\}$ be a valuation over $V$. BDD $B$ in this valuation is evaluated to 0 or 1 by moving along the edges of non-terminal nodes, where if we are in node representing variable $x \in V$, then we move along the edge labelled by $v(x)$. The resulting terminal node is then the evaluation of $B$ in $v$. BDD $B$ then represents a Boolean formula $\phi \in BF(V)$, if for each valuation $v$ it holds that $B$ is evaluated to $v(\phi)$.
+
+\begin{example}
+Fig. ??? shows an example of a BDD for BF ... Edges labelled by 0 are dashed???, by 1 are full??? 
+\end{example}
+
+% chceme mat linearne operacie ---> treba aby boli usporiadane ---> shannon expansion ---> ukazat operacie???
+When we have two BDDs, we want to have an effective way to compute their conjunction/disjunction. Such an algorithm should just traverse the BDDs in the same way while comparing the variables in the nodes. However, variables in the nodes on the paths from the root in general BDDs can occur in any order, which would cause problems with simple traversal of BDDs. To solve this we add an ordering on the set of variables $V$. The nodes in the BDD are then sorted based on this ordering. The resulting BDD is called an ordered binary decision diagram (OBDD).
+
+\begin{example}
+ukazat asi z previous example 2 orderings a povedat daco o tom ze operacie sa daju teraz implementovat jednoducho len prechadzanim stromom
+\end{example}
+
+%nieco o ROBDD, ze pre kazde BF existuje prave jedno unikatne pre kazde zoradenie + ze vyber zoradenia je dolezity + ze da sa dynamicky preukladat???
+OBDDs still suffer from one problem -- for each BF we would like to have for given order on $V$ only one OBDD representing it. This is not the case, notice OBDDs on fig. ????? and ???. Both represents BF ??? but they are different. That is why we introduce reduced OBDDs (ROBDD) (vysvetlit lepsie ze to neni moj prinos). ROBDD is an OBDD such that all isomorphic sub-BDDs are merged and the nodes that have the same BDD as children are removed.
+
+\begin{example}
+porovnat nejake OBDD s jeho ROBDD, detailne (kde sa ukaze )
+\end{example}
+
+In the following we will use the term BDD instead of ROBDD.
 
 \chapter{The Problem and Current Solutions???? state of the art}
 %problem - vytvorit algoritmus ktory zisti ze ci dana DQBF formula je splnitelna alebo nie pomocou BDDcok alebo jej podobnym strukturam (mozno dat do teorie)
+
+%popisat tu aj nejak historiu DQBF, akoze napriklad ten clanok s henkins qunatifiers abo daco???
 
 Having laid out all the necessary theory we can now define the problem we are trying to solve and current implementations solving it.
 
@@ -302,7 +333,7 @@ Let $\psi$ be DQBF. The problem we are trying to solve is to tell whether this f
 
 \section{State of the Art}
 %ake solvre existuju (vybrat tie s ktorymi budem porovnavat?), trocha viac popisat HQS a ze ako funguje aj HQSpre (lebo ho pouzivam) - ale fakt len zopar veci spomenut, mozno aj to ze mozme pouzit vytvaranie log. gates pretoze to menim do BDD ako to robia v HQS
-In this section we give an overview of existing solvers which tackle the problem. An overview of existing solvers can be found in~\cite{DQBFStateOfArtTalk,DQBFStateOfArt} (mozno tu dat aj ten talk z 2015) that is why we just give a short updated overview here (short for DQDPLL, iDQ, iProver and dCAQE). However we go into more details for solver HQS, because the methods we used for developing our solver are based on the workings of this solver.
+In this section we give an overview of existing solvers which tackle the problem. An overview of existing solvers can also be found in~\cite{DQBFStateOfArtTalk,DQBFStateOfArt,DQBFStateOfArtNew} that is why we just give a short updated overview here (short for DQDPLL, iDQ, iProver and dCAQE). However we go into more details for solver HQS, because the methods we used for developing our solver are based on the workings of this solver.
 %current solutions, that already exist
 
 %nieco o tom ze vacsina funguje na CNF, ale HQS a moje bude na NNF
@@ -310,21 +341,17 @@ In this section we give an overview of existing solvers which tackle the problem
 %fast DQBF refutation - ze premienaju na QBF abo daco (bunsat)
 
 \subsection{First Solution - DQDPLL}
-The first solver that tackled the satisfiability problem for DQBF was based on DPLL(TODO cite) algorithm which is succesfully used for BF and QBF solvers(TODO cite??). This algorithm works on formulas in CNF by  recursively trying to set variables to either true or false while checking if the disjuncts in CNF stay consistent. ??popisat nejak lepsie??? An adaptation called DQDPLL~\cite{DPLLalgorithm} was introduced for DQBF, however it did not result in competitive solver.
+The first solver that tackled the satisfiability problem for DQBF was based on DPLL(TODO cite) algorithm which is successfully used for BF and QBF solvers(TODO cite??). This algorithm works on formulas in CNF by searching for a satisfying assignment based on the clauses in CNF. By recursively choosing an assignment for literals and checking whether CNF stay consistent, DPLL searches trough all assignments until a satisfying one is found or all of them are decided to be unsatisfying. An adaptation called DQDPLL~\cite{DPLLalgorithm} was introduced for DQBF which extended existing solutions for QBF by adding so-called Skolem clauses which encode the dependencies between existential and universal variables. However, by doing so the algorithm becomes too slow and results in noncompetitive solver.
 
-\subsection{Instatiation - iDQ??(+iProver??)}
-The first ??efficient?? DQBF solver (called iDQ~\cite{iDQandDQDIMACS}) is based on instantiation technique used for solving Effectively Propositional Logic (EPR)(cite). This solver also works on formulas in CNF where in each step of the algorithm it tries to create a BF that is an overapproximation of input DQBF by instanciating each clause .... This BF is then checked if it is satisfiable, if it is not, then the input DQBF is not satisfiable. If it is, they check whether resulting valuation is valid for the input DQBF. If it is not, then it is used to create more clause instances which are then used to refine this overapproximation.
+\subsection{Instatiation - iDQ and iProver}
+The first efficient DQBF solver (called iDQ~\cite{iDQandDQDIMACS}) is based on instantiation technique used for solving Effectively Propositional Logic (EPR)(cite). This solver also works only on formulas in CNF where in each step of the algorithm it tries to create a BF $\phi$ that is an overapproximation of an input DQBF. This is done by instantiating some set of clauses, that is universal expansion is applied locally to clauses. This BF $\phi$ is then checked for satisfiability, where if $\phi$ is unsatisfiable then the input DQBF is also not satisfiable, while if it is satisfiable, it must be checked if the resulting valuation is valid for the input DQBF. If it is not, then it is used to create more clause instances which are then used to refine this overapproximation.
 
-However, EPR can be also used direclty. Because same as DQBF it belongs to NEXPTIME class, there exists a polynomial ... from DQBF to EPR (cite). This can be used by some EPR solver to transform DQBF to EPR and then solve resulting EPR. The EPR solver iProver uses this technique to solve DQBF.
-
-mozno povedat ze iProver sa ukazal lepsi
-
-%iProver - just turn DQBF to EPR instance and run EPR solver
-
-%is also NEXPTIME-complete, which means there exists a polynomial reduction from DQBF to EPR. The iDQ solver can then use techniques used for solving EPR logic but reduced to the more specific case of DQBF.
+However, a solver for EPR can also be used directly for DQBF. Because EPR belongs to the same complexity class as DQBF, there exists a polynomial-time reduction from DQBF to EPR (cite). This is used by EPR solver iProver which transforms DQBF in CNF to EPR instance and then solves this. In the SAT competition??? it turned out that iProver is more powerful compared to iDQ.
 
 \subsection{Abstraction Refinement - dCAQE}
-\cite{dCAQE} zalozene na abstraction refinement (viacmenej iDQ je tiez abstraction refinement). rozdelia si kvantifikatory na nejake urovne podla zavislosti a pouzitim 
+\cite{dCAQE} zalozene na abstraction refinement (viacmenej iDQ je tiez abstraction refinement). works on CNF. Divide quantifiers to levels based on the ordering of dependencies of existential quantifiers. The algorithm then construct for each level a BF that represents which clauses in CNF it can satisfy (for exstential level) or falsify(for universal). The algorithm then builds a candidate valuation by processing each level. For each level either this valuation is extended, or there is some conflict which means that the algorithm has to return back to some lower level and refine the abstraction????. 
+
+mozno spomenut fork splitting or some shit like that, v arXiv rozsirenej verzii maju nieco o tom v appendixe
 
 \subsection{Quanfier Elimination - HQS}
 The next solver HQS is based on quantifier elimination. This solver's basic premise is easy - it iteratively chooses some universal quantifier that is eliminated using theorem ???? and then remove all existential quantifiers that are dependent on all leftover universal quantifiers (theroem???).
@@ -347,7 +374,13 @@ HQS solver has a succesfull run soadfnosue??? winning tu sutaz dvakrat. However,
 % vysvetlit preprocessor (hlavne gate reduction alebo jak to nazvat)
 % spomenut asi aj overapproximations
 
-\chapter{Implementation/my solution??}
+\chapter{Algorithm}
+
+\section{High level defintion???}
+
+\section{Heuristics for order of elimination of universal variables}
+
+\chapter{Implementation}
 
 \chapter{Experimental results}
 grafygrafygrafy
