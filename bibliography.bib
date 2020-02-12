@@ -75,13 +75,11 @@ author={Karina {Gitina} and Sven {Reimer} and Matthias {Sauer} and Ralf {Wimmer}
 booktitle={2013 IEEE 31st International Conference on Computer Design (ICCD)},
 title={Equivalence checking of partial designs using dependency quantified Boolean formulae},
 year={2013},
-volume={},
-number={},
 pages={396-403},
 keywords={Boolean functions;logic design;equivalence checking;partial designs;dependency quantified Boolean formulae;combinational circuit;linear transformation;PEC;DQBF;quantifier elimination;QBF approximations;Approximation methods;Approximation algorithms;Logic gates;Combinational circuits;Complexity theory;Algorithm design and analysis;System analysis and design},
 doi={10.1109/ICCD.2013.6657071},
 ISSN={1063-6404},
-month={Oct},
+month={10},
 }
 
 @INPROCEEDINGS{HQSquantifierElimination,
@@ -95,7 +93,7 @@ pages={1617-1622},
 keywords={Boolean functions;computational complexity;optimisation;DQBF;dependency quantified Boolean formulas;quantifier elimination strategy;QBF solver;incomplete combinational circuit verification;NP-complete SAT problem;Logic gates;Syntactics;Benchmark testing;Inverters;Boolean functions;Automation;Europe},
 doi={10.7873/DATE.2015.0098},
 ISSN={1558-1101},
-month={March},
+month={3},
 }
 
 @InProceedings{HQSdependencyElimination,
@@ -128,7 +126,7 @@ pages={184-192},
 keywords={Boolean functions;logic circuits;prenex form;quantifier localization;Boolean formulas;DQBF benchmarks;Semantics;Syntactics;Boolean functions;Benchmark testing;Transforms;Input variables;Encoding},
 doi={10.23919/FMCAD.2019.8894269},
 ISSN={2641-8177},
-month={Oct},
+month={10},
 }
 
 @INPROCEEDINGS{AIGSolve,
@@ -136,13 +134,11 @@ author={F. {Pigorsch} and C. {Scholl}},
 booktitle={Design Automation Conference},
 title={An AIG-based QBF-solver using SAT for preprocessing},
 year={2010},
-volume={},
-number={},
 pages={170-175},
 keywords={binary decision diagrams;Boolean functions;graph theory;logic gates;AIG-based QBF-solver;SAT-solver;quantified boolean formulas;and-inverter graphs;cofactor-based quantifier elimination method;BDD;QBF preprocessing;Data structures;Boolean functions;Data preprocessing;Acceleration;Permission;Binary decision diagrams;Computer aided engineering;Algorithm design and analysis;Councils;Collaborative work;Quantified Boolean Formulas;Boolean Satisfiability},
 doi={10.1145/1837274.1837318},
 ISSN={0738-100X},
-month={June},
+month={6},
 }
 
 @InProceedings{iProver,
@@ -165,6 +161,96 @@ doi="10.1007/978-3-540-71070-7_24"
     author = {Alan Mishchenko and Satrajit Chatterjee and Robert Brayton},
     title = {FRAIGs: A unifying representation for logic synthesis and verification},
     institution = {EECS Dept., UC Berkeley},
-    month = {March},
-    year = {2005}
+    month = {3},
+    year = {2005},
+    url = {https://people.eecs.berkeley.edu/~alanmi/publications/2005/tech05_fraigs.pdf}
+}
+
+@InProceedings{HQSpre1,
+author="Wimmer, Ralf
+and Gitina, Karina
+and Nist, Jennifer
+and Scholl, Christoph
+and Becker, Bernd",
+editor="Heule, Marijn
+and Weaver, Sean",
+title="Preprocessing for DQBF",
+booktitle="Theory and Applications of Satisfiability Testing -- SAT 2015",
+year="2015",
+publisher="Springer International Publishing",
+address="Cham",
+pages="173--190",
+abstract="For SAT and QBF formulas many techniques are applied in order to reduce/modify the number of variables and clauses of the formula, before the formula is passed to the actual solving algorithm. It is well known that these preprocessing techniques often reduce the computation time of the solver by orders of magnitude. In this paper we generalize different preprocessing techniques for SAT and QBF problems to dependency quantified Boolean formulas (DQBF) and describe how they need to be adapted to work with a DQBF solver core. We demonstrate their effectiveness both for CNF- and non-CNF-based DQBF algorithms.",
+isbn="978-3-319-24318-4",
+doi="10.1007/978-3-319-24318-4_13"
+}
+
+@InProceedings{HQSpre2,
+author="Wimmer, Ralf
+and Reimer, Sven
+and Marin, Paolo
+and Becker, Bernd",
+editor="Legay, Axel
+and Margaria, Tiziana",
+title="HQSpre -- An Effective Preprocessor for QBF and DQBF",
+booktitle="Tools and Algorithms for the Construction and Analysis of Systems",
+year="2017",
+publisher="Springer Berlin Heidelberg",
+address="Berlin, Heidelberg",
+pages="373--390",
+abstract="We present our new preprocessor HQSpre, a state-of-the-art tool for simplifying quantified Boolean formulas (QBFs) and the first available preprocessor for dependency quantified Boolean formulas (DQBFs). The latter are a generalization of QBFs, resulting from adding so-called Henkin-quantifiers to QBFs. HQSpre applies most of the preprocessing techniques that have been proposed in the literature. It can be used both as a standalone tool and as a library. It is possible to tailor it towards different solver back-ends, e. g., to preserve the circuit structure of the formula when a non-CNF solver back-end is used. Extensive experiments show that HQSpre allows QBF solvers to solve more benchmark instances and is able to decide more instances on its own than state-of-the-art tools. The same impact can be observed in the DQBF domain as well.",
+isbn="978-3-662-54577-5",
+doi="10.1007/978-3-662-54577-5_21"
+}
+
+@Article{HQSpreJournal,
+  author = "Ralf Wimmer and Christoph Scholl and Bernd Becker",
+  date = "2019-07",
+  title = "The (D)QBF Preprocessor HQSpre -- Underlying Theory and Its Implementation",
+  journal = "Journal on Satisfiability, Boolean Modeling and Computation",
+  volume = "11",
+  pages = "3--52",
+  editor = "Martina Seidl and Luca Pulina",
+  issn = "1574-0617",
+  url = "http://jsatjournal.org/volumes/11/",
+  abstract = "Preprocessing turned out to be an essential step for SAT, QBF, and DQBF
+        solvers to reduce/modify the number of variables and clauses of the formula,
+        before the formula is passed to the actual solving algorithm.
+        These preprocessing techniques often reduce the computation time of the solver
+        by orders of magnitude. In this paper, we present the preprocessor HQSpre that
+        was developed for Dependency Quantified Boolean Formulas (DQBFs) and
+        generalizes different preprocessing techniques for SAT and QBF problems to DQBF.
+        We give a presentation of the underlying theory together with detailed proofs
+        as well as implementation details contributing to the efficiency of the preprocessor.
+        HQSpre has been used with obvious success by the winners of the DQBF track, and,
+        even more interestingly, the QBF tracks of QBFEVAL'18.",
+    doi="10.3233/SAT190115"
+}
+
+@InProceedings{FastDQBFRefutation,
+author="Finkbeiner, Bernd
+and Tentrup, Leander",
+editor="Sinz, Carsten
+and Egly, Uwe",
+title="Fast DQBF Refutation",
+booktitle="Theory and Applications of Satisfiability Testing -- SAT 2014",
+year="2014",
+publisher="Springer International Publishing",
+address="Cham",
+pages="243--251",
+abstract="Dependency Quantified Boolean Formulas (DQBF) extend QBF with Henkin quantifiers, which allow for non-linear dependencies between the quantified variables. This extension is useful in verification problems for incomplete designs, such as the partial equivalence checking (PEC) problem, where a partial circuit, with some parts left open as ``black boxes'', is compared against a full circuit. The PEC problem is to decide whether the black boxes in the partial circuit can be filled in such a way that the two circuits become equivalent, while respecting that each black box only observes the subset of the signals that are designated as its input. We present a new algorithm that efficiently refutes unsatisfiable DQBF formulas. The algorithm detects situations in which already a subset of the possible assignments of the universally quantified variables suffices to rule out a satisfying assignment of the existentially quantified variables. Our experimental evaluation on PEC benchmarks shows that the new algorithm is a significant improvement both over approximative QBF-based methods, where our results are much more accurate, and over precise methods based on variable elimination, where the new algorithm scales better in the number of Henkin quantifiers.",
+isbn="978-3-319-09284-3",
+doi="10.1007/978-3-319-09284-3_19"
+}
+
+@article{PSPACEsubclass,
+  doi = {10.1609/aaai.v33i01.33011584},
+  year = {2019},
+  month = {7},
+  publisher = {Association for the Advancement of Artificial Intelligence ({AAAI})},
+  volume = {33},
+  pages = {1584--1591},
+  author = {Christoph Scholl and Jie-Hong Roland Jiang and Ralf Wimmer and Aile Ge-Ernst},
+  title = {A {PSPACE} Subclass of Dependency Quantified Boolean Formulas and Its Effective Solving},
+  journal = {Proceedings of the {AAAI} Conference on Artificial Intelligence}
 }

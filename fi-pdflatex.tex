@@ -239,6 +239,7 @@ dat tu priklad nejakych formul?? a ukazat ze v akych valuaciach su splnene/nespl
 
 %definovat negation normal form + cnf
 \subsection{Conjuctive Normal Form}
+\label{sec:BF:CNF}
 To work with BFs it is usually easier to have them in some special forms. The first one we define is called conjuctive normal form.
 
 \begin{definition}
@@ -329,7 +330,7 @@ porovnat nejake OBDD s jeho ROBDD, detailne (kde sa ukaze )
 
 In the following we will use the term BDD instead of ROBDD.
 
-\chapter{The Problem and Current Solutions???? state of the art}
+\chapter{State of the Art}
 %problem - vytvorit algoritmus ktory zisti ze ci dana DQBF formula je splnitelna alebo nie pomocou BDDcok alebo jej podobnym strukturam (mozno dat do teorie)
 
 %popisat tu aj nejak historiu DQBF, akoze napriklad ten clanok s henkins qunatifiers abo daco???
@@ -359,6 +360,8 @@ However, a solver for EPR can also be used directly for DQBF. Because EPR belong
 \section{Clausal Abstraction -- dCAQE}
 Another DQBF solver called dCAQE~\cite{dCAQE} is based on clausal abstraction (mozno citovat). This solver\,---\,working again on DQBF in CNF\,---\,first puts universally and existentially quantified variables to some sets (called nodes) which are then divided into levels based on the ordering of dependencies of existential variables. The algorithm then construct for each node on each level a BF that represents which clauses in CNF it can satisfy (for existential node) or falsify (for universal node). The algorithm then builds a candidate valuation by processing each level. For each level either this valuation is extended, there is some conflict which means that the algorithm has to backtrack to some lower level and refine the abstraction or the candidate valuation is a satisfying one ending the algorithm.
 
+%odkaz na sekciu o PSPACE sublassse, ze je mozne ze tento solver nie je uplny
+
 %mozno spomenut fork splitting or some shit like that, v arXiv rozsirenej verzii maju nieco o tom v appendixe
 
 \section{Quantifier Elimination -- HQS}
@@ -381,7 +384,7 @@ The next solver is based on quantifier elimination. This solver's basic premise 
 \end{algorithmic}
 \end{algorithm}
 
-In~\cite{HQSsimpleAlg} the authors introduced the basic algorithm for solving DQBF in this way. Algorithm~\ref{alg:QE} shows simple pseudocode of this. In every step this algorithm chooses using some heuristic an universal variable to eliminate. In~\cite{HQSsimpleAlg} they used a heuristic where the universal variable is chosen based on the number of existential ones that depend on it - they choose the one that has minimal number of dependencies. After that, all the existential variables that depend on everything are also eliminated. To use this algorithm it is important to choose a good representation of the matrix of the DQBF. For this the authors chose and-inverter graphs (AIG) which are a tree-like structures where non-terminal nodes represent conjunction, terminal nodes are variables and these are connected with two types of nodes: normal ones and those that represent negation. With a proper implementation of operations they can be optimised in such a way that they reuse parts of the graphs resulting in functionally reduced AIGs~\cite{FRAIGs}.
+In~\cite{HQSsimpleAlg} the authors introduced the basic algorithm for solving DQBF in this way. (mozno spomenut ze to vlastne vymysleli aj v iDQ clanku, ako nejaky base solver ktory pouziva BDDcka) Algorithm~\ref{alg:QE} shows simple pseudocode of this. In every step this algorithm chooses using some heuristic an universal variable to eliminate. In~\cite{HQSsimpleAlg} they used a heuristic where the universal variable is chosen based on the number of existential ones that depend on it - they choose the one that has minimal number of dependencies. After that, all the existential variables that depend on everything are also eliminated. To use this algorithm it is important to choose a good representation of the matrix of the DQBF. For this the authors chose and-inverter graphs (AIG) which are a tree-like structures where non-terminal nodes represent conjunction, terminal nodes are variables and these are connected with two types of nodes: normal ones and those that represent negation. With a proper implementation of operations they can be optimised in such a way that they reuse parts of the graphs resulting in functionally reduced AIGs~\cite{FRAIGs}.
 %mozno aj tu spomenut tie theorems
 
 %MYSLIENKA K TODO - heuristika ze vyberam podla poctu zavislosti v originalnom DQBF alebo v tom co sa mi postupne po odstranovani vytvara
@@ -397,11 +400,32 @@ In~\cite{HQSdependencyElimination} the algorithm was changed a bit again. The au
 Using this the authors do not look for a set of universal variables to eliminate but for partial dependencies which removal will result in a DQBF which can be transformed into QBF. Again, they create a dependency graph which is acyclic iff DQBF can be seen as QBF. But now they create a bipartite graph whose two sets of nodes are the set of universal variables and the set of existential variables which are connected based on whether universal variable is in the dependency set of existential one. Similarly to previous, they use this graph to solve an optimization problem that encodes which dependencies to remove to get QBF which can then be solved with AIGSolve.
 %This was good and all, but in~\cite{HQSdependencyElimination} they zaoberat sa whether it is possible to remove only some universal variables from dependency sets. They showed it is possible ....tu asi dat cely ten teorem ak som ho nedal do teorie...
 
-Last but not least in~\cite{HQSquantifierLocalization} the authors have given a theorethical foundations for non-prenex DQBFs and the possibility to push quantifiers inside formulas as explained in section ????. They also showed how to remove existential quantifiers inside formulas.????????????
+Last but not least in~\cite{HQSquantifierLocalization} the authors have given a theoretical foundations for non-prenex DQBFs and the possibility to push and eliminate quantifiers inside formulas as explained in section ????. Using this they improve HQS by adding another step in the algorithm, where they first push quantifiers as much as possible into the formula, eliminate the existential variables using theorem ??? and then return the formula back to the prenex form. After this they start with elimination of universal quantifiers as was explained in previous paragraphs.
 
-\section{Preprocessing -- HQSpre}
+\section{Preprocessing}
 \label{sec:preprocessing}
-HQS solver has a succesfull run soadfnosue??? winning tu sutaz dvakrat. However, the solver partially owes its success to the effeciency of the prepropcessor. The preprocessor HQSpre is able to solve a lot of DQBFs from the go, without need for using more complex techniques. First introduced in ... it took many techniques used for QBF preprocessing and ...it to the DQBF case. asipopisat ake?? + mozno spomenut ten approximations??
+In previous sections we give an overview of techniques used for implementations of different solvers. This sections explains some techniques that are used before the actual solvers run, called fittingly preprocessing.
+
+
+%We have just gave an overiew of different solvers for DQBF. However, 
+%preprocessing pre QBF je dolezity, ergo asi je aj pre DQBF a teda je vela vyzkumu na preprocessing techniques
+
+\subsection{HQSpre}
+The first and only preprocessing engine for DQBF called HQSpre~\cite{HQSpre1,HQSpre2,HQSpreJournal} took many techniques used for QBF preprocessing and lifted them to the DQBF case. We go into details only for one technique called gate extraction. As was explained in Section~\ref{sec:BF:CNF}, transforming BF to CNF can result in polynomial increase of the size of the formula by adding new variables. Gate extraction works in opposite direction\,---\,it tries to extract this newly introduced variables and turn the formula back into one that is not in CNF. This does not mean that gate extraction works only on formulas in CNF, it can be used generally by finding ...connections????..... which makes it possible to replace a variable by some function of existing variables. However, this technique can only be used by solvers which can work on DQBFs which are not in CNF. Currently, that is only HQS. For a thorough explanation of other techniques used by HQSpre we refer the reader to~\cite{HQSpreJournal}. 
+
+\subsection{Approximations}
+Another technique which is used in some solvers as preprocessing step is to find some BF or QBF approximations which can be used with existing solvers for BFs/QBFs to potentially give us faster result about the input DQBF (satisfiability for underapproximations, unsatisfiability for overapproximations). In~\cite{HQSsimpleAlg} QBF approximations are introduced which are created by changing the dependencies of existential variables that result in QBF with the same matrix. However, these approximations can be precise only up to some level. By adding some information to these QBF overapproximation (thus changing the matrix), the authors in~\cite{FastDQBFRefutation} were able to create more and more precise QBF overapproximations. For more thorough explanation of these approximations see~\cite[Section~3]{HQSpreJournal}.
+
+\subsection{PSPACE-complete subclass}
+The last preprocessing technique is simply put just a check whether DQBF does not belong to a subclass of problems which are PSPACE-complete and if it does, it is transformed to QBF on which existing QBF solver is run. The simplest such subclass would be those DQBFs whose dependencies are linearly ordered. Then it can be easily transformed into QBF by reordering the quantifiers. In~\cite{PSPACEsubclass} the authors were investigating whether there is some another DQBF subclass which is PSPACE-complete. They show that DQBFs where the dependency sets are either equal or pairwise disjoint can be transformed into QBFs with just linear increase in size. Thus having a check on whether an input DQBF belongs to this class before running a DQBF solver can improve the efficiency.
+
+%As a note, 
+
+%If we can find a subclass that is pspace we can translate to QBF - obviously for DQBF that is already in linear order can be seen as BQF
+%QBF can be viewed as a DQBF with linearly ordered dependencies. This is enough to make it PSPACE-complete and so, in PSPACECLANOK they were interested in whether there is some another sublass of DQBF which is PSPACE-complete. They have shown that  
+%existuje classa DQBFs ktore idu iba s polynomialnym zvacsenim previest na QBF ---> patri do PSPACE a je mozne to pouzit ako preprocessing step kde ak zistime ze sme v tejto classe tak pustime QBF solver dajaky
+%As a note toto vzislo z toho, ze clanok zrobil dajaky system ktory je rozsirenie QBF systemu kde pridali fork extension pravidlo. They showed that this system is complete and sound for DQBF, however, in dCAQEclanok (ale v appendixe extended version) and PSPACEclanok ukazali ze to tak nie je (nie je complete ci co). Obe tieto clanky ukazali ze tento system je complete pre tuto PSPACE classu. Zaroven dCAQE vyuziva tento fork extension ???a zle si myslia ze tato classa je NEXPTIME??? vo svojom algoritme, takze je moznost ze ich algoritmus nefunguje pre celu classu DQBF
+
 
 % vysvetlit prve dve clanky, ze ide o jednoducho univ. expansion -> exist. elimination pouzitim AIG a pridanim nejakych zaujimavych drobnosti sa vytvori QBF ktory sa hodi do nejakeho existujuceho solvru (pridat obrazok toho cyklu + naivny alg.), tu spomenut aj preprocessor ze je vysvetleny niekde
 % potom vysvetlit ze je dolezity spravny vyber univ. kv. na expansion a vysvetlit ze v naivnom alg. to je jednoduche proste tie na ktore zavisia najviac, v tych dalsich clankoch vytvoreny dependency graf ktory sa nejak riesi, neskor sa odstranuje priamo jedna zavislost pre exist. kvantifikatory
