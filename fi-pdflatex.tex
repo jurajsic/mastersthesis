@@ -25,6 +25,7 @@
            %% `nolot` to hide the List of Tables.
   %% More options are listed in the user guide at
   %% <http://mirrors.ctan.org/macros/latex/contrib/fithesis/guide/mu/fi.pdf>.
+  color,
 ]{fithesis3}
 %% The following section sets up the locales used in the thesis.
 \usepackage[resetfonts]{cmap} %% We need to load the T2A font encoding
@@ -143,7 +144,14 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% for writing nice pseudocode...
+\usepackage{algpseudocode}
+% ...and a float wrapper for them
+\usepackage{algorithm}
+
 \usepackage{mathtools}
+
+% for \set{}
 \usepackage{braket}
 
 %% We will define several mathematical sectioning commands.
@@ -326,46 +334,73 @@ In the following we will use the term BDD instead of ROBDD.
 
 %popisat tu aj nejak historiu DQBF, akoze napriklad ten clanok s henkins qunatifiers abo daco???
 
-Having laid out all the necessary theory we can now define the problem we are trying to solve and current implementations solving it.
+%Having laid out all the necessary theory we can now define the problem we are trying to solve and current implementations solving it.
 
-\section{The Problem of Satisfiability}
-Let $\psi$ be DQBF. The problem we are trying to solve is to tell whether this formula is satisfiable, that is if there exists model in which it is true. For BF, this problem belongs to NP-complete class of problems cite. If we move to QBF, the problem gets harder and belongs to PSPACE-complete class. As was shown in CITE, this problem for DQBF belongs in NEXPTIME-complete class of problems, that is it is even harder.
+%\section{The Problem of Satisfiability}
+%Let $\psi$ be DQBF. The problem we are trying to solve is to tell whether this formula is satisfiable, that is if there exists model in which it is true. For BF, this problem belongs to NP-complete class of problems cite. If we move to QBF, the problem gets harder and belongs to PSPACE-complete class. As was shown in CITE, this problem for DQBF belongs in NEXPTIME-complete class of problems, that is it is even harder.
 
-\section{State of the Art}
+%\section{State of the Art}
 %ake solvre existuju (vybrat tie s ktorymi budem porovnavat?), trocha viac popisat HQS a ze ako funguje aj HQSpre (lebo ho pouzivam) - ale fakt len zopar veci spomenut, mozno aj to ze mozme pouzit vytvaranie log. gates pretoze to menim do BDD ako to robia v HQS
-In this section we give an overview of existing solvers which tackle the problem. An overview of existing solvers can also be found in~\cite{DQBFStateOfArtTalk,DQBFStateOfArt,DQBFStateOfArtNew} that is why we just give a short updated overview here (short for DQDPLL, iDQ, iProver and dCAQE). However we go into more details for solver HQS, because the methods we used for developing our solver are based on the workings of this solver.
+In this chapter we give an overview of existing solutions and solvers which tackle the problem. An overview of existing solvers can also be found in~\cite{DQBFStateOfArtTalk,DQBFStateOfArt,DQBFStateOfArtNew} that is why we just give a short updated overview here (short for DQDPLL, iDQ, iProver and dCAQE). However we go into more details for solver HQS, because the methods we used for developing our solver are based on the workings of this solver.
 %current solutions, that already exist
 
 %nieco o tom ze vacsina funguje na CNF, ale HQS a moje bude na NNF
 
 %fast DQBF refutation - ze premienaju na QBF abo daco (bunsat)
 
-\subsection{First Solution - DQDPLL}
+\section{First Solution - DQDPLL}
 The first solver that tackled the satisfiability problem for DQBF was based on DPLL(TODO cite) algorithm which is successfully used for BF and QBF solvers(TODO cite??). This algorithm works on formulas in CNF by searching for a satisfying assignment based on the clauses in CNF. By recursively choosing an assignment for literals and checking whether CNF stay consistent, DPLL searches trough all assignments until a satisfying one is found or all of them are decided to be unsatisfying. An adaptation called DQDPLL~\cite{DPLLalgorithm} was introduced for DQBF which extended existing solutions for QBF by adding so-called Skolem clauses which encode the dependencies between existential and universal variables. However, by doing so the algorithm becomes too slow and results in noncompetitive solver.
 
-\subsection{Instatiation - iDQ and iProver}
-The first efficient DQBF solver (called iDQ~\cite{iDQandDQDIMACS}) is based on instantiation technique used for solving Effectively Propositional Logic (EPR)(cite). This solver also works only on formulas in CNF where in each step of the algorithm it tries to create a BF $\phi$ that is an overapproximation of an input DQBF. This is done by instantiating some set of clauses, that is universal expansion is applied locally to clauses. This BF $\phi$ is then checked for satisfiability, where if $\phi$ is unsatisfiable then the input DQBF is also not satisfiable, while if it is satisfiable, it must be checked if the resulting valuation is valid for the input DQBF. If it is not, then it is used to create more clause instances which are then used to refine this overapproximation.
+\section{Instantiation -- iDQ and iProver}
+The first efficient DQBF solver, called iDQ~\cite{iDQandDQDIMACS}, is based on instantiation technique used for solving Effectively Propositional Logic (EPR)~\cite{iProver}. This solver also works only on formulas in CNF where in each step of the algorithm it tries to create a BF $\phi$ that is an overapproximation of an input DQBF. This is done by instantiating some set of clauses, that is it applies universal expansion locally to them. This BF $\phi$ is then checked for satisfiability, where if $\phi$ is unsatisfiable then the input DQBF is also not satisfiable, while if it is satisfiable, it must be checked if the resulting valuation is valid for the input DQBF. If it is not, then it is used to create more clause instances which are then used to refine this overapproximation.
 
-However, a solver for EPR can also be used directly for DQBF. Because EPR belongs to the same complexity class as DQBF, there exists a polynomial-time reduction from DQBF to EPR (cite). This is used by EPR solver iProver which transforms DQBF in CNF to EPR instance and then solves this. In the SAT competition??? it turned out that iProver is more powerful compared to iDQ.
+However, a solver for EPR can also be used directly for DQBF. Because EPR belongs to the same complexity class as DQBF, there exists a polynomial-time reduction from DQBF to EPR~\cite{iDQandDQDIMACS}. This is used by EPR solver iProver~\cite{iProver} which transforms DQBF in CNF to EPR instance and then solves this. In the SAT competition??? it turned out that iProver is more powerful compared to iDQ??
 
-\subsection{Abstraction Refinement - dCAQE}
-\cite{dCAQE} zalozene na abstraction refinement (viacmenej iDQ je tiez abstraction refinement). works on CNF. Divide quantifiers to levels based on the ordering of dependencies of existential quantifiers. The algorithm then construct for each level a BF that represents which clauses in CNF it can satisfy (for exstential level) or falsify(for universal). The algorithm then builds a candidate valuation by processing each level. For each level either this valuation is extended, or there is some conflict which means that the algorithm has to return back to some lower level and refine the abstraction????. 
+\section{Clausal Abstraction -- dCAQE}
+Another DQBF solver called dCAQE~\cite{dCAQE} is based on clausal abstraction (mozno citovat). This solver\,---\,working again on DQBF in CNF\,---\,first puts universally and existentially quantified variables to some sets (called nodes) which are then divided into levels based on the ordering of dependencies of existential variables. The algorithm then construct for each node on each level a BF that represents which clauses in CNF it can satisfy (for existential node) or falsify (for universal node). The algorithm then builds a candidate valuation by processing each level. For each level either this valuation is extended, there is some conflict which means that the algorithm has to backtrack to some lower level and refine the abstraction or the candidate valuation is a satisfying one ending the algorithm.
 
-mozno spomenut fork splitting or some shit like that, v arXiv rozsirenej verzii maju nieco o tom v appendixe
+%mozno spomenut fork splitting or some shit like that, v arXiv rozsirenej verzii maju nieco o tom v appendixe
 
-\subsection{Quanfier Elimination - HQS}
-The next solver HQS is based on quantifier elimination. This solver's basic premise is easy - it iteratively chooses some universal quantifier that is eliminated using theorem ???? and then remove all existential quantifiers that are dependent on all leftover universal quantifiers (theroem???).
+\section{Quantifier Elimination -- HQS}
+The next solver is based on quantifier elimination. This solver's basic premise is simple\,---\,it iteratively chooses some universal variable for universal expansion (theorem ???) thus eliminating it and then eliminates all existential quantifiers that are dependent on all leftover universal quantifiers using theroem???.
 %nejak vysvetlit ze pouzivaju AIG
 
-In (citeprvynaivnyalgclanok) the authors introduced the basic algorithm for solving DQBF in this way. ...vlozit algoritmus???... They first choose the blabla. The universal variable is chosen based on the number of existential ones that depend on it - they choose the maximal.
+\begin{algorithm}
+\caption{Quantifier elimination algorithm}
+\label{alg:QE}
+\begin{algorithmic}[1]
+\Function{SolveDQBF}{DQBF $\psi$ in prenex form}
+\While{$V_{\psi}^{\forall}$ is not empty}%there is some universal variable $x$ in $\psi$
+    \State choose $x$ from $V_{\psi}^{\forall}$
+    \State $\psi = \forall\text{-elimination}(x,\psi)$% universal expansion
+    \ForAll{$y \in V_{\psi}^{\exists}$ s. t. $D_y = V_{\psi}^{\forall}$} %existential variables $y$ such that they depend on all universal variables in $\psi$
+        \State $\psi = \exists\text{-elimination}(y,\psi)$% existential expansion
+    \EndFor
+\EndWhile
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
 
-Following this technique, in (citeqe) they introduce solver HQS which was enhanced by using QBF solver as subprocedure. They still eliminate quantifiers in similar fashion, but now they do it until the formula results in QBF form. On this QBF they then run already existing solver for QBF called AIG-solver(cite) which is much more optimized and effective. Universal quantifiers to eliminate are chosen in the beginning in such a way that the number of universal eliminations is small as possible while still the resulting formula is QBF. For this they build a dependency graph where nodes are existential variables and they are connected only if the dependency sets are not subsets. They noticed that if this graph is acyclic, the formula can be seen as QBF and so they solve the problem of finding minimum set of universal variables that when they are removed the graph is acyclic. For this they use MaxSAT????
+In~\cite{HQSsimpleAlg} the authors introduced the basic algorithm for solving DQBF in this way. Algorithm~\ref{alg:QE} shows simple pseudocode of this. In every step this algorithm chooses using some heuristic an universal variable to eliminate. In~\cite{HQSsimpleAlg} they used a heuristic where the universal variable is chosen based on the number of existential ones that depend on it - they choose the one that has minimal number of dependencies. After that, all the existential variables that depend on everything are also eliminated. To use this algorithm it is important to choose a good representation of the matrix of the DQBF. For this the authors chose and-inverter graphs (AIG) which are a tree-like structures where non-terminal nodes represent conjunction, terminal nodes are variables and these are connected with two types of nodes: normal ones and those that represent negation. With a proper implementation of operations they can be optimised in such a way that they reuse parts of the graphs resulting in functionally reduced AIGs~\cite{FRAIGs}.
+%mozno aj tu spomenut tie theorems
 
-This was good and all, but in (depelim) they zaoberat sa whether it is possible to remove only some universal variables from dependency sets. They showed it is possible ....tu asi dat cely ten teorem ak som ho nedal do teorie...
+%MYSLIENKA K TODO - heuristika ze vyberam podla poctu zavislosti v originalnom DQBF alebo v tom co sa mi postupne po odstranovani vytvara
 
-Last but not least in (quantlocalization) the authors have given  a theorethical foundations for non-prenex DQBFs and a possibility to push qunatifiers inside formulas. They also showed how to remove existential quantifiers inside formulas.????????????
+% bol zlepseny s tym ze pridali nejaky preprocessing, odstranovanie pure a daco vars a QBF solver ako subproceduru - dat pekny obrazok
+Following this technique,  the authors of~\cite{HQSquantifierElimination} introduced solver HQS which was enhanced by using QBF solver as a subprocedure. They still eliminate quantifiers in similar fashion, but now they do it until the formula can be transformed to QBF. On this QBF they then run already existing solver for QBF called AIGSolve~\cite{AIGSolve} which can use more effective techniques developed for QBFs. Universal quantifiers to eliminate are chosen in the beginning in such a way that the number of universal eliminations is as small as possible while still the resulting formula is QBF. For this they build a dependency graph in which nodes are existential variables where $y_i$ is connected to $y_j$ if for their dependency sets hold that $D_{y_i} \not\subseteq D_{y_j}$. They noticed that if this graph is acyclic, the formula can be seen as QBF. Furthermore, there is a cycle in this graph iff there is a simple cycle in the graph (between two nodes). They use this to create an instance of MaxSAT problem which is a problem of finding a valuation of one BF while maximizing another formula. This instance then encodes which universal variables have to be eliminated so the dependency graph becomes acyclic while minimising the number of universal variables to eliminate. After finding the set of variables to eliminate, they follow with an improved quantifier elimination algorithm. They improved it by adding a preprocessing step (see section~\ref{sec:preprocessing}), syntactic detection and elimination of special types of variables called unit and pure and already mentioned subprocedure that calls QBF solver AIGSolve.
 
-\subsection{HQSpre}
+In~\cite{HQSdependencyElimination} the algorithm was changed a bit again. The authors were interested in whether it is possible to somehow remove specific dependencies from the list of dependencies of existential variable. They have shown that it is possible at the expense of adding a new existential variable. This is similar to the already shown universal expansion (theroem???), however, by removing just one dependency we add just one new existential variable. Let for example \[\psi = \forall x_1 \dots \forall x_n \exists y_1(D_{y_1}) \dots \exists y_m(D_{y_m}) \colon \phi\] be a prenex DQBF where $\psi$ is a BF and $x_1 \in D_{y_1}$. We can now remove $x_1$ from $D_{y_1}$ by adding a copy of $y_1$ resulting in an equisatisfiable DQBF
+\begin{multline*}
+\forall x_1 \dots \forall x_n \exists y_1^0(D_{y_1} \setminus \{x_1\}) \exists y_1^1(D_{y_1} \setminus \{x_1\}) \exists y_2(D_{y_2})\dots \exists y_m(D_{y_m}) \colon \\
+\phi\left[((\neg x_1 \land y_1^0) \lor (\neg x_1 \land y_1^1))/y_1\right].
+\end{multline*}
+Using this the authors do not look for a set of universal variables to eliminate but for partial dependencies which removal will result in a DQBF which can be transformed into QBF. Again, they create a dependency graph which is acyclic iff DQBF can be seen as QBF. But now they create a bipartite graph whose two sets of nodes are the set of universal variables and the set of existential variables which are connected based on whether universal variable is in the dependency set of existential one. Similarly to previous, they use this graph to solve an optimization problem that encodes which dependencies to remove to get QBF which can then be solved with AIGSolve.
+%This was good and all, but in~\cite{HQSdependencyElimination} they zaoberat sa whether it is possible to remove only some universal variables from dependency sets. They showed it is possible ....tu asi dat cely ten teorem ak som ho nedal do teorie...
+
+Last but not least in~\cite{HQSquantifierLocalization} the authors have given a theorethical foundations for non-prenex DQBFs and the possibility to push quantifiers inside formulas as explained in section ????. They also showed how to remove existential quantifiers inside formulas.????????????
+
+\section{Preprocessing -- HQSpre}
+\label{sec:preprocessing}
 HQS solver has a succesfull run soadfnosue??? winning tu sutaz dvakrat. However, the solver partially owes its success to the effeciency of the prepropcessor. The preprocessor HQSpre is able to solve a lot of DQBFs from the go, without need for using more complex techniques. First introduced in ... it took many techniques used for QBF preprocessing and ...it to the DQBF case. asipopisat ake?? + mozno spomenut ten approximations??
 
 % vysvetlit prve dve clanky, ze ide o jednoducho univ. expansion -> exist. elimination pouzitim AIG a pridanim nejakych zaujimavych drobnosti sa vytvori QBF ktory sa hodi do nejakeho existujuceho solvru (pridat obrazok toho cyklu + naivny alg.), tu spomenut aj preprocessor ze je vysvetleny niekde
@@ -861,7 +896,7 @@ automatic tool -- such as \LaTeX MK -- all commands are executed
 automatically. When you omit the \verb"\printbibliography" command,
 its location will be decided by the template.
 
-  \printbibliography[heading=bibintoc] %% Print the bibliography.
+ % \printbibliography[heading=bibintoc] %% Print the bibliography.
 
 \chapter{Inserting the index}
 After using the \verb"\makeindex" macro and loading the

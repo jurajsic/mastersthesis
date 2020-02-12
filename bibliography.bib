@@ -69,3 +69,102 @@ isbn="978-3-030-24258-9"
   url       = {https://easychair.org/publications/paper/PRV},
   doi       = {10.29007/1s5k}
 }
+
+@INPROCEEDINGS{HQSsimpleAlg,
+author={Karina {Gitina} and Sven {Reimer} and Matthias {Sauer} and Ralf {Wimmer} and Christoph {Scholl} and Bernd {Becker}},
+booktitle={2013 IEEE 31st International Conference on Computer Design (ICCD)},
+title={Equivalence checking of partial designs using dependency quantified Boolean formulae},
+year={2013},
+volume={},
+number={},
+pages={396-403},
+keywords={Boolean functions;logic design;equivalence checking;partial designs;dependency quantified Boolean formulae;combinational circuit;linear transformation;PEC;DQBF;quantifier elimination;QBF approximations;Approximation methods;Approximation algorithms;Logic gates;Combinational circuits;Complexity theory;Algorithm design and analysis;System analysis and design},
+doi={10.1109/ICCD.2013.6657071},
+ISSN={1063-6404},
+month={Oct},
+}
+
+@INPROCEEDINGS{HQSquantifierElimination,
+author={Karina {Gitina} and Ralf {Wimmer} and Sven {Reimer} and Matthias {Sauer} and Christoph {Scholl} and Bernd {Becker}},
+booktitle={2015 Design, Automation Test in Europe Conference Exhibition (DATE)},
+title={Solving DQBF through quantifier elimination},
+year={2015},
+volume={},
+number={},
+pages={1617-1622},
+keywords={Boolean functions;computational complexity;optimisation;DQBF;dependency quantified Boolean formulas;quantifier elimination strategy;QBF solver;incomplete combinational circuit verification;NP-complete SAT problem;Logic gates;Syntactics;Benchmark testing;Inverters;Boolean functions;Automation;Europe},
+doi={10.7873/DATE.2015.0098},
+ISSN={1558-1101},
+month={March},
+}
+
+@InProceedings{HQSdependencyElimination,
+author="Wimmer, Ralf
+and Karrenbauer, Andreas
+and Becker, Ruben
+and Scholl, Christoph
+and Becker, Bernd",
+editor="Gaspers, Serge
+and Walsh, Toby",
+title="From DQBF to QBF by Dependency Elimination",
+booktitle="Theory and Applications of Satisfiability Testing -- SAT 2017",
+year="2017",
+publisher="Springer International Publishing",
+address="Cham",
+pages="326--343",
+abstract="In this paper, we propose the elimination of dependencies to convert a given dependency quantified Boolean formula (DQBF) to an equisatisfiable QBF. We show how to select a set of dependencies to eliminate such that we arrive at a smallest equisatisfiable QBF in terms of existential variables that is achievable using dependency elimination. This approach is improved by taking so-called don't-care dependencies into account, which result from the application of dependency schemes to the formula and can be added to or removed from the formula at no cost. We have implemented this new method in the state-of-the-art DQBF solver HQS. Experiments show that dependency elimination is clearly superior to the previous method using variable elimination.",
+isbn="978-3-319-66263-3",
+doi="10.1007/978-3-319-66263-3_21"
+}
+
+@INPROCEEDINGS{HQSquantifierLocalization,
+author={Aile {Ge-Ernst} and Christoph {Scholl} and Ralf {Wimmer}},
+booktitle={2019 Formal Methods in Computer Aided Design (FMCAD)},
+title={Localizing Quantifiers for DQBF},
+year={2019},
+volume={},
+number={},
+pages={184-192},
+keywords={Boolean functions;logic circuits;prenex form;quantifier localization;Boolean formulas;DQBF benchmarks;Semantics;Syntactics;Boolean functions;Benchmark testing;Transforms;Input variables;Encoding},
+doi={10.23919/FMCAD.2019.8894269},
+ISSN={2641-8177},
+month={Oct},
+}
+
+@INPROCEEDINGS{AIGSolve,
+author={F. {Pigorsch} and C. {Scholl}},
+booktitle={Design Automation Conference},
+title={An AIG-based QBF-solver using SAT for preprocessing},
+year={2010},
+volume={},
+number={},
+pages={170-175},
+keywords={binary decision diagrams;Boolean functions;graph theory;logic gates;AIG-based QBF-solver;SAT-solver;quantified boolean formulas;and-inverter graphs;cofactor-based quantifier elimination method;BDD;QBF preprocessing;Data structures;Boolean functions;Data preprocessing;Acceleration;Permission;Binary decision diagrams;Computer aided engineering;Algorithm design and analysis;Councils;Collaborative work;Quantified Boolean Formulas;Boolean Satisfiability},
+doi={10.1145/1837274.1837318},
+ISSN={0738-100X},
+month={June},
+}
+
+@InProceedings{iProver,
+author="Korovin, Konstantin",
+editor="Armando, Alessandro
+and Baumgartner, Peter
+and Dowek, Gilles",
+title="iProver -- An Instantiation-Based Theorem Prover for First-Order Logic (System Description)",
+booktitle="Automated Reasoning",
+year="2008",
+publisher="Springer Berlin Heidelberg",
+address="Berlin, Heidelberg",
+pages="292--298",
+abstract="iProver is an instantiation-based theorem prover which is based on Inst-Gen calculus, complete for first-order logic. One of the distinctive features of iProver is a modular combination of instantiation and propositional reasoning. In particular, any state-of-the art SAT solver can be integrated into our framework. iProver incorporates state-of-the-art implementation techniques such as indexing, redundancy elimination, semantic selection and saturation algorithms. Redundancy elimination implemented in iProver include: dismatching constraints, blocking non-proper instantiations and propositional-based simplifications. In addition to instantiation, iProver implements ordered resolution calculus and a combination of instantiation and ordered resolution. In this paper we discuss the design of iProver and related implementation issues.",
+isbn="978-3-540-71070-7",
+doi="10.1007/978-3-540-71070-7_24"
+}
+
+@TECHREPORT{FRAIGs,
+    author = {Alan Mishchenko and Satrajit Chatterjee and Robert Brayton},
+    title = {FRAIGs: A unifying representation for logic synthesis and verification},
+    institution = {EECS Dept., UC Berkeley},
+    month = {March},
+    year = {2005}
+}
