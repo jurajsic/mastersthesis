@@ -152,7 +152,16 @@
 \usepackage{mathtools}
 
 % for \set{}
-\usepackage{braket}
+%\usepackage{braket}
+%\newcommand{\oldset}[1]{\set{#1}}
+%\renewcommand{set}[1]{}
+\newcommand{\set}[1]{\{{#1}\}}
+
+% for semantic symbols [[ and ]]
+\usepackage{stmaryrd}
+
+% for nicer looking substitutions in formulas
+\usepackage{nicefrac}
 
 %% We will define several mathematical sectioning commands.
 \newtheorem{theorem}{Theorem}[section] %% The numbering of theorems
@@ -165,6 +174,13 @@
 \newtheorem{example}{Example}
 \theoremstyle{remark}
 \newtheorem*{remark}{Remark}
+
+% [[ #1 ]]
+\newcommand{\seman}[1]{\left\llbracket {#1} \right\rrbracket}
+% 
+\newcommand{\substitute}[2]{\left[ \nicefrac{#2}{#1} \right]}
+
+%\renewcommand{\phi}{\varphi}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -249,7 +265,7 @@ and
 \[\psi_i = l_{i1} \lor \dots \lor l_{i{m_i}}\]
 for each $i = 1, \dots, n$ and for each $l_{ij}$ where $j \in \set{1,\dots,m_i}$ either $l_{ij} = x$ or $l_{ij} = \neg x$ for some $x \in V$.
 \end{definition}
-BFs $\psi_1,\dots,\psi_n$ are called clauses and $l_ij$ are called literals. That is BF is in CNF if it is a conjuction of clauses which are disjuncts of literals, where literal is either a variable or negation of a variable.
+BFs $\psi_1,\dots,\psi_n$ are called clauses and $l_{ij}$ are called literals. That is BF is in CNF if it is a conjuction of clauses which are disjuncts of literals, where literal is either a variable or negation of a variable.
 
 \begin{example}
 priklad nejakej formule co je cnf a co neni abo daco
@@ -291,24 +307,33 @@ Quantifiers have expanded BFs quite considerably (mozno nieco ako expressibality
 
 %definicia DQBF -ak robim nonprenex tak zacat s prenex ale vysvetlit ze pre jednoduchost zacneme s tym + semantika prenex + priklady
 \begin{definition}
-Let $V = \set{x_1, \dots, x_n, y_1, \dots, y_m}$ be a set of variables and $\phi \in BF(V)$ a BF over $V$. A \emph{dependency quantified Boolean formula} (DQBF) $\psi$ has the form
-\[\psi \coloneqq \forall x_1 \dots \forall x_n \exists (D_1) y_1 \dots \exists (D_m) y_m \phi\]
-where $D_i \subseteq \set{x_1, \dots, x_n}$, $i \in \set{1,\dots,m}$, is a \emph{dependency sets} of variable $y_i$.
+  Let $V = \set{x_1, \dots, x_n, y_1, \dots, y_m}$ be a set of variables and $\phi \in BF(V)$ a BF over $V$. A \emph{dependency quantified Boolean formula} (DQBF) $\psi$ has the form
+  \[\psi \coloneqq \forall x_1 \dots \forall x_n \exists (D_1) y_1 \dots \exists (D_m) y_m \phi\]
+  where $D_i \subseteq \set{x_1, \dots, x_n}$, $i \in \set{1,\dots,m}$, is a \emph{dependency sets} of variable $y_i$.
 \end{definition}
 Let use an example to explain the meaning behind dependency sets. Let 
 \[\psi = \forall x_1 \forall x_2 \exists (x1) y_1 \exists (x_2) y_2 : (x_1 \land x_2) \iff (y1 \iff y2)\]
 be a DQBF. Both $y_1$ and $y_2$ depend only on one variable, $x_1$ and $x_2$ respectively. TODO + citovat odkial som vzal priklad
 
-tu dat nonprenex ak robim, semantika + priklady + dokazy o nahradzovani a eliminovani kvantifikatorov
+tu dat nonprenex ak robim, semantika + priklady + dokazy o nahradzovani a eliminovani kvantifikatorov - dat dokaz ze ked equality tak to ide nahradit (kvoli tomu ze maju rovnake hodnoty volnych premennych)
 
+\begin{theorem}
+  Let $\phi, \psi_1, \psi_2$ be a ??non-prenex?? DQBFs where $\psi_1$ is subformula of $\phi$ and $\psi_1 = \psi_2$. Assume that for each existential variable $y \in V_{\psi_1}^{\exists}$ the dependency set of $y$ in $\psi_1$ is equal to the dependency set of $y$ in $\psi_2$. Then it holds that $\phi = \phi\substitute{\psi_1}{\psi_2}$. 
+\end{theorem}
+\begin{proof}
+  We show that if $s \in \seman{\phi}$ then $s \in \seman{\phi\substitute{\psi_1}{\psi_2}}$ and vice versa. Notice that $V_{\phi}^{\forall} = V_{\phi\substitute{\psi_1}{\psi_2}}^{\forall}$ and $V_{\psi_1}^{\forall} = V_{\psi_2}^{\forall}$. Let $s \in \seman{\phi}$ and assume that $s \not\in \seman{\phi\substitute{\psi_1}{\psi_2}}$.  That means there exists a valuation $v\colon V_{\phi}^{\forall} \mapsto \set{0,1}$ such that $v(s(\phi)) = 1$ but $v(s(\phi\substitute{\psi_1}{\psi_2})) = 0$. Because these two formulas are the same except for the difference in $\psi_1$ and $\psi_2$ the change of evaluation has to come from the difference in evaluation of these two formulas. That is $v(s(\psi_1)) \not= v(s(\psi_2))$. If $\psi_1 = v$ for some $v \in V$, then $\psi_2 = v$ and then $v(s(\psi_1)) = v(s(\psi_2))$. This means both $\psi_1$ and $\psi_2$ are something more complex than just a variable which cannot have negation in front of it in $\phi$ (because negation can be only in front of a variable). This also means that BF $s(\phi)$ will have $s(\psi_1)$ only in sequence of conjunctions and disjunctions. But because $v(s(\phi))=1$ and $v(s(\phi\substitute{\psi_1}{\psi_2}) = 0$ where the only difference in these formulas are $s(\psi_1)$ and $s(\psi_2)$ it has to hold that $v(s(\psi_1)) = 1$ and $v(s(\psi_2)) = 0$. Let $s'$ be a restriction of $s$ on $V_{\psi_1}^{\exists} \cup V_{\psi_1}^{free}$. If $s' \in \seman{\psi_1}$ then from $\psi_1 = \psi_2$ it has to hold that $s' \in \seman{\psi_2}$ and so $v(s(\psi_2)) = 1$. This means that $s' \not\in \seman{\psi_1}$.
+\end{proof}
 
 
 \section{Binary Decision Diagrams}
+%mozno tu dat high level def. ze BDD je tree like struktura kde nodes reprezentuju variables z ktorych vychadzaju hrany reprezentujuce valuaciu pre 0 a 1
 Having defined DQBFs we can now turn our attention to their representation. We have already defined some normal forms in section blabla, but algorithmically, working with them in this form would not be very effective (why?). For this reason binary decision diagrams (BDDs) were introduced. These structures allow for a succinct representation of BFs with an effecient polynomial time implementation of logical operations.
 
 Let $V$ be a set of variables. A binary decision diagram over $V$ is a binary tree like structure with two terminal nodes 0 and 1 and a set of non-terminal nodes each representing a variable from $V$. Each non-terminal node has two child nodes with edges connecting them labeled with 0 and 1 respectively.
 
-Let $v\colon V \mapsto \{0,1\}$ be a valuation over $V$. BDD $B$ in this valuation is evaluated to 0 or 1 by moving along the edges of non-terminal nodes, where if we are in node representing variable $x \in V$, then we move along the edge labelled by $v(x)$. The resulting terminal node is then the evaluation of $B$ in $v$. BDD $B$ then represents a Boolean formula $\phi \in BF(V)$, if for each valuation $v$ it holds that $B$ is evaluated to $v(\phi)$.
+%We will give a definition of reduced ordered binary decision diagram, however we do not use that name and whenever we say BDD we mean ROBDD.
+
+Let $v\colon V \mapsto \{0,1\}$ be a valuation over $V$. BDD $B$ in this valuation is evaluated to 0 or 1 by moving along the edges of non-terminal nodes, where if we are in node representing variable $x \in V$, then we move along the edge labelled by $v(x)$. The resulting terminal node is then the evaluation of $B$ in $v$. BDD $B$ then represents a Boolean formula $\phi \in BF(V)$ if for each valuation $v$ it holds that $B$ is evaluated to $v(\phi)$.
 
 \begin{example}
 Fig. ??? shows an example of a BDD for BF ... Edges labelled by 0 are dashed???, by 1 are full??? 
@@ -329,6 +354,8 @@ porovnat nejake OBDD s jeho ROBDD, detailne (kde sa ukaze )
 \end{example}
 
 In the following we will use the term BDD instead of ROBDD.
+
+\section{And-Inverter Graphs - je ich treba rozobrat???}
 
 \chapter{State of the Art}
 %problem - vytvorit algoritmus ktory zisti ze ci dana DQBF formula je splnitelna alebo nie pomocou BDDcok alebo jej podobnym strukturam (mozno dat do teorie)
@@ -444,483 +471,7 @@ The last preprocessing technique is simply put just a check whether DQBF does no
 \chapter{Experimental results}
 grafygrafygrafy
 
-\chapter{These are}
-\section{the available}
-\subsection{sectioning}
-\subsubsection{commands.}
-\paragraph{Paragraphs and}
-\subparagraph{subparagraphs are available as well.}
-Inside the text, you can also use unnumbered lists,
-\begin{itemize}
-  \item such as
-  \item this one
-  \begin{itemize}
-    \item     and they can be nested as well.
-    \item[>>] You can even turn the bullets into something fancier,
-    \item[\S] if you so desire.
-  \end{itemize}
-\end{itemize}
-Numbered lists are
-\begin{enumerate}
-  \item very
-  \begin{enumerate}
-    \item similar
-  \end{enumerate}
-\end{enumerate}
-and so are description lists:
-\begin{description}
-  \item[Description list]
-    A list of terms with a description of each term
-\end{description}
-The spacing of these lists is geared towards paragraphs of text.
-For lists of words and phrases, the \textsf{paralist} package
-offers commands
-\begin{compactitem}
-  \item that
-  \begin{compactitem}
-    \item are
-    \begin{compactitem}
-      \item better
-      \begin{compactitem}
-        \item suited
-      \end{compactitem}
-    \end{compactitem}
-  \end{compactitem}
-\end{compactitem}
-\begin{compactenum}
-  \item to
-  \begin{compactenum}
-    \item this
-    \begin{compactenum}
-      \item kind of
-      \begin{compactenum}
-        \item content.
-      \end{compactenum}
-    \end{compactenum}
-  \end{compactenum}
-\end{compactenum}
-The \textsf{amsthm} package provides the commands necessary for the
-typesetting of mathematical definitions, theorems, lemmas and
-proofs.
-
-\begin{theorem}
-  This is a theorem that offers a profound insight into the
-  mathematical sectioning commands.
-\end{theorem}
-\begin{theorem}[Another theorem]
-  This is another theorem. Unlike the first one, this theorem has
-  been endowed with a name.
-\end{theorem}
-\begin{lemma}
-  Let us suppose that $x^2+y^2=z^2$. Then
-  \begin{equation}
-    \biggl\langle u\biggm|\sum_{i=1}^nF(e_i,v)e_i\biggr\rangle
-    =F\biggl(\sum_{i=1}^n\langle e_i|u\rangle e_i,v\biggr).
-  \end{equation}
-\end{lemma}
-\begin{proof}
-  $\nabla^2 f(x,y)=\frac{\partial^2f}{\partial x^2}+
-   \frac{\partial^2f}{\partial y^2}$.
-\end{proof}
-\begin{corollary}
-  This is a corollary.
-\end{corollary}
-\begin{remark}
-  This is a remark.
-\end{remark}
-
-\chapter{Floats and references}
-\begin{figure}
-  \begin{center}
-    %% PNG and JPG images can be inserted into the document as well,
-    %% but their resolution needs to be adequate. The minimum is
-    %% about 100 pixels per 1 centimeter or 300 pixels per 1 inch.
-    %% That means that a JPG or PNG image typeset at 4 × 4 cm should
-    %% be 400 × 400 px large at the bare minimum.
-    %%
-    %% The optimum is about 250 pixels per 1 centimeter or 600
-    %% pixels per 1 inch. That means that a JPG or PNG image typeset
-    %% at 4 × 4 cm should be 1000 × 1000 px large or larger.
-    \includegraphics[width=4cm]{fithesis/logo/mu/fithesis-base.pdf}
-  \end{center}
-  \caption{The logo of the Masaryk University at 40\,mm}
-  \label{fig:mulogo1}
-\end{figure}
-
-\begin{figure}
-  \begin{center}
-    \begin{minipage}{.66\textwidth}
-      \includegraphics[width=\textwidth]{fithesis/logo/mu/fithesis-base.pdf}
-    \end{minipage}
-    \begin{minipage}{.33\textwidth}
-      \includegraphics[width=\textwidth]{fithesis/logo/mu/fithesis-base.pdf} \\
-      \includegraphics[width=\textwidth]{fithesis/logo/mu/fithesis-base.pdf}
-    \end{minipage}
-  \end{center}
-  \caption{The logo of the Masaryk University at $\frac23$ and
-    $\frac13$ of text width}
-  \label{fig:mulogo2}
-\end{figure}
-
-\begin{table}
-  \begin{tabularx}{\textwidth}{lllX}
-    \toprule
-    Day & Min Temp & Max Temp & Summary \\
-    \midrule
-    Monday & $13^{\circ}\mathrm{C}$ & $21^\circ\mathrm{C}$ & A
-    clear day with low wind and no adverse current advisories. \\
-    Tuesday & $11^{\circ}\mathrm{C}$ & $17^\circ\mathrm{C}$ & A
-    trough of low pressure will come from the northwest. \\
-    Wednesday & $10^{\circ}\mathrm{C}$ &
-    $21^\circ\mathrm{C}$ & Rain will spread to all parts during the
-    morning. \\
-    \bottomrule
-  \end{tabularx}
-  \caption{A weather forecast}
-  \label{tab:weather}
-\end{table}
-
-The logo of the Masaryk University is shown in Figure
-\ref{fig:mulogo1} and Figure \ref{fig:mulogo2} at pages
-\pageref{fig:mulogo1} and \pageref{fig:mulogo2}. The weather
-forecast is shown in Table \ref{tab:weather} at page
-\pageref{tab:weather}. The following chapter is Chapter
-\ref{chap:matheq} and starts at page \pageref{chap:matheq}.
-Items \ref{item:star1}, \ref{item:star2}, and
-\ref{item:star3} are starred in the following list:
-\begin{compactenum}
-  \item some text
-  \item some other text
-  \item $\star$ \label{item:star1}
-  \begin{compactenum}
-    \item some text
-    \item $\star$ \label{item:star2}
-    \item some other text
-    \begin{compactenum}
-      \item some text
-      \item some other text
-      \item yet another piece of text
-      \item $\star$ \label{item:star3}
-    \end{compactenum}
-    \item yet another piece of text
-  \end{compactenum}
-  \item yet another piece of text
-\end{compactenum}
-If your reference points to a place that has not yet been typeset,
-the \verb"\ref" command will expand to \textbf{??} during the first
-run of
-\texttt{pdflatex \jobname.tex}
-and a second run is going to be needed for the references to
-resolve. With online services -- such as Overleaf -- this is
-performed automatically.
-
-\chapter{Mathematical equations}
-\label{chap:matheq}
-\TeX{} comes pre-packed with the ability to typeset inline
-equations, such as $\mathrm{e}^{ix}=\cos x+i\sin x$, and display
-equations, such as \[
-  \mathbf{A}^{-1} = \begin{bmatrix}
-  a & b \\ c & d \\
-  \end{bmatrix}^{-1} =
-  \frac{1}{\det(\mathbf{A})} \begin{bmatrix}
-  \,\,\,d & \!\!-b \\ -c & \,a \\
-  \end{bmatrix} =
-  \frac{1}{ad - bc} \begin{bmatrix}
-  \,\,\,d & \!\!-b \\ -c & \,a \\
-  \end{bmatrix}.
-\] \LaTeX{} defines the automatically numbered \texttt{equation}
-environment:
-\begin{equation}
-  \gamma Px = PAx = PAP^{-1}Px.
-\end{equation}
-The package \textsf{amsmath} provides several additional
-environments that can be used to typeset complex equations:
-\begin{enumerate}
-  \item An equation can be spread over multiple lines using the
-    \texttt{multline} environment:
-    \begin{multline}
-      a + b + c + d + e + f + b + c + d + e + f + b + c + d + e +
-f \\
-      + f + g + h + i + j + k + l + m + n + o + p + q
-    \end{multline}
-
-  \item Several aligned equations can be typeset using the
-    \texttt{align} environment:
-    \begin{align}
-              a + b &= c + d     \\
-                  u &= v + w + x \\[1ex]
-      i + j + k + l &= m
-    \end{align}
-
-  \item The \texttt{alignat} environment is similar to
-    \texttt{align}, but it doesn't insert horizontal spaces between
-    the individual columns:
-    \begin{alignat}{2}
-      a + b + c &+ d       &   &= 0 \\
-              e &+ f + g   &   &= 5
-    \end{alignat}
-
-  \item Much like chapter, sections, tables, figures, or list
-    items, equations -- such as \eqref{eq:first} and
-    \eqref{eq:mine} -- can also be labeled and referenced:
-    \begin{alignat}{4}
-      b_{11}x_1 &+ b_{12}x_2  &  &+ b_{13}x_3  &  &             &
-        &= y_1,                   \label{eq:first} \\
-      b_{21}x_1 &+ b_{22}x_2  &  &             &  &+ b_{24}x_4  &
-        &= y_2. \tag{My equation} \label{eq:mine}
-    \end{alignat}
-
-  \item The \texttt{gather} environment makes it possible to
-    typeset several equations without any alignment:
-    \begin{gather}
-      \psi = \psi\psi, \\
-      \eta = \eta\eta\eta\eta\eta\eta, \\
-      \theta = \theta.
-    \end{gather}
-
-  \item Several cases can be typeset using the \texttt{cases}
-    environment:
-    \begin{equation}
-      |y| = \begin{cases}
-        \phantom-y & \text{if }z\geq0, \\
-                -y & \text{otherwise}.
-      \end{cases}
-    \end{equation}
-\end{enumerate}
-For the complete list of environments and commands, consult the
-\textsf{amsmath} package manual\footnote{
-  See \url{http://mirrors.ctan.org/macros/latex/required/amslatex/math/amsldoc.pdf}.
-  The \texttt{\textbackslash url} command is provided by the
-  package \textsf{url}.
-}.
-
-\chapter{\textnormal{We \textsf{have} \texttt{several} \textsc{fonts}
-  \textit{at} \textbf{disposal}}}
-The serified roman font is used for the main body of the text.
-\textit{Italics are typically used to denote emphasis or
-quotations.} \texttt{The teletype font is typically used for source
-code listings.} The \textbf{bold}, \textsc{small-caps} and
-\textsf{sans-serif} variants of the base roman font can be used to
-denote specific types of information.
-
-\tiny We \scriptsize can \footnotesize also \small change \normalsize
-the \large font \Large size, \LARGE although \huge it \Huge
-is \huge usually \LARGE not \Large necessary.\normalsize
-
-A wide variety of mathematical fonts is also available, such as: \[
-  \mathrm{ABC}, \mathcal{ABC}, \mathbf{ABC}, \mathsf{ABC},
-  \mathit{ABC}, \mathtt{ABC}
-\] By loading the \textsf{amsfonts} packages, several additional
-fonts will become available: \[
-  \mathfrak{ABC}, \mathbb{ABC}
-\] Many other mathematical fonts are available\footnote{
-  See \url{http://tex.stackexchange.com/a/58124/70941}.
-}.
-
-\chapter{Using lightweight markup}
-\shorthandoff{-}
-\begin{markdown*}{%
-  hybrid,
-  definitionLists,
-  footnotes,
-  inlineFootnotes,
-  hashEnumerators,
-  fencedCode,
-  citations,
-  citationNbsps,
-}
-
-If you decide that \LaTeX{} is too wordy for some parts of your
-document, there are [packages](https://www.ctan.org/pkg/markdown
-"Markdown") that allow you to use more lightweight markup next
-to it.
-
- ![logo](fithesis/logo/mu/fithesis-base.pdf "The logo of the
-  Masaryk University")
-
-This is a bullet list. Unlike numbered lists, bulleted lists
-contain an **unordered** set of bullet points. When a bullet point
-contains multiple paragraphs, the list is typeset as follows:
-
-  * The first item of a bullet list
-
-    that spans several paragraphs,
-  * the second item of a bullet list,
-  * the third item of a bullet list.
-
-When none of the bullet points contains multiple paragraphs, the
-list has a more compact form:
-
-  * The first item of a bullet list,
-  * the second item of a bullet list,
-  * the third item of a bullet list.
-
-Unlike a bulleted list, a numbered list implies chronology or
-ordering of the bullet points. When a bullet point
-contains multiple paragraphs, the list is typeset as follows:
-
-  1. The first item of an ordered list
-
-     that spans several paragraphs,
-  2. the second item of an ordered list,
-  3. the third item of an ordered list.
-  #. If you are feeling lazy,
-  #. you can use hash enumerators as well.
-
-When none of the bullet points contains multiple paragraphs, the
-list has a more compact form:
-
-  6. The first item of an ordered list,
-  7. the second item of an ordered list,
-  8. the third item of an ordered list.
-
-Definition lists are used to provide definitions of terms. When
-a definition contains multiple paragraphs, the list is typeset
-as follows:
-
-Term 1
-
-:   Definition 1
-
-*Term 2*
-
-:   Definition 2
-
-        Some code, part of Definition 2
-
-    Third paragraph of Definition 2.
-
-When none of the bullet points contains multiple paragraphs, the
-list has a more compact form:
-
-Term 1
-:   Definition 1
-*Term 2*
-:   Definition 2
-
-Block quotations are used to include an excerpt from an external
-document in way that visually clearly separates the excerpt from
-the rest of the work:
-
-> This is the first level of quoting.
->
-> > This is nested blockquote.
->
-> Back to the first level.
-
-Footnotes are used to include additional information to the
-document that are not necessary for the understanding of the main
-text. Here is a footnote reference^[Here is the footnote.] and
-another.[^longnote]
-
-[^longnote]: Here's one with multiple blocks.
-
-    Subsequent paragraphs are indented to show that they
-belong to the previous footnote.
-
-        Some code
-
-    The whole paragraph can be indented, or just the first
-    line.  In this way, multi-paragraph footnotes work like
-    multi-paragraph list items.
-
-Citations are used to provide bibliographical references to other
-documents. This is a regular citation~[@borgman03, p. 123]. This is
-an in-text citation: @borgman03\. You can also cite several authors
-at once using both regular~[see @borgman03, p. 123; @greenberg98,
-sec.  3.2; and @thanh01] and in-text citations: @borgman03 [p.123;
-@greenberg98, sec. 3.2; @thanh01].
-
-Code blocks are used to include source code listings into the
-document:
-
-    #include <stdio.h>
-    #include <unistd.h>
-    #include <sys/types.h>
-    #include <sys/wait.h>
-    // This is a comment
-    int main(int argc, char **argv)
-    {
-        while (--c > 1 && !fork());
-        sleep(c = atoi(v[c]));
-        printf("%d\n", c);
-        wait(0);
-        return 0;
-    }
-
-There is an alternative syntax for code blocks that allows you to
-specify additional information, such as the language of the source
-code. This information can be used for syntax highlighting:
-
-``` sh
-#!/bin/sh
-fac() {
-  if [ "$1" -leq 1 ]; then
-    echo 1
-  else
-    echo $(("$1" * fac $(("$1" - 1))))
-  fi
-}
-``````````````
-
-~~~~~~ Ruby
-# Here's a way to empty an array.
-joe = [ 'eggs.', 'some', 'break', 'to', 'Have' ]
-print(joe.pop, " ") while joe.size > 0
-print "\n"
-~~~~~~
-
-\end{markdown*}
-\shorthandon{-}
-
-\chapter{Inserting the bibliography}
-After linking a bibliography data\-base files to the document using
-the \verb"\"\texttt{thesis\discretionary{-}{}{}setup\{bib\discretionary{=}{=}{=}%
-\{\textit{file1},\textit{file2},\,\ldots\,\}\}} command, you can
-start citing the entries. This is just dummy text
-\parencite{borgman03} lightly sprinkled with citations
-\parencite[p.~123]{greenberg98}. Several sources can be cited at
-once: \cite{borgman03,greenberg98,thanh01}.
-\citetitle{greenberg98} was written by \citeauthor{greenberg98} in
-\citeyear{greenberg98}. We can also produce \textcite{greenberg98}%
-\ or %% Let us define a compound command:
-\def\citeauthoryear#1{(\textcite{#1},~\citeyear{#1})}%
-\citeauthoryear{greenberg98}%
-. The full bibliographic citation is:
-\emph{\fullcite{greenberg98}}. We can easily insert a bibliographic
-citation into the footnote\footfullcite{greenberg98}.
-
-The \verb"\nocite" command will not generate any
-output\nocite{muni}, but it will insert its arguments into
-the bibliography. The \verb"\nocite{*}" command will insert all the
-records in the bibliography database file into the bibliography.
-Try uncommenting the command
-%% \nocite{*}
-and watch the bibliography section come apart at the seams.
-
-When typesetting the document for the first time, citing a
-\texttt{work} will expand to [\textbf{work}] and the
-\verb"\printbibliography" command will produce no output. It is now
-necessary to generate the bibliography by running \texttt{biber
-\jobname.bcf} from the command line and then by typesetting the
-document again twice. During the first run, the bibliography
-section and the citations will be typeset, and in the second run,
-the bibliography section will appear in the table of contents.
-
-The \texttt{biber} command needs to be executed from within the
-directory, where the \LaTeX\ source file is located. In Windows,
-the command line can be opened in a directory by holding down the
-\textsf{Shift} key and by clicking the right mouse button while
-hovering the cursor over a directory.  Select the \textsf{Open
-Command Window Here} option in the context menu that opens shortly
-afterwards.
-
-With online services -- such as Overleaf -- or when using an
-automatic tool -- such as \LaTeX MK -- all commands are executed
-automatically. When you omit the \verb"\printbibliography" command,
-its location will be decided by the template.
-
- % \printbibliography[heading=bibintoc] %% Print the bibliography.
+\printbibliography
 
 \chapter{Inserting the index}
 After using the \verb"\makeindex" macro and loading the
