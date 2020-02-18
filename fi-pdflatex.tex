@@ -34,7 +34,7 @@
   main=english, %% By using `czech` or `slovak` as the main locale
                 %% instead of `english`, you can typeset the thesis
                 %% in either Czech or Slovak, respectively.
-  english, german, russian, czech, slovak %% The additional keys allow
+  english, slovak, czech%german, russian, czech, slovak %% The additional keys allow
 ]{babel}        %% foreign texts to be typeset as follows:
 %%
 %%   \begin{otherlanguage}{german}  ... \end{otherlanguage}
@@ -177,8 +177,16 @@
 
 % [[ #1 ]]
 \newcommand{\seman}[1]{\left\llbracket {#1} \right\rrbracket}
-% 
+% substitution for formulas: [phi'/phi] - \substitute{phi}{phi'}
 \newcommand{\substitute}[2]{\left[ \nicefrac{#2}{#1} \right]}
+% the set of all boolean formulas over #1
+\newcommand{\BF}[1]{BF(#1)}
+% the set of all dependency quantified boolean formulas over #1
+\newcommand{\DQBF}[1]{DQBF(#1)}
+% the set of all valuations over #1
+\newcommand{\valtns}[1]{\mathbf{A}_V}
+% the set of all Boolean functions over #1
+\newcommand{\BFuncs}[1]{\mathbb{F}_V}
 
 %\renewcommand{\phi}{\varphi}
 
@@ -188,29 +196,6 @@
 \begin{document}
 \chapter*{Introduction}
 \addcontentsline{toc}{chapter}{Introduction}
-\begin{otherlanguage}{czech}
-Říká se, že závěrečné práce jsou vyvrcholením studia a tak jsem se
-rozhodl jednu také napsat. Pokud vše půjde podle plánu, odnesu si
-na konci semestru diplom. Držte mi palce!
-\end{otherlanguage}
-
-\begin{otherlanguage}{slovak}
-Hovorí sa, že záverečné práce sú vyvrcholením štúdia a tak som sa
-rozhodol jednu tiež napísať. Ak všetko pôjde podľa plánu, odnesiem
-si na konci semestra diplom. Držte mi palce!
-\end{otherlanguage}
-
-\begin{otherlanguage}{german}
-Man munkelt, dass die Dissertation die Krönung der Ausbildung ist.
-Deshalb habe ich mich beschlossen meine eigene zu schreiben. Wenn
-alles gut geht, bekomme ich bald ein Diplom. Wünsch mir Glück!
-\end{otherlanguage}
-
-\begin{otherlanguage}{russian}\textrussian{%
-Говорят, что тезис -- это кульминация обучения. Поэтому я и решил
-написать собственный тезис. Если всё сработает по плану, я скоро
-получу диплом. Желайте мне удачи!
-}\end{otherlanguage}
 
 \chapter{Theory}
 popisat co je DQBF (ist od BF->QBF->DQBF?), neviem ci pridavat aj nonprenex, popisat BDDs, popisat ze co je nasim problemom
@@ -235,19 +220,19 @@ Let $V = \set{x_1, \dots, x_n}$ be a set of variables. \emph{Boolean formula} (B
 \end{itemize}
 \end{definition}
 %definicia semantiky BF (+splnitelnost)
-Let $BF(V)$ be the set of all Boolean formulas over $V$ and $v\colon V \mapsto \set{0,1}$ a valuation over the set of variables $V$. We can extend this valuation to $BF(V)$%, $v\colon BF(V) \mapsto \set{0,1}$
-where
+The set of all Boolean formulas over $V$ is denoted by $\BF{V}$. A function $v\colon V \mapsto \set{0,1}$ is called a \emph{valuation} over the set of variables $V$. A set of all valuations over $V$ is denoted by $\valtns{V}$. An \emph{evaluation} of BF $\phi \in \BF{V}$ in a valuation $v \in \valtns{V}$ (denoted $v(\phi)$) is defined as %can extend this valuation to $\BF{V}$%, $v\colon \BF{V} \mapsto \set{0,1}$ where
 \begin{itemize}
-    \item for $x_i \in V$, $v(x_i)$ stays the same
-    \item $v(\phi_1 \land \phi_2) = 1$ if both $v(\phi_1) = 1$ and $v(\phi_2) = 1$, otherwise $v(\phi_1 \land \phi_2) = 0$,
-    \item $v(\phi_1 \lor \phi_2) = 1$ if either $v(\phi_1) = 1$ or $v(\phi_2) = 1$, otherwise $v(\phi_1 \lor \phi_2) = 0$ and
-    \item $v(\neg\phi) = 1$ if $v(\phi) = 0$ otherwise $v(\neg\phi) = 0$.
+    \item if $\phi = x_i$ where $x_i \in V$, then $v(\phi) = v(x_i)$,
+    \item if $\phi = \neg\phi'$, then $v(\phi) = 1$ if $v(\phi') = 0$ otherwise $v(\phi) = 0$,
+    \item if $\phi = \phi_1 \land \phi_2$, then $v(\phi) = 1$ if both $v(\phi_1) = 1$ and $v(\phi_2) = 1$, otherwise $v(\phi) = 0$ and
+    \item if $\phi = \phi_1 \lor \phi_2$, then $v(\phi) = 1$ if either $v(\phi_1) = 1$ or $v(\phi_2) = 1$, otherwise $v(\phi) = 0$.
 \end{itemize}
+Each $\psi \in \BF{V}$ represents a \emph{Boolean function} $f_{\psi}\colon \valtns{V} \mapsto \set{0,1}$ over $V$ where $f(v) = v(\psi)$. The set of all Boolean functions over $V$ is denoted by $\BFuncs{V}$.
 %We will abuse notation and use $v(\phi)$ for extended $v$????? 
 %mozno napisat ako ze ten extend nejak oznacime (napr u_v) ale ak je to jasne tak abusneme notation a budeme pod $v(\phi)$ mysliet $u_v(\phi)$
 
 
-An important notion for BFs is satisfiability. We say that BF $\phi$ over variables $V$ is satisfiable if there exists valuation $v$ over $V$ in which $\phi$ is true, that is $v(\phi) = 1$. Let $\phi_1, \phi_2 \in BF(V)$. We say that they are \emph{equivalent}, denoted $\phi_1 = \phi_2$, if for all valuations $v$ it holds that $v(\phi_1) = v(\phi_2)$. If they are either both satisfiable or they are both unsatisfiable, we call them \emph{equisatisfiable}. Notice that equisatisfiability of two formulas is just talking about their satisfiability, which means that these formulas can be over different sets of variables.
+An important notion for BFs is \emph{satisfiability}. We say that BF $\phi \in \BF{V}$ is \emph{satisfiable} if there exists valuation $v$ over $V$ in which $\phi$ is true, that is $v(\phi) = 1$. Let $\phi_1, \phi_2 \in \BF{V}$. We say that they are \emph{equivalent}, denoted $\phi_1 = \phi_2$, if for all valuations $v$ it holds that $v(\phi_1) = v(\phi_2)$. If they are either both satisfiable or they are both unsatisfiable, we call them \emph{equisatisfiable}. %Notice that equisatisfiability of two formulas is just talking about their satisfiability, which means that these formulas can be over different sets of variables.
 
 \begin{example}
 dat tu priklad nejakych formul?? a ukazat ze v akych valuaciach su splnene/nesplnene, priklad equal, equisatisfiable
@@ -259,7 +244,7 @@ dat tu priklad nejakych formul?? a ukazat ze v akych valuaciach su splnene/nespl
 To work with BFs it is usually easier to have them in some special forms. The first one we define is called conjuctive normal form.
 
 \begin{definition}
-We say that boolean formula $\phi \in BF(V)$ is in conjuctive normal form (CNF) if there exist BFs $\psi_1,\dots,\psi_n \in BF(V)$ where
+We say that boolean formula $\phi \in \BF{V}$ is in conjuctive normal form (CNF) if there exist BFs $\psi_1,\dots,\psi_n \in \BF{V}$ where
 \[\phi = \psi_1 \land \dots \land \psi_n\]
 and
 \[\psi_i = l_{i1} \lor \dots \lor l_{i{m_i}}\]
@@ -281,41 +266,80 @@ toto asi zadefinujem pre QBF/DQBF ak vobec - alebo mozno to treba fakt tu, ked b
 
 Having defined BFs, we can move to the next step on our way to defining DQBF by adding quantifiers. We add existential (${\exists}$) and universal (${\forall}$) quantifiers which will be bounded to variables. %Existential quantifier $\exists x_i$ will then tell us that at least for one of $x_i = 0$, $x_i = 1$ formula holds, while for universal quantifier $\forall x_i$ for both $x_i = 0$ and $x_i = 1$ formula holds.
 
+we give only prenex form, because the qbfs are not that important for us????????
+
 %definicia QBF (ak budem robit aj non-prenex DQBF tak rekurzivna + nahradzovanie, inak prenex)
 \begin{definition}
-Let $V$ be a set of variables and $\phi \in BF(V)$ a BF over $V$. A \emph{quantified Boolean formula} (QBF) $\psi$ has the form
+Let $V = \set{x_1,\dots,x_n}$ be a set of variables and $\phi \in \BF{V}$. A \emph{quantified Boolean formula} (QBF) $\psi$ over $V$ in closed prenex form is given by
 \[\psi \coloneqq Q_1 x_1 Q_2 x_2 \dots Q_n x_n \phi\]
-where $Q_i \in \set{{\exists}, {\forall}}$ for all $i \in \set{1,2,\dots,n}$.
+where $Q_i \in \set{{\exists}, {\forall}}$ and $x_i \in V$ are distinct for all $i \in \set{1,2,\dots,n}$.
 \end{definition}
 
+We call the variables $x_i$ such that $Q_i = \exists$ existential variables (denoted $V_{\psi}^{\exists}$) and the variables where $Q_i = \forall$ universal variables (denoted $V_{\psi}^{\forall}$). Again, we define satisfiability for QBFs, where QBF $\psi$ from the definition is satisfiable if there exist functions $s_{x}\colon x \mapsto V_{\psi}^{\forall}$ for each $x \in V_{\psi}^{\exists}$ (called Skolem functions) such that $\phi$ where every $x \in V_{\psi}^{\exists}$ is replaced by $s_x(x)$ is evaluated to $1$ in every valuation $v\colon V_{\psi}^{\forall} \mapsto \set{0,1}$.
+
 %definicia semantiky (+splnitelnost)
-Let $QBF(V)$ be the set of all quantified Boolean formulas over $V$ and $v\colon V \mapsto \set{0,1}$ a valuation over the set of variables $V$. Again, we can extend $v$ to $QBF(V)$ where 
-\begin{itemize}
-    \item for $\phi \in BF(V)$, $v(\phi)$ behaves like $v$ extended to $BF(V)$ as explained in section TODO
-    \item $v(\forall x Q_2 x_2 \dots Q_n x_n \phi) = 1$ if both $v(Q_2 x_2 \dots Q_n x_n \phi) = 1$ and ... TODO definovat nahrazdovanie + doplnit do definicie BF 1 a 0 konstanty
-\end{itemize}
+%Let $Q\BF{V}$ be the set of all quantified Boolean formulas over $V$ and $v\colon V \mapsto \set{0,1}$ a valuation over the set of variables $V$. Again, we can extend $v$ to $Q\BF{V}$ where 
+%\begin{itemize}
+%    \item for $\phi \in \BF{V}$, $v(\phi)$ behaves like $v$ extended to $\BF{V}$ as explained in section TODO
+%    \item $v(\forall x Q_2 x_2 \dots Q_n x_n \phi) = 1$ if both $v(Q_2 x_2 \dots Q_n x_n \phi) = 1$ and ... TODO definovat nahrazdovanie + doplnit do definicie BF 1 a 0 konstanty
+%\end{itemize}
 %mozno pisat skor ze pre \psi z QBF, v(psi) je definovana pre tvar \psi = itemize ...
 %definovat bounded
-Notice that in this definition of semantics the variables that are bounded with some quantifier do not care what they are evaluated to. That is priklad It can be seen that if addded $\exists x$ to unbounded variables $x$ to the beginning of any QBF, we would not need any valuation etcetc
+%Notice that in this definition of semantics the variables that are bounded with some quantifier do not care what they are evaluated to. That is priklad It can be seen that if addded $\exists x$ to unbounded variables $x$ to the beginning of any QBF, we would not need any valuation etcetc
 
-We can also define satisfiability on QBF, similarly to BF. We say that QBF $\psi$ is satisfiable if there exists valuation $v$ such that $v(\psi) = 1$.
+%We can also define satisfiability on QBF, similarly to BF. We say that QBF $\psi$ is satisfiable if there exists valuation $v$ such that $v(\psi) = 1$.
 
 priklad
 
 \section{Dependency Quantified Boolean Formulas}
-Quantifiers have expanded BFs quite considerably (mozno nieco ako expressibality???). However, there is still one drawback of QBFs - quantified variable $x$ depends on all variables that are quantified before $x$. The problem with this dependency relation is that it is given by how quantifiers follow each other. vysvetlit na priklade z predchadzajucej sekcie But what if we want nonlinear dependencies? And what would they even mean? This is where dependency quantified Boolean formulas will shine!
+Quantifiers have expanded BFs quite considerably (mozno nieco ako expressibality???). However, there is still one drawback of QBFs - quantified variable $x$ depends on all variables that are quantified before $x$. The problem with this dependency relation is that it is given by how quantifiers follow each other. vysvetlit na priklade z predchadzajucej sekcie But what if we want nonlinear dependencies? And what would they even mean? This is where dependency quantified Boolean formulas (DQBFs) will shine!
+
+DQBFs allow existential variables to be non-linearly dependent on the set of universal variables. That is the dependency set of each existential variable is explicitly given in the formula. This set is then used as a support set of the skolem function for the existential variable which allows for richer expresiability???? of DQBFs over QBFs.  
+
+We start with the definition of DQBFs in prenex normal form on which we explain the basic notions and then we give definition of DQBFs in non-prenex negation normal form which allows quantifiers inside formulas. Following this we give theorems that show which DQBFs are equisatisfiable and can be replaced with each other which results in
+\begin{itemize}
+    \item pushing quantifiers inside formula,
+    \item elimination of quantified variables or
+    \item ????removal of universal variables from the dependency sets of existential variables.????
+\end{itemize}
+
+\subsection{Prenex Normal Form}
+The first form called prenex normal form is an anallogy of the prenex normal form of QBFs.
 
 %definicia DQBF -ak robim nonprenex tak zacat s prenex ale vysvetlit ze pre jednoduchost zacneme s tym + semantika prenex + priklady
 \begin{definition}
-  Let $V = \set{x_1, \dots, x_n, y_1, \dots, y_m}$ be a set of variables and $\phi \in BF(V)$ a BF over $V$. A \emph{dependency quantified Boolean formula} (DQBF) $\psi$ has the form
-  \[\psi \coloneqq \forall x_1 \dots \forall x_n \exists (D_1) y_1 \dots \exists (D_m) y_m \phi\]
+  Let $V = \set{x_1, \dots, x_n, y_1, \dots, y_m}$ be a set of variables and $\phi \in \BF{V}$ a BF over $V$. A \emph{dependency quantified Boolean formula} (DQBF) $\psi$ in prenex normal form is given by
+  \[\psi \coloneqq \forall x_1 \dots \forall x_n \exists y_1 (D_1) \dots \exists y_m (D_m) \phi\]
   where $D_i \subseteq \set{x_1, \dots, x_n}$, $i \in \set{1,\dots,m}$, is a \emph{dependency sets} of variable $y_i$.
 \end{definition}
+We call the BF $\phi$ the matrix of $\psi$ and .. the quantifier prefix of $\psi$. 
+
+\begin{example}
 Let use an example to explain the meaning behind dependency sets. Let 
 \[\psi = \forall x_1 \forall x_2 \exists (x1) y_1 \exists (x_2) y_2 : (x_1 \land x_2) \iff (y1 \iff y2)\]
 be a DQBF. Both $y_1$ and $y_2$ depend only on one variable, $x_1$ and $x_2$ respectively. TODO + citovat odkial som vzal priklad
+\end{example}
 
+\subsection{Negation Normal Form}
 tu dat nonprenex ak robim, semantika + priklady + dokazy o nahradzovani a eliminovani kvantifikatorov - dat dokaz ze ked equality tak to ide nahradit (kvoli tomu ze maju rovnake hodnoty volnych premennych)
+
+In this section we give a definition of normal form of DQBF that is non-prenex. This allows quantifiers inside the formula however, negation is only allowed in front of variables. This restriction stems from the fact that prenex DQBFs are not syntactically closed under negation (cite ten clanok)???? This form can be then used better elimination of variables???pushin quantifiers inside formula???? ido not know. This definition is from~\cite{HQSquantifierLocalization}.
+
+\begin{definition}
+  Let $V$ be the set of variables. The set $\DQBF{V}$ of \emph{DQBFs in negation normal form} over $V$ as well as their existential, universal and free variables are defined by ... The set $\DQBF{V}$ is defined to be the smallest set satisfying these rules. We set $V_{\psi} = V...$  A DQBF in negation normal form has one of these forms
+  \begin{itemize}
+      \item $v$, where $v \in V$
+      \item $\neg v$, where $v \in V$
+      \item $\exists v(D_v):$
+  \end{itemize}
+\end{definition}
+
+povedat ze prenex je len nnf kde matica je prevedena do nnf (asi dat sekciu nnf pre BF)
+
+dat definiciu semantiky
+
+
+\subsection{Substitution Theorems/ Elimination Theorems/ ???}
 
 \begin{theorem}
   Let $\phi, \psi_1, \psi_2$ be a ??non-prenex?? DQBFs where $\psi_1$ is subformula of $\phi$ and $\psi_1 = \psi_2$. Assume that for each existential variable $y \in V_{\psi_1}^{\exists}$ the dependency set of $y$ in $\psi_1$ is equal to the dependency set of $y$ in $\psi_2$. Then it holds that $\phi = \phi\substitute{\psi_1}{\psi_2}$. 
@@ -333,7 +357,7 @@ Let $V$ be a set of variables. A binary decision diagram over $V$ is a binary tr
 
 %We will give a definition of reduced ordered binary decision diagram, however we do not use that name and whenever we say BDD we mean ROBDD.
 
-Let $v\colon V \mapsto \{0,1\}$ be a valuation over $V$. BDD $B$ in this valuation is evaluated to 0 or 1 by moving along the edges of non-terminal nodes, where if we are in node representing variable $x \in V$, then we move along the edge labelled by $v(x)$. The resulting terminal node is then the evaluation of $B$ in $v$. BDD $B$ then represents a Boolean formula $\phi \in BF(V)$ if for each valuation $v$ it holds that $B$ is evaluated to $v(\phi)$.
+Let $v\colon V \mapsto \{0,1\}$ be a valuation over $V$. BDD $B$ in this valuation is evaluated to 0 or 1 by moving along the edges of non-terminal nodes, where if we are in node representing variable $x \in V$, then we move along the edge labelled by $v(x)$. The resulting terminal node is then the evaluation of $B$ in $v$. BDD $B$ then represents a Boolean formula $\phi \in \BF{V}$ if for each valuation $v$ it holds that $B$ is evaluated to $v(\phi)$.
 
 \begin{example}
 Fig. ??? shows an example of a BDD for BF ... Edges labelled by 0 are dashed???, by 1 are full??? 
@@ -444,7 +468,7 @@ The first and only preprocessing engine for DQBF called HQSpre~\cite{HQSpre1,HQS
 Another technique which is used in some solvers as preprocessing step is to find some BF or QBF approximations which can be used with existing solvers for BFs/QBFs to potentially give us faster result about the input DQBF (satisfiability for underapproximations, unsatisfiability for overapproximations). In~\cite{HQSsimpleAlg} QBF approximations are introduced which are created by changing the dependencies of existential variables that result in QBF with the same matrix. However, these approximations can be precise only up to some level. By adding some information to these QBF overapproximation (thus changing the matrix), the authors in~\cite{FastDQBFRefutation} were able to create more and more precise QBF overapproximations. For more thorough explanation of these approximations see~\cite[Section~3]{HQSpreJournal}.
 
 \subsection{PSPACE-complete subclass}
-The last preprocessing technique is simply put just a check whether DQBF does not belong to a subclass of problems which are PSPACE-complete and if it does, it is transformed to QBF on which existing QBF solver is run. The simplest such subclass would be those DQBFs whose dependencies are linearly ordered. Then it can be easily transformed into QBF by reordering the quantifiers. In~\cite{PSPACEsubclass} the authors were investigating whether there is some another DQBF subclass which is PSPACE-complete. They show that DQBFs where the dependency sets are either equal or pairwise disjoint can be transformed into QBFs with just linear increase in size. Thus having a check on whether an input DQBF belongs to this class before running a DQBF solver can improve the efficiency.
+The last preprocessing technique is simply put just a check whether DQBF does not belong to a subclass of problems which are PSPACE-complete and if it does, it is transformed to QBF on which existing QBF solver is run. The simplest such subclass would be those DQBFs whose dependencies are linearly ordered. Then it can be easily transformed into QBF by reordering the quantifiers. In~\cite{PSPACEsubclass} the authors investigated whether there is some another DQBF subclass which is PSPACE-complete. They show that DQBFs where the dependency sets are either equal or pairwise disjoint can be transformed into QBFs with just linear increase in size. Thus having a check on whether an input DQBF belongs to this class before running a DQBF solver and if it does transforming it into QBF and running a QBF solver can improve the efficiency.
 
 %As a note, 
 
