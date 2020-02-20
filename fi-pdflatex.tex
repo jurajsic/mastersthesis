@@ -163,6 +163,12 @@
 % for nicer looking substitutions in formulas
 \usepackage{nicefrac}
 
+% for writing out rules of DQBF in NNF
+\usepackage{ebproof}
+
+% for writing left aligned text in figures
+%\usepackage{caption}
+
 %% We will define several mathematical sectioning commands.
 \newtheorem{theorem}{Theorem}[section] %% The numbering of theorems
                                %% will be reset after each section.
@@ -182,11 +188,18 @@
 % the set of all boolean formulas over #1
 \newcommand{\BF}[1]{BF(#1)}
 % the set of all dependency quantified boolean formulas over #1
-\newcommand{\DQBF}[1]{DQBF(#1)}
+\newcommand{\DQBF}[1]{\mathbf{\Phi}_{#1}^{\text{\tiny dnnf}}}
 % the set of all valuations over #1
 \newcommand{\valtns}[1]{\mathbf{A}_V}
 % the set of all Boolean functions over #1
 \newcommand{\BFuncs}[1]{\mathbb{F}_V}
+
+% the set of existential variables for formula #1
+\newcommand{\evars}[1]{V_{#1}^{\exists}}
+% the set of universal variables for formula #1
+\newcommand{\uvars}[1]{V_{#1}^{\forall}}
+% the set of free variables for formula #1
+\newcommand{\fvars}[1]{V_{#1}^{\text{free}}}
 
 %\renewcommand{\phi}{\varphi}
 
@@ -219,6 +232,7 @@ Let $V = \set{x_1, \dots, x_n}$ be a set of variables. \emph{Boolean formula} (B
     \item $\neg\phi$, where $\phi$ is a Boolean formula.
 \end{itemize}
 \end{definition}
+TODO: substitucia (i.e. $\phi\substitute{x}{0}$)
 %definicia semantiky BF (+splnitelnost)
 The set of all Boolean formulas over $V$ is denoted by $\BF{V}$. A function $v\colon V \mapsto \set{0,1}$ is called a \emph{valuation} over the set of variables $V$. A set of all valuations over $V$ is denoted by $\valtns{V}$. An \emph{evaluation} of BF $\phi \in \BF{V}$ in a valuation $v \in \valtns{V}$ (denoted $v(\phi)$) is defined as %can extend this valuation to $\BF{V}$%, $v\colon \BF{V} \mapsto \set{0,1}$ where
 \begin{itemize}
@@ -227,12 +241,12 @@ The set of all Boolean formulas over $V$ is denoted by $\BF{V}$. A function $v\c
     \item if $\phi = \phi_1 \land \phi_2$, then $v(\phi) = 1$ if both $v(\phi_1) = 1$ and $v(\phi_2) = 1$, otherwise $v(\phi) = 0$ and
     \item if $\phi = \phi_1 \lor \phi_2$, then $v(\phi) = 1$ if either $v(\phi_1) = 1$ or $v(\phi_2) = 1$, otherwise $v(\phi) = 0$.
 \end{itemize}
-Each $\psi \in \BF{V}$ represents a \emph{Boolean function} $f_{\psi}\colon \valtns{V} \mapsto \set{0,1}$ over $V$ where $f(v) = v(\psi)$. The set of all Boolean functions over $V$ is denoted by $\BFuncs{V}$.
+Each $\psi \in \BF{V}$ represents a \emph{Boolean function} $f_{\psi}\colon \valtns{V} \mapsto \set{0,1}$ over $V$ where $f_{\psi}(v) = v(\psi)$. The set of all Boolean functions over $V$ is denoted by $\BFuncs{V}$.
 %We will abuse notation and use $v(\phi)$ for extended $v$????? 
 %mozno napisat ako ze ten extend nejak oznacime (napr u_v) ale ak je to jasne tak abusneme notation a budeme pod $v(\phi)$ mysliet $u_v(\phi)$
 
 
-An important notion for BFs is \emph{satisfiability}. We say that BF $\phi \in \BF{V}$ is \emph{satisfiable} if there exists valuation $v$ over $V$ in which $\phi$ is true, that is $v(\phi) = 1$. Let $\phi_1, \phi_2 \in \BF{V}$. We say that they are \emph{equivalent}, denoted $\phi_1 = \phi_2$, if for all valuations $v$ it holds that $v(\phi_1) = v(\phi_2)$. If they are either both satisfiable or they are both unsatisfiable, we call them \emph{equisatisfiable}. %Notice that equisatisfiability of two formulas is just talking about their satisfiability, which means that these formulas can be over different sets of variables.
+An important notion for BFs is \emph{satisfiability}. We say that BF $\phi \in \BF{V}$ is \emph{satisfiable} if there exists valuation $v$ over $V$ in which $\phi$ is true, that is $v(\phi) = 1$. Let $\phi_1, \phi_2 \in \BF{V}$. We say that they are \emph{equivalent}, denoted $\phi_1 = \phi_2$, if for all valuations $v$ it holds that $v(\phi_1) = v(\phi_2)$. If they are either both satisfiable or they are both unsatisfiable, we call them \emph{equisatisfiable}, denoted $\phi_1 \approx \phi_2$. %Notice that equisatisfiability of two formulas is just talking about their satisfiability, which means that these formulas can be over different sets of variables.
 
 \begin{example}
 dat tu priklad nejakych formul?? a ukazat ze v akych valuaciach su splnene/nesplnene, priklad equal, equisatisfiable
@@ -259,8 +273,14 @@ priklad nejakej formule co je cnf a co neni abo daco
 For every BF $\phi$ there exists an equivalent formula in CNF which can be exponentially larger than $\phi$. However, there exists a construction that by adding some new variables results in an equisatisfiable BF $\phi_{CNF}$ which is only polynomially larger than the original BF $\phi$ (citedacotu).
 %TODO explain clause, literal...
 
-\subsection{Negation ci jak sa to vola Normal Form????}
-toto asi zadefinujem pre QBF/DQBF ak vobec - alebo mozno to treba fakt tu, ked budem chciet hovorit ze HQSpre meni formulu????
+\subsection{Negation Normal Form}
+\label{sec:BF:NNF}
+We say that BF $\phi$ is in negation normal form (NNF) if negation occurs only in front of the variable. Each BF $\phi$ can be easily transformed into an equivalent BF $\phi'$ by applying these two rules:
+\begin{itemize}
+    \item $\neg(\phi_1 \land \phi_2) = \neg\phi_1 \lor \neg\phi_2$ 
+    \item $\neg(\phi_1 \lor \phi_2) = \neg\phi_1 \land \neg\phi_2$.
+\end{itemize}
+%toto asi zadefinujem pre QBF/DQBF ak vobec - alebo mozno to treba fakt tu, ked budem chciet hovorit ze HQSpre meni formulu????
 
 \section{Quantified Boolean Formulas}
 
@@ -275,7 +295,13 @@ Let $V = \set{x_1,\dots,x_n}$ be a set of variables and $\phi \in \BF{V}$. A \em
 where $Q_i \in \set{{\exists}, {\forall}}$ and $x_i \in V$ are distinct for all $i \in \set{1,2,\dots,n}$.
 \end{definition}
 
-We call the variables $x_i$ such that $Q_i = \exists$ existential variables (denoted $V_{\psi}^{\exists}$) and the variables where $Q_i = \forall$ universal variables (denoted $V_{\psi}^{\forall}$). Again, we define satisfiability for QBFs, where QBF $\psi$ from the definition is satisfiable if there exist functions $s_{x}\colon x \mapsto V_{\psi}^{\forall}$ for each $x \in V_{\psi}^{\exists}$ (called Skolem functions) such that $\phi$ where every $x \in V_{\psi}^{\exists}$ is replaced by $s_x(x)$ is evaluated to $1$ in every valuation $v\colon V_{\psi}^{\forall} \mapsto \set{0,1}$.
+We call the variables $x_i$ such that $Q_i = \exists$ existential variables (denoted $V_{\psi}^{\exists}$) and the variables where $Q_i = \forall$ universal variables (denoted $V_{\psi}^{\forall}$). To each variable $x_i$ we assign a level (denoted $l(x_i)$), 
+
+Again, we define satisfiability. Usually satisfiability for QBFs is defined trough valuation as in BFs case where evaluation of QBFs follow the same rules as BFs with two newly added rules for quantifiers:
+\begin{itemize}
+    \item 
+\end{itemize}
+We follow different but equal definition based on skolemization??? ??which is better when we want to define DQBFs???? A QBF $\psi$ from the definition is satisfiable if for each $x \in V_{\psi}^{\exists}$ there exist a function $s_{x}\colon x \mapsto V_{\psi}^{\forall}$ (called Skolem functions) such that $\phi$ where every $x \in V_{\psi}^{\exists}$ is replaced by $s_x(x)$ is evaluated to $1$ in every valuation $v\colon V_{\psi}^{\forall} \mapsto \set{0,1}$.
 
 %definicia semantiky (+splnitelnost)
 %Let $Q\BF{V}$ be the set of all quantified Boolean formulas over $V$ and $v\colon V \mapsto \set{0,1}$ a valuation over the set of variables $V$. Again, we can extend $v$ to $Q\BF{V}$ where 
@@ -292,9 +318,9 @@ We call the variables $x_i$ such that $Q_i = \exists$ existential variables (den
 priklad
 
 \section{Dependency Quantified Boolean Formulas}
-Quantifiers have expanded BFs quite considerably (mozno nieco ako expressibality???). However, there is still one drawback of QBFs - quantified variable $x$ depends on all variables that are quantified before $x$. The problem with this dependency relation is that it is given by how quantifiers follow each other. vysvetlit na priklade z predchadzajucej sekcie But what if we want nonlinear dependencies? And what would they even mean? This is where dependency quantified Boolean formulas (DQBFs) will shine!
+Quantifiers have expanded the expressibility of BFs quite considerably. However, there is still one drawback of QBFs --- quantified variable $x$ depends on all variables that are quantified before $x$ in the formula. The question arises whether it is possible to give a definition of formula where the dependency relation is somehow explicitly given. This results in a definition/???? of dependency quantified Boolean formulas (DQBFs).
 
-DQBFs allow existential variables to be non-linearly dependent on the set of universal variables. That is the dependency set of each existential variable is explicitly given in the formula. This set is then used as a support set of the skolem function for the existential variable which allows for richer expresiability???? of DQBFs over QBFs.  
+DQBFs allow existential variables to be non-linearly dependent on the set of universal variables by explicitly writing out the set of universal variables on which each existential variable is dependent. This set is then used as a support set of the skolem functions of the existential variables which allows for richer expresiability???? of DQBFs over QBFs.  
 
 We start with the definition of DQBFs in prenex normal form on which we explain the basic notions and then we give definition of DQBFs in non-prenex negation normal form which allows quantifiers inside formulas. Following this we give theorems that show which DQBFs are equisatisfiable and can be replaced with each other which results in
 \begin{itemize}
@@ -304,42 +330,163 @@ We start with the definition of DQBFs in prenex normal form on which we explain 
 \end{itemize}
 
 \subsection{Prenex Normal Form}
-The first form called prenex normal form is an anallogy of the prenex normal form of QBFs.
+The first definition of DQBF form called prenex normal form is an analogy of the prenex normal form of QBFs.
+
 
 %definicia DQBF -ak robim nonprenex tak zacat s prenex ale vysvetlit ze pre jednoduchost zacneme s tym + semantika prenex + priklady
 \begin{definition}
-  Let $V = \set{x_1, \dots, x_n, y_1, \dots, y_m}$ be a set of variables and $\phi \in \BF{V}$ a BF over $V$. A \emph{dependency quantified Boolean formula} (DQBF) $\psi$ in prenex normal form is given by
+  Let $V = \set{x_1, \dots, x_n, y_1, \dots, y_m}$ be a set of variables and $\phi \in \BF{V}$ a BF over $V$. A \emph{dependency quantified Boolean formula} (DQBF) $\psi$ in prenex normal form (PNF) is given by
   \[\psi \coloneqq \forall x_1 \dots \forall x_n \exists y_1 (D_1) \dots \exists y_m (D_m) \phi\]
-  where $D_i \subseteq \set{x_1, \dots, x_n}$, $i \in \set{1,\dots,m}$, is a \emph{dependency sets} of variable $y_i$.
+  where $D_i \subseteq \set{x_1, \dots, x_n}$ for each $i \in \set{1,\dots,m}$ is a \emph{dependency set} of variable $y_i$.
 \end{definition}
 We call the BF $\phi$ the matrix of $\psi$ and .. the quantifier prefix of $\psi$. 
+
+QBFs in PNF can be seen as a special case of DQBFs in PNF where the dependency sets are linearly ordered. That is for each two dependency sets $D_{y_1}$ and $D_{y_2}$ in QBFs it holds either $D_{y_1} = D_{y_2}$ or $D_{y_1} \subseteq D_{y_2}$ or $D_{y_2} \subseteq D_{y_1}$.
 
 \begin{example}
 Let use an example to explain the meaning behind dependency sets. Let 
 \[\psi = \forall x_1 \forall x_2 \exists (x1) y_1 \exists (x_2) y_2 : (x_1 \land x_2) \iff (y1 \iff y2)\]
-be a DQBF. Both $y_1$ and $y_2$ depend only on one variable, $x_1$ and $x_2$ respectively. TODO + citovat odkial som vzal priklad
+be a DQBF. Both $y_1$ and $y_2$ depend only on one variable, $x_1$ and $x_2$ respectively. This DQBF can be seen as a game  vysvetlit to ako hru kde existential variables chcu splnit formulu, a universal chcu zablokovat TODO + citovat odkial som vzal priklad
 \end{example}
 
+With the example in mind, we define satisfiability for DQBF in PNF similarly to how satisfiability is defined for QBFs. 
+
 \subsection{Negation Normal Form}
-tu dat nonprenex ak robim, semantika + priklady + dokazy o nahradzovani a eliminovani kvantifikatorov - dat dokaz ze ked equality tak to ide nahradit (kvoli tomu ze maju rovnake hodnoty volnych premennych)
+%tu dat nonprenex ak robim, semantika + priklady + dokazy o nahradzovani a eliminovani kvantifikatorov - dat dokaz ze ked equality tak to ide nahradit (kvoli tomu ze maju rovnake hodnoty volnych premennych)
 
 In this section we give a definition of normal form of DQBF that is non-prenex. This allows quantifiers inside the formula however, negation is only allowed in front of variables. This restriction stems from the fact that prenex DQBFs are not syntactically closed under negation (cite ten clanok)???? This form can be then used better elimination of variables???pushin quantifiers inside formula???? ido not know. This definition is from~\cite{HQSquantifierLocalization}.
 
-\begin{definition}
-  Let $V$ be the set of variables. The set $\DQBF{V}$ of \emph{DQBFs in negation normal form} over $V$ as well as their existential, universal and free variables are defined by ... The set $\DQBF{V}$ is defined to be the smallest set satisfying these rules. We set $V_{\psi} = V...$  A DQBF in negation normal form has one of these forms
-  \begin{itemize}
-      \item $v$, where $v \in V$
-      \item $\neg v$, where $v \in V$
-      \item $\exists v(D_v):$
-  \end{itemize}
-\end{definition}
 
-povedat ze prenex je len nnf kde matica je prevedena do nnf (asi dat sekciu nnf pre BF)
+\begin{figure}[p]
+    \renewcommand{\arraystretch}{2}
+    %\begin{centering}
+    \begin{tabular}{cccc}
+        rule & $V_{.}^{\exists}$ & $V_{.}^{\forall}$ & $V_{.}^{\text{free}}$\\\hline
+        {\begin{prooftree}
+            \hypo{v \in V}
+            \infer1{v \in \DQBF{V}}
+        \end{prooftree}}
+        & $\emptyset$ & $\emptyset$ & $\set{v}$\\[5mm]
+        {\begin{prooftree}
+            \hypo{v \in V}
+            \infer1{\neg v \in \DQBF{V}}
+        \end{prooftree}}
+        & $\emptyset$ & $\emptyset$ & $\set{v}$\\[5mm]
+        {\begin{prooftree}
+            \hypo{\psi_1 \in \DQBF{V}}
+            \hypo{\psi_2 \in \DQBF{V}}
+            \hypo{(\ref{disconjrule})}
+            \infer3{(\psi_1 \land \psi_2) \in \DQBF{V}}
+        \end{prooftree}}
+        & $V_{\psi_1}^{\exists} \cup V_{\psi_2}^{\exists}$ & $V_{\psi_1}^{\forall} \cup V_{\psi_2}^{\forall}$ & $V_{\psi_1}^{\text{free}} \cup V_{\psi_2}^{\text{free}}$\\[5mm] 
+        {\begin{prooftree}
+            \hypo{\psi_1 \in \DQBF{V}}
+            \hypo{\psi_2 \in \DQBF{V}}
+            \hypo{(\ref{disconjrule})}
+            \infer3{(\psi_1 \lor \psi_2) \in \DQBF{V}}
+        \end{prooftree}}
+        & $V_{\psi_1}^{\exists} \cup V_{\psi_2}^{\exists}$ & $V_{\psi_1}^{\forall} \cup V_{\psi_2}^{\forall}$ & $V_{\psi_1}^{\text{free}} \cup V_{\psi_2}^{\text{free}}$\\[5mm]
+        {\begin{prooftree}
+            \hypo{\psi \in \DQBF{V}}
+            \hypo{v \not\in \evars{\psi} \cup \uvars{\psi}}
+            \hypo{(\ref{existrule})}
+            \infer3{\exists v(D_v):\psi^{-v} \in \DQBF{V}}
+        \end{prooftree}}
+        & $\evars{\psi} \cup \set{v}$ & $\uvars{\psi}$ & $\fvars{\psi}$ \\[5mm]
+        {\begin{prooftree}
+            \hypo{\psi \in \DQBF{V}}
+            \hypo{v \not\in \evars{\psi} \cup \uvars{\psi}}
+            \infer2{\forall v:\psi \in \DQBF{V}}
+        \end{prooftree}}
+        & $\evars{\psi}$ & $\uvars{\psi} \cup \set{v}$ & $\fvars{\psi}$\\[5mm]
+    \end{tabular}
+    %\end{centering}
+    \flushleft{where (\ref{disconjrule}) refers to}
+    \begin{multline}
+        \tag{1} \label{disconjrule}
+        (\evars{\psi_1} \cup \uvars{\psi_1}) \cap (\evars{\psi_2} \cup \uvars{\psi_2}) = \emptyset \land \fvars{\psi_1} \cap (\evars{\psi_2} \cup \uvars{\psi_2}) = \emptyset\\
+        \land \fvars{\psi_2} \cap (\evars{\psi_1} \cup \uvars{\psi_1}) = \emptyset
+    \end{multline}
+    \flushleft{and (\ref{existrule}) refers to}
+    \begin{equation}
+        \tag{2} \label{existrule}
+        D_v \subseteq V \setminus (\evars{\psi} \cup \uvars{\psi} \cup \set{v})
+    \end{equation}
+    \caption{Rules defining the syntax of DQBFs in NNF}
+    \label{fig:DQBFrules}
+\end{figure}
+
+\begin{definition}
+  Let $V$ be the set of variables. The set $\DQBF{V}$ of \emph{DQBFs in negation normal form} (NNF) over $V$ as well as their existential, universal and free variables are defined by Figure~\ref{fig:DQBFrules} The set $\DQBF{V}$ is defined to be the smallest set satisfying these rules. We set $V_{\psi} = \evars{\psi}\cup\uvars{\psi}\cup\fvars{\psi}$.
+\end{definition}
+Notice that each DQBF $\psi$ in PNF can be transformed into DQBF $\psi'$ in NNF by transforming the matrix of $\psi$ to NNF as explained in Section~\ref{sec:BF:NNF}.
+TODO: substitution (ze nahradzujem aj inside dependency sets???? - mozno nie, mozno len odkaz pri theorem o localization)
+
+%povedat ze prenex je len nnf kde matica je prevedena do nnf (asi dat sekciu nnf pre BF)
 
 dat definiciu semantiky
 
 
 \subsection{Substitution Theorems/ Elimination Theorems/ ???}
+Now that we have defined DQBFs we can give ...some... theorems/results??? which show the equisatisfiability of different DQBFs which can result in simplification of DQBFs. These results can be then used for developing a DQBF solver which can tell whether an input DQBF is satisfiable or not.
+
+%quantifier localization + dokaz o tom ze vieme to robit ako podformule (pre ten velky theorem kde to nezrobili, pre ten dalsi to netreba)
+
+The first two theorems show when it is possible to push (or extract) quantifiers inside the formula. The first theorem is from~\cite[Theorem 3]{HQSquantifierLocalization} where ... is replaced by ... from~\cite[Theorem 4]{HQSquantifierLocalization}
+
+\begin{theorem}[{\cite[Theorem 3,4]{HQSquantifierLocalization}}]
+  Let ${\diamond} \in \set{{\land},{\lor}}$ and $\psi,\psi_1,\psi_2 \in \DQBF{V}$. We assume that $x'$ and $y'$ are fresh variables, which do not occur in $\psi,\psi_1$ and $\psi_2$. The following equivalences and equisatifiabilities hold for all DQBFs in NNF:
+  \begin{align}
+      \forall x : \psi &\approx \psi \text{, if } x \not\in V_{\psi} \\
+      \forall x : (\psi_1 \land \psi_2) &\approx (\forall x : \psi_1) \land (\forall x' : \psi_2\substitute{x}{x'}) \\
+      \exists y(D_y) : (\psi_1 \lor \psi_2) &\approx (\exists y(D_y) : \psi_1) \lor (\exists y'(D_y) : \psi_2\substitute{y}{y'}) \\
+      \forall x : (\psi_1 \diamond \psi_2) &\approx (\psi_1^{-x} \diamond (\forall x : \psi_2)) \text{, if } x \not\in V_{\psi_1} \\
+      \exists y(D_y) : (\psi_1 \diamond \psi_2) &= (\psi_1 \diamond (\exists y(D_y) : \psi_2)) \text{, if } y \not\in V_{\psi_1} \\
+      \exists y_1(D_{y_1})\exists y_2(D_{y_2}) : \psi &= \exists y_2(D_{y_2}) \exists y_1(D_{y_1}) : \psi \\
+      \forall x_1\forall x_2 : \psi &= \forall x_2\forall x_1 : \psi \\
+      \forall x\exists y(D_y) : \psi &= \exists y(D_y)\forall x : \psi\text{, if } x \not\in D_y.
+  \end{align}
+\end{theorem}
+
+The next theorem shows that if DQBFs from the previous theorem occur as subformulas of DQBF $\psi$ they can be replaced without changing the satisfiability of $\psi$.
+
+??????
+\begin{theorem}
+  Let $\psi \in \DQBF{V}$ and $\psi_1, \psi_2$ are the formulas from previous theorem on ???each?? side of the same equality???? where $\psi_1$ is subformula of $\psi$. Again, we assume that $x'$ and $y'$ are fresh variables which do not occur in $\psi$. Then $\psi$ is equisatisfiable to $\psi'$ which results from $\psi$ where $\psi_1$ is replaced by $\psi_2$.
+\end{theorem}
+??????
+
+%quantifier elimination
+%\begin{itemize}
+%    \item universal expansion + dokaz ze vieme robit ako podformule
+%    \item existential elimination - len povedat a odkazat sa na clanok kde je dokaz
+%\end{itemize}
+
+The next two theorems give a possibility to eliminate both universal and existential quantifiers. Universal quantifiers can be eliminated always, however, by doing it the resulting DQBF can contain new copies of existential variables.
+
+\begin{theorem}[Universal Expansion]
+  Let $\psi, \psi_1 \in \DQBF{V}$ such that $\forall x : \psi_1$ is a subformula of $\psi$. Let $\psi_2$ be a DQBF that results from $\psi_1$ by substituting each $y \in V_{\psi_1}^{\exists}$ such that $x \in D_y$ with a new variable $y' \not\in V_{\psi}$ where $D_{y'} = D_y$. Then $\psi \approx \psi'$ where $\psi'$ results from $\psi$ by replacing the subformula $\forall x : \psi$ by $\psi_1^{-x}\substitute{x}{0} \land \psi_2^{-x}\substitute{x}{1}$.
+\end{theorem}
+\begin{example}
+We give an example of universal expansion. TODO
+\end{example}
+\begin{proof}
+  proof toho
+\end{proof}
+
+The conditions when existential elimination is possible are more convoluted:
+
+\begin{theorem}[{\cite[Theorem 5]{HQSquantifierLocalization}}]
+  Let $\psi, \psi_1 \in \DQBF{V}$ such that $\exists y(D_y) : \psi_1$ is a subformula of $\psi$ where $\psi_1$ does not include any quantification and includes only variables from $D_y \cap V_{\psi}^{\text{free}} \cap \set{y' \in V_{\psi}^{\exists} | D_y' \subseteq D_y}$. Then $\psi \approx \psi'$ where $\psi'$ results from $\psi$ by replacing the subformula $\exists y(D_y) : \psi_1$ by $\psi_1\substitute{y}{0} \lor \psi_1\substitute{y}{1}$.
+\end{theorem}
+\begin{example}
+We give an example of existential quantification. TODO
+\end{example}
+
+dependency elimination - jedine ak to budem pouzivat, treba potom aj dokaz ze to funguje pre podformule - inak je to spomenute pri state of art
+
+veci k zamysleniu - zrobit vseobecny dokaz alebo pre kazdu vec zvlast + ake priklady dat, asi dat priklad ku kazdej vete??
+
 
 \begin{theorem}
   Let $\phi, \psi_1, \psi_2$ be a ??non-prenex?? DQBFs where $\psi_1$ is subformula of $\phi$ and $\psi_1 = \psi_2$. Assume that for each existential variable $y \in V_{\psi_1}^{\exists}$ the dependency set of $y$ in $\psi_1$ is equal to the dependency set of $y$ in $\psi_2$. Then it holds that $\phi = \phi\substitute{\psi_1}{\psi_2}$. 
@@ -495,50 +642,29 @@ The last preprocessing technique is simply put just a check whether DQBF does no
 \chapter{Experimental results}
 grafygrafygrafy
 
+\chapter*{Conclusion}
+\addcontentsline{toc}{chapter}{Conclusion}
+
 \printbibliography
 
-\chapter{Inserting the index}
-After using the \verb"\makeindex" macro and loading the
-\texttt{makeidx} package that provides additional indexing
-commands, index entries can be created by issuing the \verb"\index"
-command. \index{dummy text|(}It is possible to create ranged index
-entries, which will encompass a span of text.\index{dummy text|)}
-To insert complex typographic material -- such as $\alpha$
-\index{alpha@$\alpha$} or \TeX{} \index{TeX@\TeX} --
-into the index, you need to specify a text string, which will
-determine how the entry will be sorted. It is also possible to
-create hierarchal entries. \index{vehicles!trucks}
-\index{vehicles!speed cars}
+%\chapter{Inserting the index}
+%After using the \verb"\makeindex" macro and loading the
+%\texttt{makeidx} package that provides additional indexing
+%commands, index entries can be created by issuing the \verb"\index"
+%command. \index{dummy text|(}It is possible to create ranged index
+%entries, which will encompass a span of text.\index{dummy text|)}
+%To insert complex typographic material -- such as $\alpha$
+%\index{alpha@$\alpha$} or \TeX{} \index{TeX@\TeX} --
+%into the index, you need to specify a text string, which will
+%determine how the entry will be sorted. It is also possible to
+%create hierarchal entries. \index{vehicles!trucks}
+%\index{vehicles!speed cars}
 
-After typesetting the document, it is necessary to generate the
-index by running
-\begin{center}%
-  \texttt{texindy -I latex -C utf8 -L }$\langle$\textit{locale}%
-  $\rangle$\texttt{ \jobname.idx}
-\end{center}
-from the command line, where $\langle$\textit{locale}$\rangle$
-corresponds to the main locale of your thesis -- such as
-\texttt{english}, and then typesetting the document again.
-
-The \texttt{texindy} command needs to be executed from within the
-directory, where the \LaTeX\ source file is located. In Windows,
-the command line can be opened in a directory by holding down the
-\textsf{Shift} key and by clicking the right mouse button while
-hovering the cursor over a directory. Select the \textsf{Open Command
-Window Here} option in the context menu that opens shortly
-afterwards.
-
-With online services -- such as Overleaf -- the commands are
-executed automatically, although the locale may be erroneously
-detected, or the \texttt{makeindex} tool (which is only able to
-sort entries that contain digits and letters of the English
-alphabet) may be used instead of \texttt{texindy}. In either case,
-the index will be ill-sorted.
-
-  \makeatletter\thesis@blocks@clear\makeatother
-  \phantomsection %% Print the index and insert it into the
-  \addcontentsline{toc}{chapter}{\indexname} %% table of contents.
-  \printindex
+%index:
+%  \makeatletter\thesis@blocks@clear\makeatother
+%  \phantomsection %% Print the index and insert it into the
+%  \addcontentsline{toc}{chapter}{\indexname} %% table of contents.
+%  \printindex
 
 \appendix %% Start the appendices.
 \chapter{An appendix}
