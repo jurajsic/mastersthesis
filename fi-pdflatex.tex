@@ -57,8 +57,8 @@
     advisor       = Jan Strej\v{c}ek,
     title         = {Solving DQBF using BDDs},
     TeXtitle      = {Solving DQBF using BDDs},
-    keywords      = {DQBF, BDD, solver},
-    TeXkeywords   = {DQBF, BDD, solver},
+    keywords      = {dependency quantified Boolean formula, DQBF, binary decision diagram, BDD, satisfiability, solver},
+    TeXkeywords   = {dependency quantified Boolean formula, DQBF, binary decision diagram, BDD, satisfiability, solver},
     abstract      = {%
       This is the abstract of my thesis, which can
 
@@ -207,6 +207,12 @@
 % the set of free variables for formula #1
 \newcommand{\fvars}[1]{V_{#1}^{\text{free}}}
 
+% support set of boolean function #1
+\newcommand{\supp}[1]{\text{supp}(#1)}
+
+% set of skolem function candidates for formula #1
+\newcommand{\Scands}[1]{\mathbb{S}_{#1}}
+
 %\renewcommand{\phi}{\varphi}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -249,7 +255,7 @@ A function $v\colon V \to \set{0,1}$ is called a \emph{valuation} over the set o
     \item if $\phi = (\phi_1 \land \phi_2)$, then $v(\phi) = 1$ if both $v(\phi_1) = 1$ and $v(\phi_2) = 1$, otherwise $v(\phi) = 0$ and
     \item if $\phi = (\phi_1 \lor \phi_2$), then $v(\phi) = 1$ if either $v(\phi_1) = 1$ or $v(\phi_2) = 1$, otherwise $v(\phi) = 0$.
 \end{itemize}
-Each $\psi \in \BF{V}$ represents a \emph{Boolean function} over $V$ $f_{\psi}\colon \valtns{V} \to \set{0,1}$ such that $f_{\psi}(v) = v(\psi)$. The set of all Boolean functions over $V$ is denoted by $\BFuncs{V}$. TODO: definovat support set???
+Each $\phi \in \BF{V}$ represents a \emph{Boolean function} $f_{\phi}\colon \valtns{V} \to \set{0,1}$ over $V$ such that $f_{\phi}(v) = v(\phi)$. The set of all Boolean functions over $V$ is denoted by $\BFuncs{V}$. The \emph{support set} $\supp{f}$ of Boolean function $f$ is defined as the set of variables occurring in a BF $\phi$ where from all the BFs representing $f$, $\phi$ has the smallest number of variables occurring in it. That is, the variables that are not in the support set do not change the output value of $f$.
 %We will abuse notation and use $v(\phi)$ for extended $v$????? 
 %mozno napisat ako ze ten extend nejak oznacime (napr u_v) ale ak je to jasne tak abusneme notation a budeme pod $v(\phi)$ mysliet $u_v(\phi)$
 
@@ -376,7 +382,7 @@ TODO: asi povedat ze PCNF je DQBF in PNF kde BF je in CNF
 \subsection{Negation Normal Form}
 %tu dat nonprenex ak robim, semantika + priklady + dokazy o nahradzovani a eliminovani kvantifikatorov - dat dokaz ze ked equality tak to ide nahradit (kvoli tomu ze maju rovnake hodnoty volnych premennych)
 
-In this section we give a definition of normal form of DQBF that is non-prenex. This allows quantifiers inside the formula. However, negation is only allowed in front of variables. This restriction stems from the fact that prenex DQBFs are not syntactically closed under negation~\cite{NegationOfDQBFs}, therefore negation in front of some quantified subformula would make no sense. This form also allows free variables, that is variables which are not bounded by any quantifier. can be then used for better elimination of variables???pushin quantifiers inside formula???? ido not know. This section is based on~\cite{HQSquantifierLocalization}.
+In this section we give a definition of normal form of DQBF that is non-prenex. This allows quantifiers inside the formula. However, negation is only allowed in front of variables. This restriction stems from the fact that prenex DQBFs are not syntactically closed under negation~\cite{NegationOfDQBFs}, therefore negation in front of some quantified subformula would make no sense. This form also allows free variables, that is variables which are not bounded by any quantifier. can be then used for better elimination of variables???pushin quantifiers inside formula???? ido not know. The definitions in this section are from~\cite{HQSquantifierLocalization}.
 
 
 \begin{figure}[htp]
@@ -461,26 +467,29 @@ Notice that each DQBF $\psi$ in PNF can be transformed into DQBF $\psi'$ in NNF 
 By $\psi\substitute{\psi_1}{\psi_2}$ where $\psi, \psi_1, \psi_2 \in \DQBF{V}$ we denote DQBF formula in which every occurence of $\psi_1$ in $\psi$ is replaced by $\psi_2$ except for the occurence of $\psi_1$ in dependency sets. If both $\psi_1, \psi_2 \in V$, then $\psi_1$ is replaced by $\psi_2$ even in dependency sets of $\psi$.
 
 %dat definiciu semantiky
-Definition of satisfiability of DQBF in NNF follows the same way as in previous section but now we have to decide what to do with free variables. In non-prenex case of QBFs, free variables are usually assumed to be existential variables with quantifiers at the beginning of the formula. In DQBF case this would mean that free variables have empty dependency sets so the definition  follows this reasoning???? To have easier time with proofs we define semantics of DQBFs as a set of Skolem functions satisfying the formula.??? definition of semantics???? is a bit more convoluted. We first define Skolem function candidates from which we choose the set of 
+Definition of satisfiability of DQBF in NNF follows the same way as in previous section but now we have to decide what to do with free variables. In non-prenex case of QBFs, free variables are usually assumed to be existential variables with quantifiers at the beginning of the formula. In DQBF case this would mean that free variables have empty dependency sets so the definition needs to take care of that. We first define Skolem function candidates which are possible candidates fulfilling conditions set by dependency sets. Then, to have vyjadrovaci prostriedok k dokazom, we define \emph{semantics} of DQBFs in NNF as the set of Skolem function candidates which satisfy the formula.% follows this reasoning???? To have easier time with proofs we define semantics of DQBFs as a set of Skolem functions satisfying the formula.??? definition of semantics???? is a bit more convoluted. We first define Skolem function candidates from which we choose the set of 
 
-musim to zrobit jak v tom clanku, len asi lepsie povedat co je support set???
 
-\begin{itemize}
-    \item zadefinovat pre kazdu variable skolem function candidates (proste pre free hadzu len do 0,1, pre exist hadzu do prieniku dependency a universal)
-    \item zadefinovat skolem function ako $s(v) = s_v(v)$ kde plati ze ak nahradim vsetky free a exist za $s(v)$ tak dostanem tautologiu
-\end{itemize}
 
-\begin{definition}[Skolem Functions Candidates]
-  
+\begin{definition}[Skolem Function Candidates]
+  Let $\psi \in \DQBF{V}$. We say that function $s\colon \evars{\psi} \fvars{\psi} \to \BFuncs{\uvars{\psi}}$ is a \emph{Skolem function candidate} of $\psi$ if
+  \begin{itemize}
+      \item $\supp{s(v)} \subseteq (D_v \cap \fvars{\psi})$ for all $v \in \evars{\psi}$ and
+      \item $\supp{s(v)} = \emptyset$ for all $v \in \fvars{\psi}$, i.e. $s(v)=0$ or $s(v)=1$.
+  \end{itemize}
 \end{definition}
-
-\begin{definition}
-  Let $\psi \in \DQBF{V}$. We say that $\psi$ is satisfiable if it holds that for each $y \in \evars{\psi}$ with dependency set $D_y$ there exist a Skolem function $s_y $
+The set of all Skolem function candidates of $\psi$ is denoted $\Scands{\psi}$. If $s \in \Scands{\psi}$ we write $s(\psi)$ for the formula that results from $\psi$ by replacing each existential and free variable $v$ by a BF that represents $s(v)$ and ommiting all quantifiers from $\psi$. This results in a BF containing only variables from $\uvars{\psi}$.
+\begin{example}
+dat jednoduchy DQBF a ukazat skolem function candidates a ukazat co je $s(\psi)$
+\end{example}
+\begin{definition}[Semantics]
+  Let $\psi \in \DQBF{V}$. We define the \emph{semantics} $\seman{\psi}$ of $\psi$ as follows:
+  \[\seman{\psi} = \set{s \in \Scands{\psi} | v(s(\psi))=1 \text{ for all } v \in \valtns{\uvars{\psi}}}.\]
+  Formula $\psi$ is \emph{satisfiable} if $\seman{\psi} \not= \emptyset$. The elements of $\seman{\psi}$ are called \emph{Skolem functions} for $\psi$.
 \end{definition}
-
-\begin{definition}[big skolem function???]
-  zadefinovat ako hlavnu skolem function $s(v) = s_v(v)$ Skolem function $s_{\psi}$ of $\psi$ is a mapping from free and existential variables to skolem function candidates of each variable (i.e. ) such that if we replace variables with $s()$
-\end{definition}
+\begin{example}
+ukazat ze ktore su skolem functions z previous prikladu
+\end{example}
 
 \subsection{Substitution Theorems/ Elimination Theorems/ ???}
 Now that we have defined DQBFs we can give ...some... theorems/results??? which show the equisatisfiability of different DQBFs which can result in simplification of DQBFs. These results can be then used for developing a DQBF solver which can tell whether an input DQBF is satisfiable or not.
@@ -530,11 +539,11 @@ The next two theorems give a possibility to eliminate both universal and existen
 We give an example of universal expansion. TODO
 \end{example}
 \begin{proof}
-  First notice that each $y \in E_x$ must be entirely inside $\psi_1$ (even the ''$\exists y$'' bit). This stems from the way the set $\DQBF{V}$ is constructed; the dependency sets of new existential variables can only be formed from free or completely new variables and if ''$\exists y$'' was outside $\forall x :\psi_1$, then $x \in D_y$ would have to be a free or new variable. We now prove that $\seman{\psi} \not= \emptyset$ iff $\seman{\psi'} \not= \emptyset$.
+  First notice that each $y \in E_x$ must be entirely inside $\psi_1$ (even the ''$\exists y$'' bit). This stems from the way the set $\DQBF{V}$ is constructed; the dependency sets of new existential variables can only be formed from free or completely new variables and if ''$\exists y$'' was outside $\forall x :\psi_1$, then $x \in D_y$ would have to be a free or new variable. With that we can now prove that $\seman{\psi} \not= \emptyset$ iff $\seman{\psi'} \not= \emptyset$.
   
   First we prove that if $\seman{\psi} \not= \emptyset$, then $\seman{\psi'} \not= \emptyset$. Let $s \in \seman{\psi}$. We build a Skolem function $s'$ for $\psi'$. For all $y \in (\evars{\psi} \setminus E_x)$ set $s'(y) = s(y)$. For $y \in E_x$ and its copy $y' \in \evars{\psi_2}$ we set $s'(y) = s_{x=0}(y)$ and $s'(y') = s_{x=1}(y)$ where $s_{x=0}(y)$ and $s_{x=1}(y)$ denote Boolean functions that behave like $s(y)$ where $x$ is set to $0$ or $1$ respectively. Then $s'$ is a Skolem function candidate of $\psi'$. We now have to prove that BF $s'(\psi')$ is true in all valuations over $\uvars{\psi'}$. Notice that $\uvars{\psi'} = \uvars{\psi} \setminus \set{x}$. Let $v$ be one such valuation and denote $v_{x\mapsto0}$ and $v_{x\mapsto1}$ valuations over $\uvars{\psi}$ such that $v(x') = v_{x\mapsto0}(x') = v_{x\mapsto1}(x')$ for $x' \in \uvars{\psi'}$, $v_{x\mapsto0}(x) = 0$ and $v_{x\mapsto1}(x) = 1$. Because $s \in \seman{\psi}$, it has to hold that $v_{x\mapsto0}(s(\psi)) = v_{x\mapsto1}(s(\psi)) = 1$. Also, the only difference in $s(\psi)$ and $s(\psi')$ is in $s(\forall x:\psi_1)$ and $s'(\xi)$. Therefore, if $v_{x\mapsto0}(s(\forall x:\psi_1)) = v_{x\mapsto1}(s(\forall x:\psi_1))$, then $v(s'(\xi))$ is equal to that and so $v(s'(\psi')) = 1$. If $v_{x\mapsto0}(s(\forall x:\psi_1)) \not= v_{x\mapsto1}(s(\forall x:\psi_1))$ then $v(s'(\xi))$ is equal to one of them but because in both $v_{x\mapsto0}$ and $v_{x\mapsto1}$ the formula $s(\psi)$ evaluates to 1 it has to hold that $s'(\psi')$ evaluates to 1 in $v$.
   
-  Now we prove the other direction. Let $s' \in \seman{\psi'}$. We build a Skolem function $s$ for $\psi$. For all $y \in (\evars{\psi} \setminus E_x)$ set $s(y) = s'(y)$. For $y \in E_x$ with a copy $y' \in \evars{\psi_2}$ we set $s(y)$ to Boolean function that is represented by BF $(\neg x \land s'(y)) \lor (x \land s'(y'))$ where $s'(y)$ and $s'(y')$ are replaced with BFs representing them. It is obviously a Skolem function candidate thus we need to prove that $s(\psi)$ is true in all valuations. Let $v$ be a valuation over $\uvars{\psi}$. By $v_{x=0}$ and $v_{x=1}$ we denote valuations over $\uvars{\psi'}$ where 
+  Now we prove the other direction. Let $s' \in \seman{\psi'}$. We build a Skolem function $s$ for $\psi$. For all $y \in (\evars{\psi} \setminus E_x)$ we set $s(y) = s'(y)$. For $y \in E_x$ with a copy $y' \in \evars{\psi_2}$ we set $s(y)$ to Boolean function that is represented by BF $(\neg x \land s'(y)) \lor (x \land s'(y'))$ where $s'(y)$ and $s'(y')$ are replaced with BFs representing them. It is obviously a Skolem function candidate thus we need to prove that $s(\psi)$ is true in all valuations. Let $v$ be a valuation over $\uvars{\psi}$. Without loss of generality assume that $v(x) = 0$. Then $v(s(y)) = (\neg 0 \land s'(y)) \lor (0 \land s'(y')) = s'(y)$. This means that $v(s(\forall x : \psi_1)) = v(s(\psi_1^{-x}\substitute{x}{0}))$. Therefore if $v(s'(\xi)) = 1$ then $v(s(\forall x : \psi_1)) = 1$. Because $\psi'$ is in NNF, $s'(\xi)$ occurs in $s'(\psi')$ in a tree of ${\land}$ and ${\lor}$ operations. However, from assumption we know that $v(s'(\psi')) = 1$. Therefore if $v(s'(\xi)) = 0$ it does not matter, $v(s'(\psi'))$ would be true even if $v(s'(\xi)) = 1$. Also $s(\psi)$ and $s'(\psi')$ differs only in $s(\forall x : \psi_1)$ and $s'(\xi)$ part, therefore $v(s(\psi))$ must be equal to 1. 
 \end{proof}
 
 \begin{remark}
