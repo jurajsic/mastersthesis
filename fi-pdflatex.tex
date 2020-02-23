@@ -213,6 +213,9 @@
 % set of skolem function candidates for formula #1
 \newcommand{\Scands}[1]{\mathbb{S}_{#1}}
 
+% logical equality (like \lor or \land)
+\newcommand{\lequal}{\Leftrightarrow}
+
 %\renewcommand{\phi}{\varphi}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -337,16 +340,16 @@ dat priklad jednoducheho qbf ukazat ze je sat v klasickej def a ukazat ze aka sk
 %We can also define satisfiability on QBF, similarly to BF. We say that QBF $\psi$ is satisfiable if there exists valuation $v$ such that $v(\psi) = 1$.
 
 \section{Dependency Quantified Boolean Formulas}
-Quantifiers have expanded the expressibility of BFs quite considerably. However, there is still one drawback of QBFs --- quantified variable $x$ depends on all variables that are quantified before $x$ in the formula. The question arises whether it is possible to give a definition of formula where the dependency relation is somehow explicitly given. This results in a definition/???? of dependency quantified Boolean formulas (DQBFs).
+Quantifiers have expanded the expressibility of BFs quite considerably. However, there is still one drawback of QBFs --- quantified variable $x$ depends on all variables that are quantified before $x$ in the formula. The question arises whether it is possible to give a definition of formula where the dependency relation is somehow explicitly given. This results in a definition of dependency quantified Boolean formulas (DQBFs).
 
-DQBFs allow existential variables to be non-linearly dependent on the set of universal variables by explicitly writing out the set of universal variables on which each existential variable is dependent. This set is then used as a support set of the skolem functions of the existential variables which allows for richer expresiability???? of DQBFs over QBFs.  
+DQBFs allow existential variables to be non-linearly dependent on the set of universal variables by explicitly writing out the set of universal variables on which each existential variable is dependent. This set is then used as a support set of the skolem functions of the existential variables which allows for richer expresibility of DQBFs over QBFs.  
 
-We start with the definition of DQBFs in prenex normal form on which we explain the basic notions and then we give definition of DQBFs in non-prenex negation normal form which allows quantifiers inside formulas. Following this we give theorems that show which DQBFs are equisatisfiable and can be replaced with each other which results in
-\begin{itemize}
-    \item pushing quantifiers inside formula,
-    \item elimination of quantified variables or
-    \item ????removal of universal variables from the dependency sets of existential variables.????
-\end{itemize}
+We start with the definition of DQBFs in prenex normal form on which we explain the basic notions and then we give definition of DQBFs in non-prenex negation normal form which allows quantifiers inside formulas. Following this we give theorems that show which DQBFs are equisatisfiable and can be replaced with each other which results in pushing quantifiers inside formula and their elimination.
+%\begin{itemize}
+%    \item pushing quantifiers inside formula,
+%    \item elimination of quantified variables or
+%    \item ????removal of universal variables from the dependency sets of existential variables.????
+%\end{itemize}
 
 \subsection{Prenex Normal Form}
 The first definition of DQBF form called prenex normal form is an analogy of the prenex normal form of QBFs.
@@ -361,9 +364,11 @@ The first definition of DQBF form called prenex normal form is an analogy of the
 \end{definition}
 We call the BF $\phi$ the \emph{matrix} of $\psi$ and .. the \emph{quantifier prefix} of $\psi$. We also call variables from $\evars{\psi} = \set{y_1,\dots,y_m}$ \emph{existential} and variables from $\uvars{\psi} = \set{x_1,\dots,x_n}$ \emph{universal}.
 
+
+
 \begin{example}
-Let use an example from ....cite... to explain the meaning behind dependency sets. Let 
-\[\psi = \forall x_1 \forall x_2 \exists (x1) y_1 \exists (x_2) y_2 : (x_1 \land x_2) \iff (y1 \iff y2)\]
+Let use an example from~\cite{DQBFProofSystem} to explain the meaning behind dependency sets. Let 
+\[\psi = \forall x_1 \forall x_2 \exists y_1 (x_1) \exists y_2 (x_2) : (x_1 \land x_2) \lequal (y_1 \lequal y_2)\]
 be a DQBF. Both $y_1$ and $y_2$ depend only on one variable, $x_1$ and $x_2$ respectively. This DQBF can be seen as a game  vysvetlit to ako hru kde existential variables chcu splnit formulu, a universal chcu zablokovat TODO + citovat odkial som vzal priklad
 \end{example}
 
@@ -382,7 +387,8 @@ TODO: asi povedat ze PCNF je DQBF in PNF kde BF je in CNF
 \subsection{Negation Normal Form}
 %tu dat nonprenex ak robim, semantika + priklady + dokazy o nahradzovani a eliminovani kvantifikatorov - dat dokaz ze ked equality tak to ide nahradit (kvoli tomu ze maju rovnake hodnoty volnych premennych)
 
-In this section we give a definition of normal form of DQBF that is non-prenex. This allows quantifiers inside the formula. However, negation is only allowed in front of variables. This restriction stems from the fact that prenex DQBFs are not syntactically closed under negation~\cite{NegationOfDQBFs}, therefore negation in front of some quantified subformula would make no sense. This form also allows free variables, that is variables which are not bounded by any quantifier. can be then used for better elimination of variables???pushin quantifiers inside formula???? ido not know. The definitions in this section are from~\cite{HQSquantifierLocalization}.
+In this section we give a definition of normal form of DQBF that is non-prenex. This allows quantifiers inside the formula. However, negation is only allowed in front of variables. This restriction stems from the fact that prenex DQBFs are not syntactically closed under negation~\cite{NegationOfDQBFs}. %, therefore negation in front of some quantified subformula would make no sense.
+This form is also not closed which means it allows free variables. These variables are not bounded by any quantifier thus the definition of satisfiability has to take them into consideration. The definitions in this section are from~\cite{HQSquantifierLocalization}.
 
 
 \begin{figure}[htp]
@@ -452,9 +458,7 @@ In this section we give a definition of normal form of DQBF that is non-prenex. 
 \end{figure}
 
 \begin{definition}
-  Let $V$ be the set of variables. Let $\psi^{-v}$ result from $\psi$ where $v$ is removed from every dependency set in $\psi$.
-  
-  The set $\DQBF{V}$ of \emph{DQBFs in negation normal form} (NNF) over $V$ as well as their existential, universal and free variables are defined by Figure~\ref{fig:DQBFrules}. The set $\DQBF{V}$ is defined to be the smallest set satisfying these rules. We set $V_{\psi} = \evars{\psi}\cup\uvars{\psi}\cup\fvars{\psi}$.
+  Let $V$ be the set of variables. Let $\psi^{-v}$ result from $\psi$ where $v$ is removed from every dependency set in $\psi$. The set $\DQBF{V}$ of \emph{DQBFs in negation normal form} (NNF) over $V$ as well as their existential, universal and free variables are defined by Figure~\ref{fig:DQBFrules}. The set $\DQBF{V}$ is defined to be the smallest set satisfying these rules. We set $V_{\psi} = \evars{\psi}\cup\uvars{\psi}\cup\fvars{\psi}$.
 \end{definition}
 \begin{remark}
 In~\cite{HQSquantifierLocalization} the last two rules in Figure~\ref{fig:DQBFrules} have condition $v \in \fvars{\psi}$ instead of $v \in V \setminus (\evars{\psi} \cup \uvars{\psi})$. This condition is too strong and does not allow some formulas which are valid. For example, as we show in the next section, we can transform DQBFs by pushing quantifiers inside the formula and this way we can end up with a formula $\forall x : \psi$ where $x \not\in V_{\psi}$. However, according to the definition in~\cite{HQSquantifierLocalization} this would not be a valid formula.
@@ -472,7 +476,7 @@ Definition of satisfiability of DQBF in NNF follows the same way as in previous 
 
 
 \begin{definition}[Skolem Function Candidates]
-  Let $\psi \in \DQBF{V}$. We say that function $s\colon \evars{\psi} \fvars{\psi} \to \BFuncs{\uvars{\psi}}$ is a \emph{Skolem function candidate} of $\psi$ if
+  Let $\psi \in \DQBF{V}$. We say that function $s\colon (\evars{\psi} \cup \fvars{\psi}) \to \BFuncs{\uvars{\psi}}$ is a \emph{Skolem function candidate} of $\psi$ if
   \begin{itemize}
       \item $\supp{s(v)} \subseteq (D_v \cap \fvars{\psi})$ for all $v \in \evars{\psi}$ and
       \item $\supp{s(v)} = \emptyset$ for all $v \in \fvars{\psi}$, i.e. $s(v)=0$ or $s(v)=1$.
@@ -485,18 +489,16 @@ dat jednoduchy DQBF a ukazat skolem function candidates a ukazat co je $s(\psi)$
 \begin{definition}[Semantics]
   Let $\psi \in \DQBF{V}$. We define the \emph{semantics} $\seman{\psi}$ of $\psi$ as follows:
   \[\seman{\psi} = \set{s \in \Scands{\psi} | v(s(\psi))=1 \text{ for all } v \in \valtns{\uvars{\psi}}}.\]
-  Formula $\psi$ is \emph{satisfiable} if $\seman{\psi} \not= \emptyset$. The elements of $\seman{\psi}$ are called \emph{Skolem functions} for $\psi$.
 \end{definition}
+Formula $\psi$ is \emph{satisfiable} if $\seman{\psi} \not= \emptyset$. The elements of $\seman{\psi}$ are called \emph{Skolem functions} for $\psi$. We say that two formulas $\psi_1$ and $\psi_2$ are \emph{equisatisfiable}, denoted $\psi_1 \approx \psi_2$, if both are either satisfiable or both are unsatisfiable.
 \begin{example}
 ukazat ze ktore su skolem functions z previous prikladu
 \end{example}
 
-\subsection{Substitution Theorems/ Elimination Theorems/ ???}
-Now that we have defined DQBFs we can give ...some... theorems/results??? which show the equisatisfiability of different DQBFs which can result in simplification of DQBFs. These results can be then used for developing a DQBF solver which can tell whether an input DQBF is satisfiable or not.
+\subsection{Localising Quantifiers}
+Now that we have defined DQBFs we give some theoretical results which show the equisatisfiability of different DQBFs which can result in their simplification. These results can be then used for developing a DQBF solver which checks whether an input DQBF is satisfiable or not.
 
-%quantifier localization + dokaz o tom ze vieme to robit ako podformule (pre ten velky theorem kde to nezrobili, pre ten dalsi to netreba)
-
-The first two theorems show when it is possible to push (or extract) quantifiers inside (from) the formula. %The first theorem is from~\cite[Theorem 3]{HQSquantifierLocalization} where ... is replaced by ... from~\cite[Theorem 4]{HQSquantifierLocalization}
+We start with two theorems that show when it is possible to push (extract) quantifiers in (from) the formula. %The first theorem is from~\cite[Theorem 3]{HQSquantifierLocalization} where ... is replaced by ... from~\cite[Theorem 4]{HQSquantifierLocalization}
 
 \begin{theorem}[{\cite[Theorem 3,4]{HQSquantifierLocalization}}]
   Let ${\diamond} \in \set{{\land},{\lor}}$ and $\psi,\psi_1,\psi_2 \in \DQBF{V}$. We assume that $x'$ and $y'$ are fresh variables, which do not occur in $\psi,\psi_1$ and $\psi_2$. The following equivalences and equisatifiabilities hold for all DQBFs in NNF:
@@ -517,19 +519,20 @@ The first two theorems show when it is possible to push (or extract) quantifiers
 The next theorem shows that if DQBFs from the previous theorem occur as subformulas of DQBF $\psi$ they can be replaced without changing the satisfiability of $\psi$.
 
 \begin{theorem}
-  Let $\psi \in \DQBF{V}$ and $\psi_1, \psi_2$ are the formulas from previous theorem on ???each?? side of the same equality???? where $\psi_1$ is subformula of $\psi$. Again, we assume that $x'$ and $y'$ are fresh variables which do not occur in $\psi$. Then $\psi \approx \psi'$ where $\psi'$ results from $\psi$ by replacing $\psi_1$ with $\psi_2$.
+  Let $\psi \in \DQBF{V}$ and $\psi_1, \psi_2$ be the formulas from previous theorem on each side of the same equality where $\psi_1$ is a subformula of $\psi$. Again, we assume that $x'$ and $y'$ are fresh variables which do not occur in $\psi$. Then $\psi \approx \psi'$ where $\psi'$ results from $\psi$ by replacing $\psi_1$ with $\psi_2$.
 \end{theorem}
 \begin{proof}
   TODO!!!
 \end{proof}
 
+\subsection{Quantifier Elimination}
 %quantifier elimination
 %\begin{itemize}
 %    \item universal expansion + dokaz ze vieme robit ako podformule
 %    \item existential elimination - len povedat a odkazat sa na clanok kde je dokaz
 %\end{itemize}
 
-The next two theorems give a possibility to eliminate both universal and existential quantifiers. Universal quantifiers can be eliminated always, however, by doing it the resulting DQBF can contain new copies of existential variables.
+The next two theorems give a possibility to eliminate both universal and existential quantifiers. Universal quantifiers can be eliminated always but by doing it the resulting DQBF can contain new copies of existential variables.
 
 \begin{theorem}[Universal Expansion]
   Let $\psi, \psi_1 \in \DQBF{V}$ such that $\forall x : \psi_1$ is a subformula of $\psi$. Let $E_{x} = \set{y \in \evars{\psi_1} | x \in D_y}$ be the set of all existential variables dependent on $x$. Let $\psi_2$ be a DQBF that results from $\psi_1$ by substituting each $y \in E_x$ with a new variable $y' \not\in V_{\psi}$ where we set $D_{y'} = D_y$. Then $\psi \approx \psi'$ where $\psi'$ results from $\psi$ by replacing the subformula $\forall x : \psi_1$ by 
