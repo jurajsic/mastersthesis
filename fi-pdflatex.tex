@@ -218,6 +218,10 @@
 
 %\renewcommand{\phi}{\varphi}
 
+% for fixing overflowing in bibliography
+\hyphenation{Chri-stoph}
+%\hyphenation{Ma-tthias}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -226,11 +230,9 @@
 \addcontentsline{toc}{chapter}{Introduction}
 
 \chapter{Theory}
-popisat co je DQBF (ist od BF->QBF->DQBF?), neviem ci pridavat aj nonprenex, popisat BDDs, popisat ze co je nasim problemom
+In this chapter we give the definitions and some theoretical results of dependency quantified Boolean formulas (DQBFs) and binary decision diagrams (BDDs). For DQBFs we build up from Boolean formulas (BFs) to which we add quantifiers resulting in quantified Boolean formulas (QBFs). After this, we add explicit dependencies to the definition of QBFs which results in DQBFs. For these we give two forms, one that does not allow quantifiers inside the formula and one that does. For the latter we give some theoretical results which allows us to transform DQBFs which we then use for developing our solver in Chapter ... In the last section of this chapter, we define BDDs and give some of their properties.% needed theory for our problem. We definition of dependency quantified Boolean formulas??? and BDDs?? citacie odkial vychadzam??
 
-In this chapter we give the needed theory for our problem. We definition of dependency quantified Boolean formulas??? and BDDs?? citacie odkial vychadzam??
-
-We define dependency quantified Boolean formulas building up from Boolean formulas to which we add quantifications followed by adding dependencies for these quantifications. We also give a 
+%We define dependency quantified Boolean formulas building up from Boolean formulas to which we add quantifications followed by adding dependencies for these quantifications. We also give a 
 
 \section{Boolean Formulas}
 %definicia boolean formula (rekurzivna)
@@ -263,14 +265,16 @@ Each $\phi \in \BF{V}$ represents a \emph{Boolean function} $f_{\phi}\colon \val
 %mozno napisat ako ze ten extend nejak oznacime (napr u_v) ale ak je to jasne tak abusneme notation a budeme pod $v(\phi)$ mysliet $u_v(\phi)$
 
 
-An important notion for BFs is \emph{satisfiability}. We say that $\phi \in \BF{V}$ is \emph{satisfiable} if there exists valuation $v \in \valtns{V}$ in which $\phi$ is true, that is $v(\phi) = 1$. Let $\phi_1, \phi_2 \in \BF{V}$. We say that they are \emph{equivalent}, denoted $\phi_1 = \phi_2$, if for all valuations $v$ it holds that $v(\phi_1) = v(\phi_2)$. If they are either both satisfiable or they are both unsatisfiable, we call them \emph{equisatisfiable}, denoted $\phi_1 \approx \phi_2$. %Notice that equisatisfiability of two formulas is just talking about their satisfiability, which means that these formulas can be over different sets of variables.
+An important notion for BFs is \emph{satisfiability}. We say that $\phi \in \BF{V}$ is \emph{satisfiable} if there exists valuation $v \in \valtns{V}$ in which $\phi$ is true, that is $v(\phi) = 1$. Let $\phi_1, \phi_2 \in \BF{V}$. We say that they are \emph{equivalent}, denoted $\phi_1 \equiv \phi_2$, if for all valuations $v$ it holds that $v(\phi_1) = v(\phi_2)$. If they are either both satisfiable or they are both unsatisfiable, we call them \emph{equisatisfiable}, denoted $\phi_1 \approx \phi_2$. %Notice that equisatisfiability of two formulas is just talking about their satisfiability, which means that these formulas can be over different sets of variables.
 
 \begin{example}
 \label{ex:BF:prenex}
 Let
 \[\phi = (x_1 \land x_2) \lequal (y_1 \lequal y_2)\]
-be BF where by $y_1 \lequal y_2$ we mean the formula $(y_1 \land y_2) \lor (\neg y_1 \land \neg y_2)$ (similarly for the ). This formula says that if both $x_1$ and $x_2$ are true, then $y_1$ and $y_2$ must be same, otherwise they must be different. This formula is satisfiable, because in valuation $v$ such that $v(x_1) = v_(x_2) = (v_(y_1) = v(y_2) = 1$ it holds that $\phi$ is evaluated to $v(\phi)=1$.
-%dat tu priklad nejakych formul?? a ukazat ze v akych valuaciach su splnene/nesplnene, priklad equal, equisatisfiable
+be BF where by $y_1 \lequal y_2$ we mean the formula $(y_1 \land y_2) \lor (\neg y_1 \land \neg y_2)$ (similarly for the ${\lequal}$ between $x_1\land x_2$ and $y_1 \lequal y_2$). This formula says that if both $x_1$ and $x_2$ are true, then $y_1$ and $y_2$ must be same, otherwise they must be different. It is satisfiable, because in valuation $v$ such that $v(x_1) = v(x_2) = v(y_1) = v(y_2) = 1$ it holds that $\phi$ is evaluated to $v(\phi)=1$.
+%This formula is also equisatisfiable to formula 
+%\[\phi' = (x \land y) \lor \neg x\] 
+%because $\phi'$ is also satisfiable: in valuation $v'$ where $v'(x) = v'(y) = 1$ it holds that $v'(\phi') = 1$. Notice that even though $\phi$ and $\phi'$ have different variables, the equisatisfiability still holds. However, $\phi \not= \phi'$ because if we add to $v'$ that $v'(x_1) = v'(x_2) = v'(y_1) = 1$ and $v'(y_2) = 0$ we get that $v'(\phi) \not= v'(\phi')$.
 \end{example}
 
 %definovat negation normal form + cnf
@@ -279,18 +283,18 @@ be BF where by $y_1 \lequal y_2$ we mean the formula $(y_1 \land y_2) \lor (\neg
 To work with BFs it is usually easier to have them in some special forms. The first one we define is called conjuctive normal form.
 
 \begin{definition}
-We say that boolean formula $\phi \in \BF{V}$ is in \emph{conjuctive normal form} (CNF) if there exist BFs $\psi_1,\dots,\psi_n \in \BF{V}$ where
-\[\phi = \psi_1 \land \dots \land \psi_n\]
+We say that boolean formula $\phi \in \BF{V}$ is in \emph{conjuctive normal form} (CNF) if there exist $\phi_1,\dots,\phi_n \in \BF{V}$ where
+\[\phi = \phi_1 \land \dots \land \phi_n\]
 and
-\[\psi_i = l_{i1} \lor \dots \lor l_{i{m_i}}\]
+\[\phi_i = l_{i1} \lor \dots \lor l_{i{m_i}}\]
 for each $i = 1, \dots, n$ and for each $l_{ij}$ where $j \in \set{1,\dots,m_i}$ either $l_{ij} = x$ or $l_{ij} = \neg x$ for some $x \in V$.
 \end{definition}
-BFs $\psi_1,\dots,\psi_n$ are called clauses and $l_{ij}$ are called literals. That is BF is in CNF if it is a conjuction of clauses which are disjuncts of literals, where literal is either a variable or negation of a variable.
+Formulas $\phi_1,\dots,\phi_n$ are called clauses and $l_{ij}$ are called literals. That is BF is in CNF if it is a conjuction of clauses which are disjuncts of literals, where literal is either a variable or negation of a variable.
 
 \begin{example}
 The formula
-\[\phi_{CNF} = ()\]
-is in CNF which is equal to formula $\psi$ from Example~\ref{ex:BF:prenex}.
+\[\phi_{CNF} = (x \lor \neg y) \land (\neg x \lor y)\]
+is in CNF with clauses $(x \lor \neg y)$ and $(\neg x \lor y)$ and literals $x,\neg y, \neg x$ and $y$.
 \end{example}
 
 For every BF $\phi$ there exists an equivalent formula in CNF which can be exponentially larger than $\phi$. However, there exists a construction that by adding some new variables results in an equisatisfiable BF $\phi_{CNF}$ which is only polynomially larger than the original BF $\phi$ (citedacotu).
@@ -299,9 +303,9 @@ For every BF $\phi$ there exists an equivalent formula in CNF which can be expon
 \label{sec:BF:NNF}
 We say that BF $\phi$ is in negation normal form (NNF) if negation occurs only in front of the variable. Each BF $\phi$ can be easily transformed into an equivalent BF $\phi'$ in NNF by applying these three rules:
 \begin{enumerate}
-    \item $\neg(\phi_1 \land \phi_2) = (\neg\phi_1 \lor \neg\phi_2)$ 
-    \item $\neg(\phi_1 \lor \phi_2) = (\neg\phi_1 \land \neg\phi_2)$
-    \item $\neg\neg x = x$
+    \item $\neg(\phi_1 \land \phi_2) \equiv (\neg\phi_1 \lor \neg\phi_2)$ 
+    \item $\neg(\phi_1 \lor \phi_2) \equiv (\neg\phi_1 \land \neg\phi_2)$
+    \item $\neg\neg x \equiv x$
 \end{enumerate}
 \begin{example}
 Formula $\neg (x_1 \land (x_2 \lor \neg x_3))$ that is not in NNF is by using the first rule equal to $(\neg x_1 \lor \neg(x_2 \lor \neg x_3))$ which is by using the second rule equal to $(\neg x_1 \lor (\neg x_2 \land \neg\neg x_3))$. Finally, by using the third rule we get $(\neg x_1 \lor (\neg x_2 \land x_3))$ which is in NNF.
@@ -309,7 +313,7 @@ Formula $\neg (x_1 \land (x_2 \lor \neg x_3))$ that is not in NNF is by using th
 %toto asi zadefinujem pre QBF/DQBF ak vobec - alebo mozno to treba fakt tu, ked budem chciet hovorit ze HQSpre meni formulu????
 
 \section{Quantified Boolean Formulas}
-Having defined BFs, we can move to the next step on the way to defining DQBF by adding quantifiers. We add existential (${\exists}$) and universal (${\forall}$) quantifiers which are bounded to variables resulting in \emph{quantified Boolean formulas} (QBFs). Usually, definitions of QBFs allow quantifiers everywhere inside formula, however we only give definition of one special form of QBFs called prenex normal form. In this form, QBFs allow quantifiers only at the beginning of the formula. However, this does not change the expressibility as it is possible to transform every QBF into prenex normal form~\cite{prenexingQBFs}.
+Having defined BFs, we can move to the next step on the way to defining DQBF by adding quantifiers. We add existential (${\exists}$) and universal (${\forall}$) quantifiers which are bounded to variables resulting in \emph{quantified Boolean formulas} (QBFs). Usually, definitions of QBFs allow quantifiers everywhere inside formula but we only give definition of one special form of QBFs called prenex normal form. In this form, QBFs allow quantifiers only at the beginning of the formula. However, this does not change the expressibility as it is possible to transform every QBF into prenex normal form~\cite{prenexingQBFs}.
 
 %definicia QBF (ak budem robit aj non-prenex DQBF tak rekurzivna + nahradzovanie, inak prenex)
 \begin{definition}
@@ -327,12 +331,15 @@ Again, we define satisfiability. Usually, satisfiability for QBFs is defined tro
     \item $v(\forall x Q_i x_i \dots Q_n x_n \phi) = 1$ if both $v(Q_i x_i \dots Q_n x_n \phi\substitute{x}{0}) = 1$ and $v(Q_i x_i \dots Q_n x_n \phi\substitute{x}{1}) = 1$, otherwise it equals $0$,
     \item $v(\exists x Q_i x_i \dots Q_n x_n \phi) = 1$ if either $v(Q_i x_i \dots Q_n x_n \phi\substitute{x}{0}) = 1$ or $v(Q_i x_i \dots Q_n x_n \phi\substitute{x}{1}) = 1$, otherwise it equals $0$.
 \end{itemize}
-We follow different but equal definition based on skolemization, which replaces the existential variables $x$ by some Boolean function of universal variables with lower level than $x$. This is better suited to show a correspondence of QBFs and DQBFs when we add dependencies in the next section. A QBF $\psi$ from Definition~\ref{def:QBF} is satisfiable if for each $x \in V_{\psi}^{\exists}$ there exists a function $s_{x} \in \BFuncs{\uvars{\psi}\cap V_{\psi}^{<l(x)}}$ (called Skolem function) such that $\phi$, where every $x \in \evars{\psi}$ is replaced by some BF that represents $s_x(x)$, is evaluated to $1$ in every valuation $v\colon \uvars{\psi} \to \set{0,1}$.
+We follow different but equal definition based on skolemization, which replaces each existential variable $x$ by some Boolean function of universal variables with lower level than $x$. This is better suited to show a correspondence of QBFs and DQBFs when we add dependencies in the next section. A QBF $\psi$ from Definition~\ref{def:QBF} is satisfiable if for each $x \in V_{\psi}^{\exists}$ there exists a function $s_{x} \in \BFuncs{\uvars{\psi}\cap V_{\psi}^{<l(x)}}$ (called Skolem function) such that $\phi$, where every $x \in \evars{\psi}$ is replaced by some BF that represents $s_x(x)$, is evaluated to $1$ in every valuation $v\colon \uvars{\psi} \to \set{0,1}$.
 
 \begin{example}
+\label{ex:QBF:prenex}
 Let 
 \[\psi = \forall x_1 \forall x_2 \exists y_1  \exists y_2  : (x_1 \land x_2) \lequal (y_1 \lequal y_2)\]
-be a QBF where the matrix is from Example??????. This QBF is satisfiable, because for all values of $x_1, x_2$ we can find
+be a QBF where the matrix is formula $\phi$ from Example~\ref{ex:BF:prenex}. This QBF is satisfiable because for all values of $x_1, x_2$ we can find values of $y_1$ and $y_2$ such that they are same if $x_1 = x_2 = 1$ and different otherwise. The Skolem functions for this formula are for example $s_{y_1}$ which is represented by BF $x_1 \land x_2$ and $s_{y_2}$ which is represented by BF $1$. If we replace existential variables with their Skolem function we get BF
+\[(x_1 \land x_2) \lequal ((x_1 \land x_2) \lequal 1)\]
+which is true in all valuations.
 \end{example}
 
 %definicia semantiky (+splnitelnost)
@@ -370,14 +377,14 @@ The first definition of DQBF form called prenex normal form is an analogy of the
   where $D_i \subseteq \set{x_1, \dots, x_n}$ for each $i \in \set{1,\dots,m}$ is a \emph{dependency set} of variable $y_i$.
   \label{def:DQBF:PNF}
 \end{definition}
-We call the BF $\phi$ the \emph{matrix} of $\psi$ and .. the \emph{quantifier prefix} of $\psi$. We also call variables from $\evars{\psi} = \set{y_1,\dots,y_m}$ \emph{existential} and variables from $\uvars{\psi} = \set{x_1,\dots,x_n}$ \emph{universal}.
+We call the BF $\phi$ the \emph{matrix} of $\psi$ and $\forall x_1 \dots \forall x_n \exists y_1 (D_1) \dots \exists y_m (D_m)$ the \emph{quantifier prefix} of $\psi$. We also call variables from $\evars{\psi} = \set{y_1,\dots,y_m}$ \emph{existential} and variables from $\uvars{\psi} = \set{x_1,\dots,x_n}$ \emph{universal}.
 
 
 
 \begin{example}
-Let use an example from~\cite{DQBFProofSystem} to explain the meaning behind dependency sets. Let 
+Let us use an example from~\cite{DQBFProofSystem} to explain the meaning behind dependency sets. Let 
 \[\psi = \forall x_1 \forall x_2 \exists y_1 (x_1) \exists y_2 (x_2) : (x_1 \land x_2) \lequal (y_1 \lequal y_2)\]
-be a DQBF. Both $y_1$ and $y_2$ depend only on one variable, $x_1$ and $x_2$ respectively. This DQBF can be seen as a game where $y_1$  and $y_2$ are trying to satisfy the formula and $x_1,x_2$ are trying to make it false. However, $y_1$ knows only how $x_1$ is behaving and similarly $y_2$ knows only what $x_2$ is doing.  The formula says that if both $x_1$ and $x_2$ are true, then $y_1$ and $y_2$ should be same, otherwise they need to be different. However, this is not possible, because if for example both $y_1,y_2$ decide to be true when their respective universal variable is true then if one of the universal variable change, for example $x_1$ turns to false, then $y_2$ does not know about this and stays true. Thus, in that case $y_1$ has to change the value to false. The same thing happens to $y_2$ if $x_2$ changes its value to false. But at the end if both $x_1$ and $x_2$ change their values to false, then the values of $y_1$ and $y_2$ are the same (false) which makes the formula $\psi$ false.
+be a DQBF. The matrix is the BF $\phi$ from Example~\ref{ex:BF:prenex} and the quantifier prefix is very similar to the QBF from Example~\ref{ex:QBF:prenex} but now both $y_1$ and $y_2$ depend only on one variable, $x_1$ and $x_2$ respectively. The QBF was satisfiable but this DQBF is not. It can be seen as a game where $y_1$  and $y_2$ are trying to satisfy the formula and $x_1,x_2$ are trying to make it false. However, $y_1$ knows only how $x_1$ is behaving and similarly $y_2$ knows only what $x_2$ is doing. As explained in Example~\ref{ex:BF:prenex} the matrix says that if both $x_1$ and $x_2$ are true, then $y_1$ and $y_2$ should be same, otherwise they need to be different. However, this is not possible, because if for example both $y_1,y_2$ decide to be true when their respective universal variable is true then if one of the universal variable change, for example $x_1$ turns to false, then $y_2$ does not know about this and stays true. In that case $y_1$ has to change the value to false so they become different. The same thing happens to $y_2$ if $x_2$ changes its value to false. So we get behaviour where both existential variables just copy the behaviour of their universal variable. But at the end, if both $x_1$ and $x_2$ change their values to false, then the values of $y_1$ and $y_2$ are the same (false) which makes the formula $\psi$ false.
 \end{example}
 
 With the example in mind, we define satisfiability for DQBF in PNF similarly to how satisfiability is defined for QBFs with Skolem functions. DQBF in PNF $\psi$ from Definition~\ref{def:DQBF:PNF} is satisfiable if for each $y \in \evars{\psi}$ there exists a Skolem function $s_y\colon y \to \BFuncs{D_y}$ such that $\phi$, where each $y \in \evars{\psi}$ is replaced by a BF representing Boolean function $s_y(y)$, evaluates to $1$ in all valuations $v\colon \uvars{\psi} \to \set{0,1}$.
@@ -476,10 +483,10 @@ In~\cite{HQSquantifierLocalization} the last two rules in Figure~\ref{fig:DQBFru
 Notice that each DQBF $\psi$ in PNF can be transformed into DQBF $\psi'$ in NNF by transforming the matrix of $\psi$ to NNF as explained in Section~\ref{sec:BF:NNF}.
 \end{remark}
 
-By $\psi\substitute{\psi_1}{\psi_2}$ where $\psi, \psi_1, \psi_2 \in \DQBF{V}$ we denote DQBF formula in which every occurence of $\psi_1$ in $\psi$ is replaced by $\psi_2$ except for the occurence of $\psi_1$ in dependency sets. If both $\psi_1, \psi_2 \in V$, then $\psi_1$ is replaced by $\psi_2$ even in dependency sets of $\psi$.
+By $\psi\substitute{\psi_1}{\psi_2}$ where $\psi, \psi_1, \psi_2 \in \DQBF{V}$ we denote DQBF formula in which every occurence of $\psi_1$ in $\psi$ is replaced by $\psi_2$ except for the occurence of $\psi_1$ in the dependency sets. If both $\psi_1, \psi_2 \in V$, then $\psi_1$ is also replaced by $\psi_2$ even in the dependency sets of $\psi$.
 
 %dat definiciu semantiky
-Definition of satisfiability of DQBF in NNF follows the same way as in previous section but now we have to decide what to do with free variables. In non-prenex case of QBFs, free variables are usually assumed to be existential variables with quantifiers at the beginning of the formula. In DQBF case this would mean that free variables have empty dependency sets so the definition needs to take care of that. We first define Skolem function candidates which are possible candidates fulfilling conditions set by dependency sets. Then, to have vyjadrovaci prostriedok k dokazom, we define \emph{semantics} of DQBFs in NNF as the set of Skolem function candidates which satisfy the formula.% follows this reasoning???? To have easier time with proofs we define semantics of DQBFs as a set of Skolem functions satisfying the formula.??? definition of semantics???? is a bit more convoluted. We first define Skolem function candidates from which we choose the set of 
+Definition of satisfiability of DQBF in NNF follows the same way as in previous section but now we have to decide what to do with free variables. In non-prenex case of QBFs, free variables are usually assumed to be existential variables with quantifiers at the beginning of the formula. In DQBF case this would mean that free variables have empty dependency sets so the definition needs to take care of that. We first define Skolem function candidates which are possible candidates fulfilling conditions set by dependency sets. Then we define \emph{semantics} of DQBFs in NNF as the set of Skolem function candidates which satisfy the formula. % follows this reasoning???? To have easier time with proofs we define semantics of DQBFs as a set of Skolem functions satisfying the formula.??? definition of semantics???? is a bit more convoluted. We first define Skolem function candidates from which we choose the set of 
 
 
 
@@ -487,20 +494,23 @@ Definition of satisfiability of DQBF in NNF follows the same way as in previous 
   Let $\psi \in \DQBF{V}$. We say that function $s\colon (\evars{\psi} \cup \fvars{\psi}) \to \BFuncs{\uvars{\psi}}$ is a \emph{Skolem function candidate} of $\psi$ if
   \begin{itemize}
       \item $\supp{s(v)} \subseteq (D_v \cap \fvars{\psi})$ for all $v \in \evars{\psi}$ and
-      \item $\supp{s(v)} = \emptyset$ for all $v \in \fvars{\psi}$, i.e. $s(v)=0$ or $s(v)=1$.
+      \item $\supp{s(v)} = \emptyset$ for all $v \in \fvars{\psi}$, i.e. $s(v)$ is either represented by $0$ or $1$.
   \end{itemize}
 \end{definition}
-The set of all Skolem function candidates of $\psi$ is denoted $\Scands{\psi}$. If $s \in \Scands{\psi}$ we write $s(\psi)$ for the formula that results from $\psi$ by replacing each existential and free variable $v$ by a BF that represents $s(v)$ and ommiting all quantifiers from $\psi$. This results in a BF containing only variables from $\uvars{\psi}$.
-\begin{example}
-dat jednoduchy DQBF a ukazat skolem function candidates a ukazat co je $s(\psi)$
-\end{example}
+
+The set of all Skolem function candidates of $\psi$ is denoted by $\Scands{\psi}$. If $s \in \Scands{\psi}$, we write $s(\psi)$ for the formula that results from $\psi$ by replacing each existential and free variable $v$ by a BF that represents $s(v)$ and omitting all quantifiers from $\psi$. This results in a BF containing only variables from $\uvars{\psi}$.
+
 \begin{definition}[Semantics]
   Let $\psi \in \DQBF{V}$. We define the \emph{semantics} $\seman{\psi}$ of $\psi$ as follows:
   \[\seman{\psi} = \set{s \in \Scands{\psi} | v(s(\psi))=1 \text{ for all } v \in \valtns{\uvars{\psi}}}.\]
 \end{definition}
-Formula $\psi$ is \emph{satisfiable} if $\seman{\psi} \not= \emptyset$. The elements of $\seman{\psi}$ are called \emph{Skolem functions} for $\psi$. We say that two formulas $\psi_1$ and $\psi_2$ are \emph{equisatisfiable}, denoted $\psi_1 \approx \psi_2$, if both are either satisfiable or both are unsatisfiable.
+Formula $\psi$ is \emph{satisfiable} if $\seman{\psi} \not= \emptyset$. The elements of $\seman{\psi}$ are called \emph{Skolem functions} of $\psi$. We say that two formulas $\psi_1$ and $\psi_2$ are \emph{equisatisfiable}, denoted $\psi_1 \approx \psi_2$, if both are either satisfiable or both are unsatisfiable.
 \begin{example}
-ukazat ze ktore su skolem functions z previous prikladu
+\label{ex:DQBF:NNF}
+To explain semantics of DQBF in NNF we use an example from~\cite{HQSquantifierLocalization}:
+\[\psi = \forall x_1 \forall x_2 : (x_1 \lequal x_2) \lor \exists y (x_2) : \neg(x_1 \lequal y)\]
+where ${\lequal}$ has the same meaning as in Example~\ref{ex:BF:prenex}. The meaning behind this formula is that either $x_1$ and $x_2$ are the same of there is some $y$ which is dependent only on $x_2$ which is different from $x_1$. The Skolem function candidates of $\psi$ are then $\Scands{\psi} = \{y\mapsto f_0$, $y\mapsto f_1$, $y\mapsto f_x$, $y\mapsto f_{\neg x}\}$ % then map $y$ to Boolean function which are represented either by $0,1,x_2$ or $\neg x_2$. It is pretty obvious that only 
+where $f_0$ is Boolean function represented by Boolean formula $0$, $f_1$ is represented by $1$, $f_x$ by $x$ and $f_{\neg x}$ by $\neg x$. It is pretty obvious that only $s = y \mapsto f_{\neg x}$ is a Skolem function of $\psi$, since only $s(\psi) = (x_1 \lequal x_2) \lor \neg(x_1 \lequal \neg x_2)$ is true in all valuations.
 \end{example}
 
 \subsection{Localising Quantifiers}
@@ -509,18 +519,18 @@ Now that we have defined DQBFs we give some theoretical results which show the e
 We start with two theorems that show when it is possible to push (extract) quantifiers in (from) the formula. %The first theorem is from~\cite[Theorem 3]{HQSquantifierLocalization} where ... is replaced by ... from~\cite[Theorem 4]{HQSquantifierLocalization}
 
 \begin{theorem}[{\cite[Theorem 3,4]{HQSquantifierLocalization}}]
-  Let ${\diamond} \in \set{{\land},{\lor}}$ and $\psi,\psi_1,\psi_2 \in \DQBF{V}$. We assume that $x'$ and $y'$ are fresh variables, which do not occur in $\psi,\psi_1$ and $\psi_2$. The following equivalences and equisatifiabilities hold for all DQBFs in NNF:
+  Let ${\diamond} \in \set{{\land},{\lor}}$ and $\psi,\psi_1,\psi_2 \in \DQBF{V}$. We assume that $x'$ and $y'$ are fresh variables, which do not occur in $\psi,\psi_1$ and $\psi_2$. The following equisatifiabilities hold for all DQBFs in NNF:
   \begin{align}
       %\forall x : \psi &\approx \psi \text{, if } x \not\in V_{\psi} \\
       \forall x : (\psi_1 \land \psi_2) &\approx (\forall x : \psi_1) \land (\forall x' : \psi_2\substitute{x}{x'}) \\
       \forall x : (\psi_1 \land \psi_2) &\approx (\psi_1^{-x} \land (\forall x : \psi_2)) \text{, if } x \not\in V_{\psi_1} \\
-      \forall x : (\psi_1 \lor \psi_2) &= \begin{multlined}[t][3cm](\psi_1 \lor (\forall x : \psi_2)) \text{, if } x \not\in V_{\psi_1}\\
+      \forall x : (\psi_1 \lor \psi_2) &\approx \begin{multlined}[t][3cm](\psi_1 \lor (\forall x : \psi_2)) \text{, if } x \not\in V_{\psi_1}\\
       \text{ and } x \not\in D_y \text{ for all } y \in \evars{\psi_1}\end{multlined} \\
       \exists y(D_y) : (\psi_1 \lor \psi_2) &\approx (\exists y(D_y) : \psi_1) \lor (\exists y'(D_y) : \psi_2\substitute{y}{y'}) \\
-      \exists y(D_y) : (\psi_1 \diamond \psi_2) &= (\psi_1 \diamond (\exists y(D_y) : \psi_2)) \text{, if } y \not\in V_{\psi_1} \\
-      \exists y_1(D_{y_1})\exists y_2(D_{y_2}) : \psi &= \exists y_2(D_{y_2}) \exists y_1(D_{y_1}) : \psi \\
-      \forall x_1\forall x_2 : \psi &= \forall x_2\forall x_1 : \psi \\
-      \forall x\exists y(D_y) : \psi &= \exists y(D_y)\forall x : \psi\text{, if } x \not\in D_y.
+      \exists y(D_y) : (\psi_1 \diamond \psi_2) &\approx (\psi_1 \diamond (\exists y(D_y) : \psi_2)) \text{, if } y \not\in V_{\psi_1} \\
+      \exists y_1(D_{y_1})\exists y_2(D_{y_2}) : \psi &\approx \exists y_2(D_{y_2}) \exists y_1(D_{y_1}) : \psi \\
+      \forall x_1\forall x_2 : \psi &\approx \forall x_2\forall x_1 : \psi \\
+      \forall x\exists y(D_y) : \psi &\approx \exists y(D_y)\forall x : \psi\text{, if } x \not\in D_y.
   \end{align}
 \end{theorem}
 
@@ -547,7 +557,12 @@ The next two theorems give a possibility to eliminate both universal and existen
   \[\xi = \psi_1^{-x}\substitute{x}{0} \land \psi_2^{-x}\substitute{x}{1}.\]
 \end{theorem}
 \begin{example}
-We give an example of universal expansion. TODO
+Let $\psi$ be DQBF from Example~\ref{ex:DQBF:NNF}. Using universal expansion we can transform it to
+\begin{multline*}
+    \psi' = \forall x_1 : ((x_1 \lequal 0) \lor \exists y (\emptyset) : \neg(x_1 \lequal y)) \land\\
+    ((x_1 \lequal 1) \lor \exists y' (\emptyset) : \neg(x_1 \lequal y'))
+\end{multline*}
+which, like $\psi$, is satisfiable.
 \end{example}
 \begin{proof}
   First notice that each $y \in E_x$ must be entirely inside $\psi_1$ (even the ''$\exists y$'' bit). This stems from the way the set $\DQBF{V}$ is constructed; the dependency sets of new existential variables can only be formed from free or completely new variables and if ''$\exists y$'' was outside $\forall x :\psi_1$, then $x \in D_y$ would have to be a free or new variable. With that we can now prove that $\seman{\psi} \not= \emptyset$ iff $\seman{\psi'} \not= \emptyset$.
@@ -556,10 +571,6 @@ We give an example of universal expansion. TODO
   
   Now we prove the other direction. Let $s' \in \seman{\psi'}$. We build a Skolem function $s$ for $\psi$. For all $y \in (\evars{\psi} \setminus E_x)$ we set $s(y) = s'(y)$. For $y \in E_x$ with a copy $y' \in \evars{\psi_2}$ we set $s(y)$ to Boolean function that is represented by BF $(\neg x \land s'(y)) \lor (x \land s'(y'))$ where $s'(y)$ and $s'(y')$ are replaced with BFs representing them. It is obviously a Skolem function candidate thus we need to prove that $s(\psi)$ is true in all valuations. Let $v$ be a valuation over $\uvars{\psi}$. Without loss of generality assume that $v(x) = 0$. Then $v(s(y)) = (\neg 0 \land s'(y)) \lor (0 \land s'(y')) = s'(y)$. This means that $v(s(\forall x : \psi_1)) = v(s(\psi_1^{-x}\substitute{x}{0}))$. Therefore if $v(s'(\xi)) = 1$ then $v(s(\forall x : \psi_1)) = 1$. Because $\psi'$ is in NNF, $s'(\xi)$ occurs in $s'(\psi')$ in a tree of ${\land}$ and ${\lor}$ operations. However, from assumption we know that $v(s'(\psi')) = 1$. Therefore if $v(s'(\xi)) = 0$ it does not matter, $v(s'(\psi'))$ would be true even if $v(s'(\xi)) = 1$. Also $s(\psi)$ and $s'(\psi')$ differs only in $s(\forall x : \psi_1)$ and $s'(\xi)$ part, therefore $v(s(\psi))$ must be equal to 1. 
 \end{proof}
-
-\begin{remark}
-universal expansion je pomenovanie pouzite pre prenex (citacia??) form which coincides with the situation when $\psi$ is $\psi_1$.
-\end{remark}
 
 In the case that $x \not\in V_{\psi_1}$ the situation is simpler --- we just remove the quantifier:
 \begin{lemma}
@@ -575,13 +586,23 @@ The conditions when existential elimination is possible are more convoluted:
   Let $\psi, \psi_1 \in \DQBF{V}$ such that $\exists y(D_y) : \psi_1$ is a subformula of $\psi$ where $\psi_1$ does not include any quantification and includes only variables from $D_y \cap V_{\psi}^{\text{free}} \cap \set{y' \in V_{\psi}^{\exists} | D_y' \subseteq D_y}$. Then $\psi \approx \psi'$ where $\psi'$ results from $\psi$ by replacing the subformula $\exists y(D_y) : \psi_1$ by $\psi_1\substitute{y}{0} \lor \psi_1\substitute{y}{1}$.
 \end{theorem}
 \begin{example}
-We give an example of existential quantification. TODO
+Let
+\begin{multline*}
+\psi = \forall x_1 \forall x_2 \exists y_1(x_1) : ((x_1 \land x_2) \lequal y_1)\\
+\lor \exists y_2 (x_1,x_2) : (x_1 \lequal y_2) \land (y_1 \lequal y_2)
+\end{multline*}
+be a DQBF that says that either $y_1$ has the same value as $x_1 \land x_2$ (which is impossible because $y_1$ depends only on $x_1$) or there is some $y_2$ which is equal to both $y_1$ and $x_1$ (which is possible because both $y_1$ and $y_2$ depend on $x_1$). This means that this formula is satisfiable. Because the subformula $\exists y_2 (x_1,x_2) : (x_1 \lequal y_2) \land (y_1 \lequal y_2)$ fulfills the conditions from the theorem, $\psi$ can be transformed to
+\begin{multline*}
+\psi = \forall x_1 \forall x_2 \exists y_1(x_1) : ((x_1 \land x_2) \lequal y_1)\\
+\lor (((x_1 \lequal 0) \land (y_1 \lequal 0)) \lor ((x_1 \lequal 1) \land (y_1 \lequal 1)))
+\end{multline*}
+which is still satisfiable.
 \end{example}
 
 
-dependency elimination - jedine ak to budem pouzivat, treba potom aj dokaz ze to funguje pre podformule - inak je to spomenute pri state of art
+%dependency elimination - jedine ak to budem pouzivat, treba potom aj dokaz ze to funguje pre podformule - inak je to spomenute pri state of art
 
-veci k zamysleniu - zrobit vseobecny dokaz alebo pre kazdu vec zvlast + ake priklady dat, asi dat priklad ku kazdej vete??
+%veci k zamysleniu - zrobit vseobecny dokaz alebo pre kazdu vec zvlast + ake priklady dat, asi dat priklad ku kazdej vete??
 
 
 % \begin{theorem}
@@ -636,7 +657,8 @@ In the following we will use the term BDD instead of ROBDD.
 
 %\section{State of the Art}
 %ake solvre existuju (vybrat tie s ktorymi budem porovnavat?), trocha viac popisat HQS a ze ako funguje aj HQSpre (lebo ho pouzivam) - ale fakt len zopar veci spomenut, mozno aj to ze mozme pouzit vytvaranie log. gates pretoze to menim do BDD ako to robia v HQS
-In this chapter we give an overview of existing solutions and solvers which tackle the problem. An overview of existing solvers can also be found in~\cite{DQBFStateOfArtTalk,DQBFStateOfArt,DQBFStateOfArtNew} that is why we just give a short updated overview here (short for DQDPLL, iDQ, iProver and dCAQE). However we go into more details for solver HQS, because the methods we used for developing our solver are based on the workings of this solver.
+In this chapter we give an overview of existing solutions and solvers which tackle the satisfiability problem of DQBF. An overview of existing solvers can also be found in~\cite{DQBFStateOfArtTalk,DQBFStateOfArt,DQBFStateOfArtNew} that is why we just give a short updated overview here %(short for DQDPLL, iDQ, iProver and dCAQE). 
+However we go into more details for solver HQS, because the methods we used for developing our solver are based on the workings of this solver.
 %current solutions, that already exist
 
 %nieco o tom ze vacsina funguje na CNF, ale HQS a moje bude na NNF
@@ -678,7 +700,8 @@ The next solver is based on quantifier elimination. This solver's basic premise 
 \end{algorithmic}
 \end{algorithm}
 
-In~\cite{HQSsimpleAlg} the authors introduced the basic algorithm for solving DQBF in this way. (mozno spomenut ze to vlastne vymysleli aj v iDQ clanku, ako nejaky base solver ktory pouziva BDDcka) Algorithm~\ref{alg:QE} shows simple pseudocode of this. In every step this algorithm chooses using some heuristic an universal variable to eliminate. In~\cite{HQSsimpleAlg} they used a heuristic where the universal variable is chosen based on the number of existential ones that depend on it - they choose the one that has minimal number of dependencies. After that, all the existential variables that depend on everything are also eliminated. To use this algorithm it is important to choose a good representation of the matrix of the DQBF. For this the authors chose and-inverter graphs (AIG) which are a tree-like structures where non-terminal nodes represent conjunction, terminal nodes are variables and these are connected with two types of nodes: normal ones and those that represent negation. With a proper implementation of operations they can be optimised in such a way that they reuse parts of the graphs resulting in functionally reduced AIGs~\cite{FRAIGs}.
+In~\cite{HQSsimpleAlg} the authors introduced the basic algorithm for solving DQBF in this way. %(mozno spomenut ze to vlastne vymysleli aj v iDQ clanku, ako nejaky base solver ktory pouziva BDDcka) 
+Algorithm~\ref{alg:QE} shows simple pseudocode of this. In every step this algorithm chooses (using some heuristic) an universal variable to eliminate. In~\cite{HQSsimpleAlg} they used a heuristic where the universal variable is chosen based on the number of existential ones that depend on it --- they choose the one that has minimal number of dependencies. After that, all the existential variables that depend on everything are also eliminated. To use this algorithm it is important to choose a good representation of the matrix of the DQBF. For this the authors chose and-inverter graphs (AIG) which are a tree-like structures where non-terminal nodes represent conjunction, terminal nodes are variables and these are connected with two types of nodes: normal ones and those that represent negation. With a proper implementation of operations they can be optimised in such a way that they reuse parts of the graphs resulting in functionally reduced AIGs~\cite{FRAIGs}.
 %mozno aj tu spomenut tie theorems
 
 %MYSLIENKA K TODO - heuristika ze vyberam podla poctu zavislosti v originalnom DQBF alebo v tom co sa mi postupne po odstranovani vytvara
