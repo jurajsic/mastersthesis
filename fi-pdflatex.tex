@@ -266,7 +266,11 @@ Each $\phi \in \BF{V}$ represents a \emph{Boolean function} $f_{\phi}\colon \val
 An important notion for BFs is \emph{satisfiability}. We say that $\phi \in \BF{V}$ is \emph{satisfiable} if there exists valuation $v \in \valtns{V}$ in which $\phi$ is true, that is $v(\phi) = 1$. Let $\phi_1, \phi_2 \in \BF{V}$. We say that they are \emph{equivalent}, denoted $\phi_1 = \phi_2$, if for all valuations $v$ it holds that $v(\phi_1) = v(\phi_2)$. If they are either both satisfiable or they are both unsatisfiable, we call them \emph{equisatisfiable}, denoted $\phi_1 \approx \phi_2$. %Notice that equisatisfiability of two formulas is just talking about their satisfiability, which means that these formulas can be over different sets of variables.
 
 \begin{example}
-dat tu priklad nejakych formul?? a ukazat ze v akych valuaciach su splnene/nesplnene, priklad equal, equisatisfiable
+\label{ex:BF:prenex}
+Let
+\[\phi = (x_1 \land x_2) \lequal (y_1 \lequal y_2)\]
+be BF where by $y_1 \lequal y_2$ we mean the formula $(y_1 \land y_2) \lor (\neg y_1 \land \neg y_2)$ (similarly for the ). This formula says that if both $x_1$ and $x_2$ are true, then $y_1$ and $y_2$ must be same, otherwise they must be different. This formula is satisfiable, because in valuation $v$ such that $v(x_1) = v_(x_2) = (v_(y_1) = v(y_2) = 1$ it holds that $\phi$ is evaluated to $v(\phi)=1$.
+%dat tu priklad nejakych formul?? a ukazat ze v akych valuaciach su splnene/nesplnene, priklad equal, equisatisfiable
 \end{example}
 
 %definovat negation normal form + cnf
@@ -284,7 +288,9 @@ for each $i = 1, \dots, n$ and for each $l_{ij}$ where $j \in \set{1,\dots,m_i}$
 BFs $\psi_1,\dots,\psi_n$ are called clauses and $l_{ij}$ are called literals. That is BF is in CNF if it is a conjuction of clauses which are disjuncts of literals, where literal is either a variable or negation of a variable.
 
 \begin{example}
-priklad nejakej formule co je cnf a co neni abo daco
+The formula
+\[\phi_{CNF} = ()\]
+is in CNF which is equal to formula $\psi$ from Example~\ref{ex:BF:prenex}.
 \end{example}
 
 For every BF $\phi$ there exists an equivalent formula in CNF which can be exponentially larger than $\phi$. However, there exists a construction that by adding some new variables results in an equisatisfiable BF $\phi_{CNF}$ which is only polynomially larger than the original BF $\phi$ (citedacotu).
@@ -324,7 +330,9 @@ Again, we define satisfiability. Usually, satisfiability for QBFs is defined tro
 We follow different but equal definition based on skolemization, which replaces the existential variables $x$ by some Boolean function of universal variables with lower level than $x$. This is better suited to show a correspondence of QBFs and DQBFs when we add dependencies in the next section. A QBF $\psi$ from Definition~\ref{def:QBF} is satisfiable if for each $x \in V_{\psi}^{\exists}$ there exists a function $s_{x} \in \BFuncs{\uvars{\psi}\cap V_{\psi}^{<l(x)}}$ (called Skolem function) such that $\phi$, where every $x \in \evars{\psi}$ is replaced by some BF that represents $s_x(x)$, is evaluated to $1$ in every valuation $v\colon \uvars{\psi} \to \set{0,1}$.
 
 \begin{example}
-dat priklad jednoducheho qbf ukazat ze je sat v klasickej def a ukazat ze aka skolem funkcia existuje ze to fakt plati
+Let 
+\[\psi = \forall x_1 \forall x_2 \exists y_1  \exists y_2  : (x_1 \land x_2) \lequal (y_1 \lequal y_2)\]
+be a QBF where the matrix is from Example??????. This QBF is satisfiable, because for all values of $x_1, x_2$ we can find
 \end{example}
 
 %definicia semantiky (+splnitelnost)
@@ -369,7 +377,7 @@ We call the BF $\phi$ the \emph{matrix} of $\psi$ and .. the \emph{quantifier pr
 \begin{example}
 Let use an example from~\cite{DQBFProofSystem} to explain the meaning behind dependency sets. Let 
 \[\psi = \forall x_1 \forall x_2 \exists y_1 (x_1) \exists y_2 (x_2) : (x_1 \land x_2) \lequal (y_1 \lequal y_2)\]
-be a DQBF. Both $y_1$ and $y_2$ depend only on one variable, $x_1$ and $x_2$ respectively. This DQBF can be seen as a game  vysvetlit to ako hru kde existential variables chcu splnit formulu, a universal chcu zablokovat TODO + citovat odkial som vzal priklad
+be a DQBF. Both $y_1$ and $y_2$ depend only on one variable, $x_1$ and $x_2$ respectively. This DQBF can be seen as a game where $y_1$  and $y_2$ are trying to satisfy the formula and $x_1,x_2$ are trying to make it false. However, $y_1$ knows only how $x_1$ is behaving and similarly $y_2$ knows only what $x_2$ is doing.  The formula says that if both $x_1$ and $x_2$ are true, then $y_1$ and $y_2$ should be same, otherwise they need to be different. However, this is not possible, because if for example both $y_1,y_2$ decide to be true when their respective universal variable is true then if one of the universal variable change, for example $x_1$ turns to false, then $y_2$ does not know about this and stays true. Thus, in that case $y_1$ has to change the value to false. The same thing happens to $y_2$ if $x_2$ changes its value to false. But at the end if both $x_1$ and $x_2$ change their values to false, then the values of $y_1$ and $y_2$ are the same (false) which makes the formula $\psi$ false.
 \end{example}
 
 With the example in mind, we define satisfiability for DQBF in PNF similarly to how satisfiability is defined for QBFs with Skolem functions. DQBF in PNF $\psi$ from Definition~\ref{def:DQBF:PNF} is satisfiable if for each $y \in \evars{\psi}$ there exists a Skolem function $s_y\colon y \to \BFuncs{D_y}$ such that $\phi$, where each $y \in \evars{\psi}$ is replaced by a BF representing Boolean function $s_y(y)$, evaluates to $1$ in all valuations $v\colon \uvars{\psi} \to \set{0,1}$.
