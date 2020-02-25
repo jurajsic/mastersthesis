@@ -219,8 +219,8 @@
 %\renewcommand{\phi}{\varphi}
 
 % for fixing overflowing in bibliography
-\hyphenation{Chri-stoph}
-%\hyphenation{Ma-tthias}
+\hyphenation{Chris-toph}
+%\hyphenation{Mat-thias}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -230,17 +230,17 @@
 \addcontentsline{toc}{chapter}{Introduction}
 
 \chapter{Theory}
-In this chapter we give the definitions and some theoretical results of dependency quantified Boolean formulas (DQBFs) and binary decision diagrams (BDDs). For DQBFs we build up from Boolean formulas (BFs) to which we add quantifiers resulting in quantified Boolean formulas (QBFs). After this, we add explicit dependencies to the definition of QBFs which results in DQBFs. For these we give two forms, one that does not allow quantifiers inside the formula and one that does. For the latter we give some theoretical results which allows us to transform DQBFs which we then use for developing our solver in Chapter ... In the last section of this chapter, we define BDDs and give some of their properties.% needed theory for our problem. We definition of dependency quantified Boolean formulas??? and BDDs?? citacie odkial vychadzam??
+In this chapter we give the definitions and some theoretical results of dependency quantified Boolean formulas (DQBFs) and binary decision diagrams (BDDs). For DQBFs we build up from Boolean formulas (BFs) to which we add quantifiers resulting in quantified Boolean formulas (QBFs). After this, we add explicit dependencies to the definition of QBFs which results in DQBFs. For these we give two forms, one that does not allow quantifiers inside the formula and one that does. For the latter we give some theoretical results which allow us to transform DQBFs which we then use for developing our solver in Chapter~\ref{chap:algorithm}. In the last section of this chapter we define BDDs and give some of their properties.% needed theory for our problem. We definition of dependency quantified Boolean formulas??? and BDDs?? citacie odkial vychadzam??
 
 %We define dependency quantified Boolean formulas building up from Boolean formulas to which we add quantifications followed by adding dependencies for these quantifications. We also give a 
 
 \section{Boolean Formulas}
 %definicia boolean formula (rekurzivna)
 
-We first start with defining Boolean formulas. For these we need a set of variables $V = \set{x_1, \dots, x_n}$ for which we can define a valuation function $v\colon V \to \{0,1\}$ that says whether each variable is true or false. We define Boolean formulas as variables connected by logical operatives \emph{and} (${\land}$), \emph{or} (${\lor}$) and \emph{negation} (${\neg}$).
+We first start with defining Boolean formulas. For these we need a set of variables $V = \set{x_1, \dots, x_n}$ for which we can define a valuation function $v\colon V \to \{0,1\}$ that says whether each variable is true or false. We then define Boolean formulas as variables connected by logical operatives \emph{and} (${\land}$), \emph{or} (${\lor}$) and \emph{negation} (${\neg}$).
 
 \begin{definition}
-Let $V = \set{x_1, \dots, x_n}$ be a set of variables. The set of \emph{Boolean formulas} (BFs) over $V$, denoted $\BF{V}$ is defined as the smallest set fulfilling these conditions:
+Let $V = \set{x_1, \dots, x_n}$ be a set of variables. The set of \emph{Boolean formulas} (BFs) over $V$, denoted by $\BF{V}$, is defined as the smallest set fulfilling these conditions:
 \begin{itemize}
     \item $0,1 \in \BF{V}$,
     \item $x \in \BF{V}$ if $x \in V$,
@@ -249,7 +249,7 @@ Let $V = \set{x_1, \dots, x_n}$ be a set of variables. The set of \emph{Boolean 
     \item $\neg\phi \in \BF{V}$ if $\phi \in \BF{V}$.
 \end{itemize}
 \end{definition}
-By $\phi\substitute{\phi_1}{\phi_2}$, where $\phi,\phi_1,\phi_2 \in BF{V}$, we denote a BF where each occurrence of $\phi_1$ in $\phi$ is replaced by $\phi_2$.
+By $\phi\substitute{\phi_1}{\phi_2}$, where $\phi,\phi_1,\phi_2 \in \BF{V}$, we denote the BF where each occurrence of $\phi_1$ in $\phi$ is replaced by $\phi_2$.
 
 A function $v\colon V \to \set{0,1}$ is called a \emph{valuation} over the set of variables $V$. A set of all valuations over $V$ is denoted by $\valtns{V}$. An \emph{evaluation} of $\phi \in \BF{V}$ in a valuation $v \in \valtns{V}$, denoted $v(\phi)$, is defined as %can extend this valuation to $\BF{V}$%, $v\colon \BF{V} \to \set{0,1}$ where
 \begin{itemize}
@@ -260,7 +260,7 @@ A function $v\colon V \to \set{0,1}$ is called a \emph{valuation} over the set o
     \item if $\phi = (\phi_1 \land \phi_2)$, then $v(\phi) = 1$ if both $v(\phi_1) = 1$ and $v(\phi_2) = 1$, otherwise $v(\phi) = 0$ and
     \item if $\phi = (\phi_1 \lor \phi_2$), then $v(\phi) = 1$ if either $v(\phi_1) = 1$ or $v(\phi_2) = 1$, otherwise $v(\phi) = 0$.
 \end{itemize}
-Each $\phi \in \BF{V}$ represents a \emph{Boolean function} $f_{\phi}\colon \valtns{V} \to \set{0,1}$ over $V$ such that $f_{\phi}(v) = v(\phi)$. The set of all Boolean functions over $V$ is denoted by $\BFuncs{V}$. The \emph{support set} $\supp{f}$ of Boolean function $f$ is defined as the set of variables occurring in a BF $\phi$ where from all the BFs representing $f$, $\phi$ has the smallest number of variables occurring in it. That is, the variables that are not in the support set do not change the output value of $f$.
+Each $\phi \in \BF{V}$ represents a \emph{Boolean function} $f_{\phi}\colon \valtns{V} \to \set{0,1}$ over $V$ such that $f_{\phi}(v) = v(\phi)$. The set of all Boolean functions over $V$ is denoted by $\BFuncs{V}$. The \emph{support set} $\supp{f}$ of Boolean function $f$ is defined as the set of variables occurring in a BF $\phi$ where from all the BFs representing $f$, $\phi$ has the smallest number of variables occurring in it. That is, changing the values of variables that are not in the support set do not change the output value of $f$.
 %We will abuse notation and use $v(\phi)$ for extended $v$????? 
 %mozno napisat ako ze ten extend nejak oznacime (napr u_v) ale ak je to jasne tak abusneme notation a budeme pod $v(\phi)$ mysliet $u_v(\phi)$
 
@@ -280,7 +280,7 @@ be BF where by $y_1 \lequal y_2$ we mean the formula $(y_1 \land y_2) \lor (\neg
 %definovat negation normal form + cnf
 \subsection{Conjuctive Normal Form}
 \label{sec:BF:CNF}
-To work with BFs it is usually easier to have them in some special forms. The first one we define is called conjuctive normal form.
+To work with BFs it is usually easier to have them in some special form. The first one we define is called conjuctive normal form.
 
 \begin{definition}
 We say that boolean formula $\phi \in \BF{V}$ is in \emph{conjuctive normal form} (CNF) if there exist $\phi_1,\dots,\phi_n \in \BF{V}$ where
@@ -297,7 +297,7 @@ The formula
 is in CNF with clauses $(x \lor \neg y)$ and $(\neg x \lor y)$ and literals $x,\neg y, \neg x$ and $y$.
 \end{example}
 
-For every BF $\phi$ there exists an equivalent formula in CNF which can be exponentially larger than $\phi$. However, there exists a construction that by adding some new variables results in an equisatisfiable BF $\phi_{CNF}$ which is only polynomially larger than the original BF $\phi$ (citedacotu).
+For every BF $\phi$ there exist an equivalent formula in CNF which can be exponentially larger than $\phi$. However, by using Tseytin transformation~\cite{Tseitin} we can create an equisatisfiable BF $\phi_{CNF}$ which is only polynomially larger than the original BF $\phi$.
 
 \subsection{Negation Normal Form}
 \label{sec:BF:NNF}
@@ -323,7 +323,7 @@ where $Q_i \in \set{{\exists}, {\forall}}$ and $x_i \in V$ are distinct for all 
 \label{def:QBF}
 \end{definition}
 
-A variable $x_i$ is called \emph{existential} if $Q_i = \exists$ and \emph{universal} if $Q_i = \forall$. The set of all existential variables of QBF $\psi$ is denoted by $\evars{\psi}$ and the set of all universal variables of $\psi$ is denoted by $\uvars{\psi}$. We define a level function $l\colon V \to \mathbb{N}$ which maps to each variable the number of quantifiers occurring before the variable in the formula. That is the variable $x_i \in V$ from QBF $\psi$ from Definition~\ref{def:QBF} has level $l(x_i) = i$. We denote the set of variables with level less than some $n \in \mathbb{N}$ as $V_{\psi}^{<n} = \set{x \in V | l(x) < n}$.
+The BF $\phi$ is called the \emph{matrix} of $\psi$ and $Q_1 x_1 Q_2 x_2 \dots Q_n$ is called the \emph{quantifier prefix} of $\psi$ A variable $x_i$ is called \emph{existential} if $Q_i = \exists$ and \emph{universal} if $Q_i = \forall$. The set of all existential variables of QBF $\psi$ is denoted by $\evars{\psi}$ and the set of all universal variables of $\psi$ is denoted by $\uvars{\psi}$. We define a level function $l\colon V \to \mathbb{N}$ which maps to each variable the number of quantifiers occurring before the variable in the formula. That is the variable $x_i \in V$ from QBF $\psi$ from Definition~\ref{def:QBF} has level $l(x_i) = i$. We denote the set of variables with level less than some $n \in \mathbb{N}$ as $V_{\psi}^{<n} = \set{x \in V | l(x) < n}$.
 %We call the variables $x_i$ such that $Q_i = \exists$ existential variables (denoted $V_{\psi}^{\exists}$) and the variables where $Q_i = \forall$ universal variables (denoted $V_{\psi}^{\forall}$). To each variable $x_i$ we assign a level (denoted $l(x_i)$), 
 
 Again, we define satisfiability. Usually, satisfiability for QBFs is defined trough valuation function as in BFs case where evaluation of QBFs follows the same rules as BFs with two newly added rules for quantifiers:
@@ -355,11 +355,11 @@ which is true in all valuations.
 %We can also define satisfiability on QBF, similarly to BF. We say that QBF $\psi$ is satisfiable if there exists valuation $v$ such that $v(\psi) = 1$.
 
 \section{Dependency Quantified Boolean Formulas}
-Quantifiers have expanded the expressibility of BFs quite considerably. However, there is still one drawback of QBFs --- quantified variable $x$ depends on all variables that are quantified before $x$ in the formula. The question arises whether it is possible to give a definition of formula where the dependency relation is somehow explicitly given. This results in a definition of dependency quantified Boolean formulas (DQBFs).
+Quantifiers have expanded the expressibility of BFs quite considerably. However, there is still one drawback of QBFs --- quantified variable $x$ depends on all variables that are quantified before $x$ in the formula. The question arises whether it is possible to give a definition of formula where the dependency relation is somehow explicitly given. This results in a definition of \emph{dependency quantified Boolean formulas} (DQBFs).
 
 DQBFs allow existential variables to be non-linearly dependent on the set of universal variables by explicitly writing out the set of universal variables on which each existential variable is dependent. This set is then used as a support set of the skolem functions of the existential variables which allows for richer expresibility of DQBFs over QBFs.  
 
-We start with the definition of DQBFs in prenex normal form on which we explain the basic notions and then we give definition of DQBFs in non-prenex negation normal form which allows quantifiers inside formulas. Following this we give theorems that show which DQBFs are equisatisfiable and can be replaced with each other which results in pushing quantifiers inside formula and their elimination.
+We start with the definition of DQBFs in prenex normal form on which we explain the basic notions and then we give definition of DQBFs in non-prenex negation normal form which allows quantifiers inside formulas. Following this, we give theorems that show which DQBFs are equisatisfiable and can be replaced with each other which can be used to push quantifiers inside the formula or to eliminate quantifiers.
 %\begin{itemize}
 %    \item pushing quantifiers inside formula,
 %    \item elimination of quantified variables or
@@ -372,7 +372,7 @@ The first definition of DQBF form called prenex normal form is an analogy of the
 
 %definicia DQBF -ak robim nonprenex tak zacat s prenex ale vysvetlit ze pre jednoduchost zacneme s tym + semantika prenex + priklady
 \begin{definition}
-  Let $V = \set{x_1, \dots, x_n, y_1, \dots, y_m}$ be a set of variables and $\phi \in \BF{V}$ a BF over $V$. A \emph{dependency quantified Boolean formula} (DQBF) $\psi$ in prenex normal form (PNF) is given by
+  Let $V = \set{x_1, \dots, x_n, y_1, \dots, y_m}$ be a set of variables and $\phi \in \BF{V}$ a BF over $V$. A \emph{dependency quantified Boolean formula} (DQBF) $\psi$ in \emph{prenex normal form} (PNF) is given by
   \[\psi \coloneqq \forall x_1 \dots \forall x_n \exists y_1 (D_1) \dots \exists y_m (D_m) \phi\]
   where $D_i \subseteq \set{x_1, \dots, x_n}$ for each $i \in \set{1,\dots,m}$ is a \emph{dependency set} of variable $y_i$.
   \label{def:DQBF:PNF}
@@ -384,20 +384,22 @@ We call the BF $\phi$ the \emph{matrix} of $\psi$ and $\forall x_1 \dots \forall
 \begin{example}
 Let us use an example from~\cite{DQBFProofSystem} to explain the meaning behind dependency sets. Let 
 \[\psi = \forall x_1 \forall x_2 \exists y_1 (x_1) \exists y_2 (x_2) : (x_1 \land x_2) \lequal (y_1 \lequal y_2)\]
-be a DQBF. The matrix is the BF $\phi$ from Example~\ref{ex:BF:prenex} and the quantifier prefix is very similar to the QBF from Example~\ref{ex:QBF:prenex} but now both $y_1$ and $y_2$ depend only on one variable, $x_1$ and $x_2$ respectively. The QBF was satisfiable but this DQBF is not. It can be seen as a game where $y_1$  and $y_2$ are trying to satisfy the formula and $x_1,x_2$ are trying to make it false. However, $y_1$ knows only how $x_1$ is behaving and similarly $y_2$ knows only what $x_2$ is doing. As explained in Example~\ref{ex:BF:prenex} the matrix says that if both $x_1$ and $x_2$ are true, then $y_1$ and $y_2$ should be same, otherwise they need to be different. However, this is not possible, because if for example both $y_1,y_2$ decide to be true when their respective universal variable is true then if one of the universal variable change, for example $x_1$ turns to false, then $y_2$ does not know about this and stays true. In that case $y_1$ has to change the value to false so they become different. The same thing happens to $y_2$ if $x_2$ changes its value to false. So we get behaviour where both existential variables just copy the behaviour of their universal variable. But at the end, if both $x_1$ and $x_2$ change their values to false, then the values of $y_1$ and $y_2$ are the same (false) which makes the formula $\psi$ false.
+be a DQBF. The matrix is the BF $\phi$ from Example~\ref{ex:BF:prenex} and the quantifier prefix is very similar to the QBF from Example~\ref{ex:QBF:prenex} but now both $y_1$ and $y_2$ depend only on one variable, $x_1$ and $x_2$ respectively. The QBF was satisfiable but this DQBF is not. To show why, we can look at it as a game where $y_1$  and $y_2$ are trying to satisfy the formula and $x_1,x_2$ are trying to make it false. However, $y_1$ knows only how $x_1$ is behaving and similarly $y_2$ knows only what $x_2$ is doing. As explained in Example~\ref{ex:BF:prenex} the matrix says that if both $x_1$ and $x_2$ are true, then $y_1$ and $y_2$ should be same, otherwise they need to be different. However, this is not possible, because if for example both $y_1,y_2$ decide to be true when their respective universal variables are true then if one of the universal variable change, for example $x_1$ turns to false, then $y_2$ does not know about this and stays true. In that case $y_1$ has to change the value to false so they become different. The same thing happens to $y_2$ if $x_2$ changes its value to false. So we get behaviour where both existential variables just copy the behaviour of their universal variable. But at the end, if both $x_1$ and $x_2$ change their values to false, then the values of $y_1$ and $y_2$ are the same (false) which makes the formula $\psi$ false.
 \end{example}
 
-With the example in mind, we define satisfiability for DQBF in PNF similarly to how satisfiability is defined for QBFs with Skolem functions. DQBF in PNF $\psi$ from Definition~\ref{def:DQBF:PNF} is satisfiable if for each $y \in \evars{\psi}$ there exists a Skolem function $s_y\colon y \to \BFuncs{D_y}$ such that $\phi$, where each $y \in \evars{\psi}$ is replaced by a BF representing Boolean function $s_y(y)$, evaluates to $1$ in all valuations $v\colon \uvars{\psi} \to \set{0,1}$.
+With the example in mind, we define satisfiability for DQBF in PNF similarly to how satisfiability is defined for QBFs with Skolem functions. DQBF in PNF $\psi$ from Definition~\ref{def:DQBF:PNF} is satisfiable if for each $y \in \evars{\psi}$ there exists a Skolem function $s_y \in \BFuncs{D_y}$ such that $\phi$, where each $y \in \evars{\psi}$ is replaced by a BF representing Boolean function $s_y(y)$, evaluates to $1$ in all valuations $v\colon \uvars{\psi} \to \set{0,1}$.
 
 \begin{example}
-povedat ze ziadny taky neexistuje pre predchadzajuci priklad a ukazat jednu formulu kde to existuje
+The possible Skolem functions $s_{y_1}$ for existential variable $y_1$ from previous Example are those that are represented by BFs $0$, $1$, $x_1$ or $\neg x_1$. For $y_2$ the Skolem functions $s_{y_2}$ can be those that are represented by BFs $0$, $1$, $x_2$ or $\neg x_2$. However, we cannot choose a pair $s_{y_1}$ and $s_{y_2}$ such that replacing $y_1$ and $y_2$ we get a BF which is true in all valuations. In the previous Example we actually used $s_{y_1}$ represented by $x_1$ and $s_{y_2}$ represented by $x_2$ where we get BF
+\[(x_1 \land x_2) \lequal (x_1 \lequal x_2)\]
+which is obviously not true in all valuations.
 \end{example}
 
 \begin{remark}
 QBFs in PNF can be seen as a special case of DQBFs in PNF where the dependency sets are linearly ordered. That is a DQBF $\psi$ is a QBF if for each two dependency sets $D_{y_1}$ and $D_{y_2}$ in $\psi$ it holds that either $D_{y_1} = D_{y_2}$ or $D_{y_1} \subseteq D_{y_2}$ or $D_{y_2} \subseteq D_{y_1}$.
 \end{remark}
 
-TODO: asi povedat ze PCNF je DQBF in PNF kde BF je in CNF
+%TODO: asi povedat ze PCNF je DQBF in PNF kde BF je in CNF
 
 \subsection{Negation Normal Form}
 %tu dat nonprenex ak robim, semantika + priklady + dokazy o nahradzovani a eliminovani kvantifikatorov - dat dokaz ze ked equality tak to ide nahradit (kvoli tomu ze maju rovnake hodnoty volnych premennych)
@@ -509,7 +511,7 @@ Formula $\psi$ is \emph{satisfiable} if $\seman{\psi} \not= \emptyset$. The elem
 \label{ex:DQBF:NNF}
 To explain semantics of DQBF in NNF we use an example from~\cite{HQSquantifierLocalization}:
 \[\psi = \forall x_1 \forall x_2 : (x_1 \lequal x_2) \lor \exists y (x_2) : \neg(x_1 \lequal y)\]
-where ${\lequal}$ has the same meaning as in Example~\ref{ex:BF:prenex}. The meaning behind this formula is that either $x_1$ and $x_2$ are the same of there is some $y$ which is dependent only on $x_2$ which is different from $x_1$. The Skolem function candidates of $\psi$ are then $\Scands{\psi} = \{y\mapsto f_0$, $y\mapsto f_1$, $y\mapsto f_x$, $y\mapsto f_{\neg x}\}$ % then map $y$ to Boolean function which are represented either by $0,1,x_2$ or $\neg x_2$. It is pretty obvious that only 
+where ${\lequal}$ has the same meaning as in Example~\ref{ex:BF:prenex}. The meaning behind this formula is that either $x_1$ and $x_2$ are the same or there is some $y$ which is dependent only on $x_2$ which is different from $x_1$. The Skolem function candidates of $\psi$ are then $\Scands{\psi} = \{y\mapsto f_0$, $y\mapsto f_1$, $y\mapsto f_x$, $y\mapsto f_{\neg x}\}$ % then map $y$ to Boolean function which are represented either by $0,1,x_2$ or $\neg x_2$. It is pretty obvious that only 
 where $f_0$ is Boolean function represented by Boolean formula $0$, $f_1$ is represented by $1$, $f_x$ by $x$ and $f_{\neg x}$ by $\neg x$. It is pretty obvious that only $s = y \mapsto f_{\neg x}$ is a Skolem function of $\psi$, since only $s(\psi) = (x_1 \lequal x_2) \lor \neg(x_1 \lequal \neg x_2)$ is true in all valuations.
 \end{example}
 
@@ -544,12 +546,6 @@ The next theorem shows that if DQBFs from the previous theorem occur as subformu
 \end{proof}
 
 \subsection{Quantifier Elimination}
-%quantifier elimination
-%\begin{itemize}
-%    \item universal expansion + dokaz ze vieme robit ako podformule
-%    \item existential elimination - len povedat a odkazat sa na clanok kde je dokaz
-%\end{itemize}
-
 The next two theorems give a possibility to eliminate both universal and existential quantifiers. Universal quantifiers can be eliminated always but by doing it the resulting DQBF can contain new copies of existential variables.
 
 \begin{theorem}[Universal Expansion]
@@ -562,7 +558,7 @@ Let $\psi$ be DQBF from Example~\ref{ex:DQBF:NNF}. Using universal expansion we 
     \psi' = \forall x_1 : ((x_1 \lequal 0) \lor \exists y (\emptyset) : \neg(x_1 \lequal y)) \land\\
     ((x_1 \lequal 1) \lor \exists y' (\emptyset) : \neg(x_1 \lequal y'))
 \end{multline*}
-which, like $\psi$, is satisfiable.
+which (like $\psi$) is satisfiable.
 \end{example}
 \begin{proof}
   First notice that each $y \in E_x$ must be entirely inside $\psi_1$ (even the ''$\exists y$'' bit). This stems from the way the set $\DQBF{V}$ is constructed; the dependency sets of new existential variables can only be formed from free or completely new variables and if ''$\exists y$'' was outside $\forall x :\psi_1$, then $x \in D_y$ would have to be a free or new variable. With that we can now prove that $\seman{\psi} \not= \emptyset$ iff $\seman{\psi'} \not= \emptyset$.
@@ -572,13 +568,14 @@ which, like $\psi$, is satisfiable.
   Now we prove the other direction. Let $s' \in \seman{\psi'}$. We build a Skolem function $s$ for $\psi$. For all $y \in (\evars{\psi} \setminus E_x)$ we set $s(y) = s'(y)$. For $y \in E_x$ with a copy $y' \in \evars{\psi_2}$ we set $s(y)$ to Boolean function that is represented by BF $(\neg x \land s'(y)) \lor (x \land s'(y'))$ where $s'(y)$ and $s'(y')$ are replaced with BFs representing them. It is obviously a Skolem function candidate thus we need to prove that $s(\psi)$ is true in all valuations. Let $v$ be a valuation over $\uvars{\psi}$. Without loss of generality assume that $v(x) = 0$. Then $v(s(y)) = (\neg 0 \land s'(y)) \lor (0 \land s'(y')) = s'(y)$. This means that $v(s(\forall x : \psi_1)) = v(s(\psi_1^{-x}\substitute{x}{0}))$. Therefore if $v(s'(\xi)) = 1$ then $v(s(\forall x : \psi_1)) = 1$. Because $\psi'$ is in NNF, $s'(\xi)$ occurs in $s'(\psi')$ in a tree of ${\land}$ and ${\lor}$ operations. However, from assumption we know that $v(s'(\psi')) = 1$. Therefore if $v(s'(\xi)) = 0$ it does not matter, $v(s'(\psi'))$ would be true even if $v(s'(\xi)) = 1$. Also $s(\psi)$ and $s'(\psi')$ differs only in $s(\forall x : \psi_1)$ and $s'(\xi)$ part, therefore $v(s(\psi))$ must be equal to 1. 
 \end{proof}
 
-In the case that $x \not\in V_{\psi_1}$ the situation is simpler --- we just remove the quantifier:
-\begin{lemma}
-Let $\psi, \psi_1 \in \DQBF{V}$ such that $\forall x : \psi_1$ is a subformula of $\psi$ and $x \not\in V_{\psi_1}$. Then $\psi \approx \psi'$ where $\psi'$ results from $\psi$ by replacing the subformula $\forall x : \psi_1$ by $\psi_1$.
-\end{lemma}
-\begin{proof}
-  For $\psi$ to be a DQBF in NNF, it has to hold that $x$ is not quantified anywhere else than in the subformula $\forall x : \psi_1$. Then the equisatisfiability follows from the similar argument as was used in the proof of $\forall x : \psi_1 \approx \psi_1$ in~\cite[Theorem 3]{HQSquantifierLocalization}.
-\end{proof}
+% TODO: check if we need this:
+%In the case that $x \not\in V_{\psi_1}$ the situation is simpler --- we just remove the quantifier:
+%\begin{lemma}
+%Let $\psi, \psi_1 \in \DQBF{V}$ such that $\forall x : \psi_1$ is a subformula of $\psi$ and $x \not\in V_{\psi_1}$. Then $\psi \approx \psi'$ where $\psi'$ results from $\psi$ by replacing the subformula $\forall x : \psi_1$ by $\psi_1$.
+%\end{lemma}
+%\begin{proof}
+%  For $\psi$ to be a DQBF in NNF, it has to hold that $x$ is not quantified anywhere else than in the subformula $\forall x : \psi_1$. Then the equisatisfiability follows from the similar argument as was used in the proof of $\forall x : \psi_1 \approx \psi_1$ in~\cite[Theorem 3]{HQSquantifierLocalization}.
+%\end{proof}
 
 The conditions when existential elimination is possible are more convoluted:
 
@@ -614,36 +611,56 @@ which is still satisfiable.
 
 
 \section{Binary Decision Diagrams}
-%mozno tu dat high level def. ze BDD je tree like struktura kde nodes reprezentuju variables z ktorych vychadzaju hrany reprezentujuce valuaciu pre 0 a 1
-Having defined DQBFs we can now turn our attention to their representation. We have already defined some normal forms in section blabla, but algorithmically, working with them in this form would not be very effective (why?). For this reason binary decision diagrams (BDDs) were introduced. These structures allow for a succinct representation of BFs with an effecient polynomial time implementation of logical operations.
+%Having defined DQBFs we can now turn our attention to their representation. We have already defined some normal forms in section blabla, but algorithmically, working with them in this form would not be very effective (why?). For this reason binary decision diagrams (BDDs) were introduced~\cite{BDD}. These structures allow for a succinct representation of BFs with an efficient polynomial time implementation of logical operations.
+In this section we give definition of \emph{binary decision diagrams}~\cite{BDD} which are a succinct representation of BFs with an efficient polynomial time implementation of logical operations.
 
-Let $V$ be a set of variables. A binary decision diagram over $V$ is a binary tree like structure with two terminal nodes 0 and 1 and a set of non-terminal nodes each representing a variable from $V$. Each non-terminal node has two child nodes with edges connecting them labeled with 0 and 1 respectively.
+\begin{definition}
+  Let $V$ be a set of variables. A \emph{binary decision diagram} (BDD) over $V$ is a binary tree like structure with two terminal nodes 0 and 1 and a set $N$ of non-terminal nodes each representing a variable from $V$. Each non-terminal node has two child nodes with edges connecting them labeled with 0 and 1 respectively.
+\end{definition}
 
 %We will give a definition of reduced ordered binary decision diagram, however we do not use that name and whenever we say BDD we mean ROBDD.
 
-Let $v\colon V \to \{0,1\}$ be a valuation over $V$. BDD $B$ in this valuation is evaluated to 0 or 1 by moving along the edges of non-terminal nodes, where if we are in node representing variable $x \in V$, then we move along the edge labelled by $v(x)$. The resulting terminal node is then the evaluation of $B$ in $v$. BDD $B$ then represents a Boolean formula $\phi \in \BF{V}$ if for each valuation $v$ it holds that $B$ is evaluated to $v(\phi)$.
+Let $v\colon V \to \{0,1\}$ be a valuation over $V$. BDD $\beta$ in this valuation is evaluated to 0 or 1 by moving along the edges of non-terminal nodes, where if we are in the node representing variable $x \in V$, then we move along the edge labelled by $v(x)$. The resulting terminal node is then the evaluation of $B$ in $v$. BDD $\beta$ then represents a Boolean formula $\phi \in \BF{V}$ if for each valuation $v$ it holds that $\beta$ is evaluated to $v(\phi)$.
+
+dat tu figure s bdd a robdd ktore reprezentuju rovnaku funkciu
 
 \begin{example}
 Fig. ??? shows an example of a BDD for BF ... Edges labelled by 0 are dashed???, by 1 are full??? 
 \end{example}
 
-% chceme mat linearne operacie ---> treba aby boli usporiadane ---> shannon expansion ---> ukazat operacie???
-When we have two BDDs, we want to have an effective way to compute their conjunction/disjunction. Such an algorithm should just traverse the BDDs in the same way while comparing the variables in the nodes. However, variables in the nodes on the paths from the root in general BDDs can occur in any order, which would cause problems with simple traversal of BDDs. To solve this we add an ordering on the set of variables $V$. The nodes in the BDD are then sorted based on this ordering. The resulting BDD is called an ordered binary decision diagram (OBDD).
+To have simpler algorithms for BDDs, we actually use \emph{reduced ordered BDDs} (ROBDDs) which are BDDs such that 
+\begin{enumerate}
+    \item the variables on each path from the root of BDD to the terminal are in the same order,
+    \item the isomorphic (''the same looking'') subtrees are merged and
+    \item nodes whose both edges go to the same subtree are deleted.
+\end{enumerate}
+They have the nice property that for each BF there is exactly one ROBDD representing it. In the following, when we use BDD we mean ROBDD. see fig somehting for something
 
-\begin{example}
-ukazat asi z previous example 2 orderings a povedat daco o tom ze operacie sa daju teraz implementovat jednoducho len prechadzanim stromom
-\end{example}
+%To have simpler algorithms for BDDs, we usually want to have some ordering on the set of variables $V$ such that for each path from the root of BDD to the terminal of the BDD has nodes in this order. These BDDs are called ordered BDDs (OBDDs). The ordering of BDDs is important, because two BDD representations of the same BF in different orderings can have very different sizes. odkazat sa na obrazok ze tam je ordered 
+
+%Two OBDDs with the same ordering representing the same BF can still be different, that is why we will actually work with reduced OBDDs (ROBDDs) which is an OBDD that merges isomorphic (''the same looking'') subtrees and deletes nodes whose both edges go to the same subtree. 
+
+%As a final step 
+
+% chceme mat linearne operacie ---> treba aby boli usporiadane ---> shannon expansion ---> ukazat operacie???
+%When we have two BDDs, we want to have an effective way to compute their conjunction/disjunction. Such an algorithm should just traverse the BDDs in the same way while comparing the variables in the nodes. However, variables in the nodes on the paths from the root in general BDDs can occur in any order, which would cause problems with simple traversal of BDDs. To solve this we add an ordering on the set of variables $V$. The nodes in the BDD are then sorted based on this ordering. The resulting BDD is called an ordered binary decision diagram (OBDD).
+
+%\begin{example}
+%ukazat asi z previous example 2 orderings a povedat daco o tom ze operacie sa daju teraz implementovat jednoducho len prechadzanim stromom
+%\end{example}
 
 %nieco o ROBDD, ze pre kazde BF existuje prave jedno unikatne pre kazde zoradenie + ze vyber zoradenia je dolezity + ze da sa dynamicky preukladat???
-OBDDs still suffer from one problem -- for each BF we would like to have for given order on $V$ only one OBDD representing it. This is not the case, notice OBDDs on fig. ????? and ???. Both represents BF ??? but they are different. That is why we introduce reduced OBDDs (ROBDD) (vysvetlit lepsie ze to neni moj prinos). ROBDD is an OBDD such that all isomorphic sub-BDDs are merged and the nodes that have the same BDD as children are removed.
+%OBDDs still suffer from one problem -- for each BF we would like to have for given order on $V$ only one OBDD representing it. This is not the case, notice OBDDs on fig. ????? and ???. Both represents BF ??? but they are different. That is why we introduce reduced OBDDs (ROBDD) (vysvetlit lepsie ze to neni moj prinos). ROBDD is an OBDD such that all isomorphic sub-BDDs are merged and the nodes that have the same BDD as children are removed.
 
-\begin{example}
-porovnat nejake OBDD s jeho ROBDD, detailne (kde sa ukaze )
-\end{example}
+%\begin{example}
+%porovnat nejake OBDD s jeho ROBDD, detailne (kde sa ukaze )
+%\end{example}
 
-In the following we will use the term BDD instead of ROBDD.
+For each operation on BFs (${\land}$, ${\lor}$, ${\neg}$) there is an algorithm on BDDs which can get the resulting BDD representing the application of the operation. For example, if we have BDD representing BF $\psi_1$ we can get BDD representing $\neg \psi_1$ by swapping terminal nodes $0$ and $1$. See for example~\cite{BDDdetails} for more details. %If we have another BDD representing BF $\phi_2$, we can get $\psi_1 \land \psi_2$ by using this algorithm.  Similarly an algorithm for ${\lor}$ can be defined.
 
-\section{And-Inverter Graphs - je ich treba rozobrat???}
+%In the following we will use the term BDD instead of ROBDD.
+
+%\section{And-Inverter Graphs - je ich treba rozobrat???}
 
 \chapter{State of the Art}
 %problem - vytvorit algoritmus ktory zisti ze ci dana DQBF formula je splnitelna alebo nie pomocou BDDcok alebo jej podobnym strukturam (mozno dat do teorie)
@@ -657,8 +674,9 @@ In the following we will use the term BDD instead of ROBDD.
 
 %\section{State of the Art}
 %ake solvre existuju (vybrat tie s ktorymi budem porovnavat?), trocha viac popisat HQS a ze ako funguje aj HQSpre (lebo ho pouzivam) - ale fakt len zopar veci spomenut, mozno aj to ze mozme pouzit vytvaranie log. gates pretoze to menim do BDD ako to robia v HQS
-In this chapter we give an overview of existing solutions and solvers which tackle the satisfiability problem of DQBF. An overview of existing solvers can also be found in~\cite{DQBFStateOfArtTalk,DQBFStateOfArt,DQBFStateOfArtNew} that is why we just give a short updated overview here %(short for DQDPLL, iDQ, iProver and dCAQE). 
-However we go into more details for solver HQS, because the methods we used for developing our solver are based on the workings of this solver.
+In this chapter we give an overview of existing solutions and solvers which tackle the satisfiability problem of DQBF. An overview of existing solvers can also be found in~\cite{DQBFStateOfArtTalk,DQBFStateOfArt,DQBFStateOfArtNew}. We give a short overview of most solvers and techniques but % that is why we just give a short updated overview here %(short for DQDPLL, iDQ, iProver and dCAQE). 
+%However 
+we go into more details for solver HQS, because the methods we use for developing our solver are based on the workings of this solver.
 %current solutions, that already exist
 
 %nieco o tom ze vacsina funguje na CNF, ale HQS a moje bude na NNF
@@ -753,6 +771,7 @@ The last preprocessing technique is simply put just a check whether DQBF does no
 % spomenut asi aj overapproximations
 
 \chapter{Algorithm}
+\label{chap:algorithm}
 
 \section{High level defintion???}
 
