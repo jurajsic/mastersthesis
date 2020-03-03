@@ -553,6 +553,8 @@ The next theorem shows that if DQBFs from the previous theorem occur as subformu
 \subsection{Quantifier Elimination}
 The next two theorems give a possibility to eliminate both universal and existential quantifiers. Universal quantifiers can be eliminated always but by doing it the resulting DQBF can contain new copies of existential variables.
 
+TODO: zacitovat tu treba, ze universal expansion je based na .... ale tu ukazeme verziu kde nahradzujeme vo vnutri subformule
+
 \begin{theorem}[Universal Expansion]
 \label{thrm:unExpan}
   Let $\psi, \psi_1 \in \DQBF{V}$ such that $\forall x : \psi_1$ is a subformula of $\psi$. Let $E_{x} = \set{y \in \evars{\psi_1} | x \in D_y}$ be the set of all existential variables dependent on $x$. Let $\psi_2$ be a DQBF that results from $\psi_1$ by substituting each $y \in E_x$ with a new variable $y' \not\in V_{\psi}$ where we set $D_{y'} = D_y$. Then $\psi \approx \psi'$ where $\psi'$ results from $\psi$ by replacing the subformula $\forall x : \psi_1$ by 
@@ -807,7 +809,24 @@ The last preprocessing technique is simply put just a check whether DQBF does no
 \chapter{Implementation}
 
 \chapter{Experimental results}
-grafygrafygrafy
+popisat na com testujeme a ze sme pouzili benchexec
+
+povedat ze sme najprv pustili HQSpre (odkaz na sekciu a asi aj znova citovat) bez gate detection, odfiltrovali sme results ktore boli vyriesene HQSpre alebo uz HQSpre prekrocil limity... vysledok tohto sme hodili do iDQ, iProver, dCAQE
+
+pre HQS a moj pouzivame -> ak gate detection zisti ze mame viac ako n gates (v HQS maju teraz 5) tak pustime znova HQSpre ale teraz uz aj s tym ze chranime tieto gates aby sme ich potom mohli pouzit
+
+cas HQSpre bez gate detection zaratavame do vsetkych solvrov, tym silmulujeme to co robi HQSnp???
+
+benchmarks:
+\begin{itemize}
+    \item PEC - vid \cite{HQSquantifierLocalization} ze co vsetko citovat, su to asi folders Finkbenier, Scholl a Biere v z tej stranky stiahnute co je tam odkaz v tom istom clanku
+    \item controller synthesis problems - to iste, folder je ale iba Bloem
+    \item ziskane zo SAT - to iste, folder je ale iba Balabanov
+    \item BoSy - vid \cite{dCAQE}, nie su ale zverejnene, skusit asi popytat
+\end{itemize}
+Zrobit asi pre kazdy tento benchmark sekciu a porovnat - grafy, tabulky atd, neviem este. Potom zrobit velky graf kde dam vsetko dohromady mozno, nech vidno spolu ze ake to je. A mozno dat z QBFeval'19, ze povedat ze je to suhrn vybratych benchmarks z tychto (okrem asi BoSy), tak aby nijaky nedominoval a nejak su pekne rozdelene ci co a ukazat na tom ????
+
+Este mozno budem porovnavat navzajom rozne heuristiky pouzite v mojom a potom budem porovnavat najlepsiu???? s ostatnymi????
 
 \chapter*{Conclusion}
 \addcontentsline{toc}{chapter}{Conclusion}
