@@ -793,17 +793,33 @@ The last preprocessing technique is simply put just a check whether DQBF does no
 \chapter{Algorithm}
 \label{chap:algorithm}
 
+v tejto kapitole popisem nas algoritmus ktory vyuziva BDDcka na solving DQBF
+
 \section{High level defintion???}
+vysvetlit co je to quantifier tree (proste reprezentacia DQBF, kde kazdy non terminal node reprezentuje operaciu and alebo or na children (co su subformule) a pri kazdom tomto node su ulozene kvantifikatory; terminal nodes su literals) -- hodit mozno do kapitoly 1, plus obrazok
+
+algoritmus zacina s tymto stromom kde vsetky kvantifikatory su v root, pomocou theoremu o lokalizacii ich strcime dnu (popisat heuristiku ze ako ich strkame), potom rekurzivne prechadza tento strom, kde ziska s children formule, z ktorych vytiahne kvantifikatory a maticu prevedie do BDD a potom nejakou heuristikou sa rozhodne ktore kvantifikatory sa odstrania, tie sa odstrania (pouzitim theorems o odstranovani - pridat mazanie ak nie je v support set, nejakou heuristikou sa rozhodne v akom poradi) a return zvysny prefix s maticou v BDD
 
 \section{Heuristics of deciding what to do on each level of quantifier tree}
 \begin{itemize}
-    \item nothing - simple solver
-    \item remove everything possible (all universal vars and possible exist. vars) - tree solver
+    \item nothing - simple solver (maybe have it a heuristic which variables to localise???, so we say none and we get simple solver; we could put it with how to localise???)
+    \item remove everything possible (all universal vars and possible exist. vars, in iteration -> one universal var, all possible existential vars (based on theorem~\ref{thrm:exElim}) and so on) - tree solver
     \item remove only exist vars (or maybe just some univ. vars - those that only few exist vars depend on or those that will allow me to remove some exist vars)???
-    \item remove some dependencies to be able to remove exist vars????
+    \item remove some dependencies to be able to remove exist vars???? - not possible??
+\end{itemize}
+
+\section{Heuristic to how to localise variables}
+\begin{itemize}
+    \item we do not localise - for simple solver
+    \item when we localise for conjuction and univ/exist quantifier we choose this and this children to put it in etc. for disjunction and univ/exist this and this etc.
 \end{itemize}
 
 \section{Heuristics for order of elimination of universal variables}
+\begin{itemize}
+    \item the order is set on the beginning based on the number of existential variables that depend on them (from lowest to highest), so the created duplicates do not count in, i.e. for \[\forall x_1 \forall x_2 \forall x_3 \exists y_1(x_1, x_2) \exists y_2(x_1,x_2) \exists y_3(x_3) \exists y_4(x_3) \exists y_5 (x_3),\] the order is $x_1, x_2, x_3$, because both $x_1$ and $x_2$ only two depend on them, for $x_3$ it is three
+    \item similarly, but the next universal variable to eliminate is the one with the minimal number of existential variables that depend on them (so also the existential duplicated count here), i. e. for previous example, first $x_1$ is removed, but then we have \[\forall x_2 \forall x_3 \exists y_1(x_2) \exists y_2(x_2) \exists y_1'(x_2) \exists y_2'(x_2) \exists y_3(x_3) \exists y_4(x_3) \exists y_5 (x_3)\] and so $x_3$ is removed next, because there are four ex. variables (two original, two duplicates) that depend on $x_2$ now
+    \item something with creating depency tree, to find existential variables to remove as fast as possible (not sure if possible)
+\end{itemize}
 
 \chapter{Implementation}
 
@@ -830,7 +846,11 @@ Este mozno budem porovnavat navzajom rozne heuristiky pouzite v mojom a potom bu
 \chapter*{Conclusion}
 \addcontentsline{toc}{chapter}{Conclusion}
 
+
+\begingroup
+\setlength{\emergencystretch}{8em}
 \printbibliography[heading=bibintoc]
+\endgroup
 
 %\chapter{Inserting the index}
 %After using the \verb"\makeindex" macro and loading the
