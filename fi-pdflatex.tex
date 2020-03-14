@@ -418,16 +418,17 @@ QBFs in PNF can be seen as a special case of DQBFs in PNF where the dependency s
 \subsection{Negation Normal Form}
 %tu dat nonprenex ak robim, semantika + priklady + dokazy o nahradzovani a eliminovani kvantifikatorov - dat dokaz ze ked equality tak to ide nahradit (kvoli tomu ze maju rovnake hodnoty volnych premennych)
 
-In this section we give the definition of the normal form of DQBF that is non-prenex. This allows quantifiers inside the formula. However, negation is only allowed in front of variables. This restriction stems from the fact that prenex DQBFs are not syntactically closed under negation~\cite{NegationOfDQBFs}. %, therefore negation in front of some quantified subformula would make no sense.
+In this section we give the definition of the normal form of DQBF that is non-prenex. This allows quantifiers inside the formula. However, negation is only allowed in front of variables. %This restriction stems from the fact that prenex DQBFs are not syntactically closed under negation~\cite{NegationOfDQBFs}. %, therefore negation in front of some quantified subformula would make no sense.
 This form is also not closed which means it allows free variables. These variables are not bounded by any quantifier thus the definition of satisfiability has to take them into consideration. The definitions in this section are taken from Ge-Ernst et al.~\cite{HQSquantifierLocalization}.
 
 
-We first give the definition of the set $\DQBF{}$ of DQBFs in \emph{negation normal form} where we use the rules form Figure~\ref{fig:DQBFrules}. Each rule is ... with the rules for updating the sets of universla, existental and free variables. In the rules we sometimes use notation blabla for removing from dependency sets
+We first give the definition of the set $\DQBF{V}$ of DQBFs in \emph{negation normal form} where we use the rules form Figure~\ref{fig:DQBFrules}. Each rule has the list of conditions (over the line) that has to hold so that the resulting formula under the line is in $\DQBF{V}$. For each formula $\psi$ we also define the set of existential $\evars{\psi}$, universal $\uvars{\psi}$, and free $\fvars{\psi}$ variables. We also use $\qvars{\psi} = \evars{\psi} \cup \uvars{\psi}$ and $V_{\psi} = \qvars{\psi} \cup \fvars{\psi}$.  Furthermore, $\psi^{-v}$ result from $\psi$ where $v$ is removed from every dependency set in $\psi$. 
 
 \begin{figure}[htp]
     \renewcommand{\arraystretch}{2}
     %\begin{centering}
-    \hspace*{-0.7cm}\begin{tabular}{ccccc}
+    %\hspace*{-0.7cm}
+    \begin{tabular}{ccccc}
         \multicolumn{2}{c}{rule} & $V_{.}^{\exists}$ & $V_{.}^{\forall}$ & $V_{.}^{\text{free}}$\\\hline
         {\begin{prooftree}
             \infer0{0 \in \DQBF{V}}
@@ -462,14 +463,14 @@ We first give the definition of the set $\DQBF{}$ of DQBFs in \emph{negation nor
         & $\evars{\psi_1} \cup \evars{\psi_2}$ & $\uvars{\psi_2} \cup \uvars{\psi_2}$ & $\fvars{\psi_1} \cup \fvars{\psi_2}$\\[5mm]
         \multicolumn{2}{c}{{\begin{prooftree}
             \hypo{\psi \in \DQBF{V}}
-            \hypo{v \in V \setminus (\evars{\psi} \cup \uvars{\psi})}
+            \hypo{v \in V \setminus \qvars{\psi}}
             \hypo{(\ref{existrule})}
             \infer3{\exists v(D_v)\itholds\psi^{-v} \in \DQBF{V}}
         \end{prooftree}}}
         & $\evars{\psi} \cup \set{v}$ & $\uvars{\psi}$ & $\fvars{\psi} \setminus \set{v}$ \\[5mm]
         \multicolumn{2}{c}{{\begin{prooftree}
             \hypo{\psi \in \DQBF{V}}
-            \hypo{v \in V \setminus (\evars{\psi} \cup \uvars{\psi})}
+            \hypo{v \in V \setminus \qvars{\psi}}
             \infer2{\forall v\itholds\psi \in \DQBF{V}}
         \end{prooftree}}}
         & $\evars{\psi}$ & $\uvars{\psi} \cup \set{v}$ & $\fvars{\psi} \setminus \set{v}$\\[5mm]
@@ -478,23 +479,22 @@ We first give the definition of the set $\DQBF{}$ of DQBFs in \emph{negation nor
     \flushleft{where (\ref{disconjrule}) refers to}
     \begin{multline}
         \tag{1} \label{disconjrule}
-        (\evars{\psi_1} \cup \uvars{\psi_1}) \cap (\evars{\psi_2} \cup \uvars{\psi_2}) = \emptyset \land \fvars{\psi_1} \cap (\evars{\psi_2} \cup \uvars{\psi_2}) = \emptyset\\
-        \land \fvars{\psi_2} \cap (\evars{\psi_1} \cup \uvars{\psi_1}) = \emptyset
+        \qvars{\psi_1} \cap \qvars{\psi_2} = \emptyset \text{\quad and\quad} \fvars{\psi_1} \cap \qvars{\psi_2} = \emptyset \text{\quad and\quad} \fvars{\psi_2} \cap \qvars{\psi_1} = \emptyset
     \end{multline}
     \flushleft{and (\ref{existrule}) refers to}
     \begin{equation}
         \tag{2} \label{existrule}
-        D_v \subseteq V \setminus (\evars{\psi} \cup \uvars{\psi} \cup \set{v})
+        D_v \subseteq V \setminus (\qvars{\psi} \cup \set{v})
     \end{equation}
     \caption{Rules defining the syntax of DQBFs in NNF (based on Ge-Ernst et al.~\cite{HQSquantifierLocalization}).}
     \label{fig:DQBFrules}
 \end{figure}
 
 \begin{definition}
-  Let $V$ be a set of variables. Let $\psi^{-v}$ result from $\psi$ where $v$ is removed from every dependency set in $\psi$. The set $\DQBF{V}$ of \emph{DQBFs in negation normal form} (NNF) over $V$ as well as their existential, universal and free variables are defined by Figure~\ref{fig:DQBFrules}. The set $\DQBF{V}$ is defined to be the smallest set satisfying these rules. We set $V_{\psi} = \evars{\psi}\cup\uvars{\psi}\cup\fvars{\psi}$.
+  Let $V$ be a set of variables. The set $\DQBF{V}$ of \emph{DQBFs in negation normal form} (NNF) over $V$ is defined to be the smallest set satisfying the rules from Figure~\ref{fig:DQBFrules}.
 \end{definition}
 \begin{remark}
-In the definition by Ge-Ernst et al.~\cite{HQSquantifierLocalization} the last two rules in Figure~\ref{fig:DQBFrules} have condition $v \in \fvars{\psi}$ instead of $v \in V \setminus (\evars{\psi} \cup \uvars{\psi})$. This condition is too strong and does not allow some formulas which are valid. For example, as we show in the next section, we can transform DQBFs by pushing quantifiers inside the formula and this way we can end up with a formula $\forall x \itholds \psi$ where $x \not\in V_{\psi}$. However, according to the definition by Ge-Ernst et al.~\cite{HQSquantifierLocalization} this would not be a valid formula.
+In the definition by Ge-Ernst et al.~\cite{HQSquantifierLocalization} the last two rules in Figure~\ref{fig:DQBFrules} have condition $v \in \fvars{\psi}$ instead of $v \in V \setminus \qvars{V}$. This condition is too strong and does not allow some formulas which are valid. For example, as we show in the next section, we can transform DQBFs by pushing quantifiers inside the formula and this way we can end up with a formula $\forall x \itholds \psi$ where $x \not\in V_{\psi}$. However, according to the definition by Ge-Ernst et al.~\cite{HQSquantifierLocalization} this would not be a valid formula.
 \end{remark}
 
 \begin{remark}
@@ -639,12 +639,12 @@ which is still satisfiable.
 In this section we recall a definition of \emph{binary decision diagrams}~\cite{BDD} which is a succinct representation of BFs with an efficient polynomial time implementation of logical operations.
 
 \begin{definition}
-  Let $V$ be a set of variables. A \emph{binary decision diagram} (BDD) over $V$ is a binary tree like structure with two terminal nodes 0 and 1 and a set $N$ of non-terminal nodes each representing a variable from $V$. Each non-terminal node has two child nodes with edges connecting them labeled with 0 and 1 respectively.
+  Let $V$ be a set of variables. A \emph{binary decision diagram} (BDD) \emph{over $V$} is a rooted, directed, acyclic graph with two terminal nodes 0 and 1 and a set $N$ of non-terminal nodes, each representing a variable from $V$. Each $n \in N$ has two child nodes, low child and high child. For each $x \in V$ and every path $\sigma$ from root to a terminal node there is at most one $n \in N$ on $\sigma$ representing $x$.
 \end{definition}
 
 %We will give a definition of reduced ordered binary decision diagram, however we do not use that name and whenever we say BDD we mean ROBDD.
 
-Let $v\colon V \to \{0,1\}$ be a valuation over $V$. BDD $\beta$ in this valuation is evaluated to 0 or 1 by moving along the edges of non-terminal nodes, where if we are in the node representing variable $x \in V$, then we move along the edge labelled by $v(x)$. The resulting terminal node is then the evaluation $v(\beta)$ of $\beta$ in $v$. BDD $\beta$ then represents a Boolean formula $\phi \in \BF{V}$ if for each valuation $v$ it holds that $v(\beta) = v(\phi)$.
+Let $v\colon V \to \{0,1\}$ be a valuation over $V$. BDD $\beta$ in this valuation is evaluated to 0 or 1 by starting in the root and for every $n \in N$, representing some $x \in V$, either moving to low child if $v(x) = 0$ or to high child if $v(x) = 1$. The resulting terminal node is then the evaluation $v(\beta)$ of $\beta$ in $v$. BDD $\beta$ then represents a Boolean formula $\phi \in \BF{V}$ if for each valuation $v$ it holds that $v(\beta) = v(\phi)$.
 
 \begin{figure}[ht!]
     \centering
@@ -657,19 +657,22 @@ Let $v\colon V \to \{0,1\}$ be a valuation over $V$. BDD $\beta$ in this valuati
 \end{figure}
 
 \begin{example}
-Figure~\ref{fig:BDD} shows an example of a BDD where edges labelled by 0 are dashed and by 1 are full, non-terminal nodes are denoted by the variable they represent and terminal notes are shown as box with the constant they represent. We also show two copies of terminal nodes, that is only for better visualization, they are still the same two. To show nicer picture, the non-terminal nodes (boxe) This BDD represents the BF $(\neg x_1 \land x_2 \land x_3) \lor (x_1 \land \neg (x_1 \lequal x_2))$. 
+\label{ex:BDD}
+Figure~\ref{fig:BDD} shows an example of a BDD where edges to low children are dashed and to high children are full, non-terminal nodes are denoted by the variable they represent and terminal nodes are shown as boxes with the constant they represent. %We also show two copies of terminal nodes, this is only for better visualization, they are still the same two. To show nicer picture, the non-terminal nodes (boxe) 
+This BDD represents the BF $(\neg x_1 \land x_2 \land x_3) \lor (x_1 \land \neg (x_1 \lequal x_2))$. 
 \end{example}
 
 To have simpler algorithms for BDDs, we actually use \emph{reduced ordered BDDs} (ROBDDs) which are BDDs such that 
 \begin{enumerate}
-    \item the variables on each path from the root of BDD to the terminal are in the same order,
+    \item the variables on each path from the root of BDD to a terminal node are in the same order (possibly some of them are missing),
     \item the isomorphic (''the same looking'') subtrees are merged and
     \item nodes whose both edges go to the same subtree are deleted.
 \end{enumerate}
-They have the nice property that for each BF there is exactly one ROBDD representing it. In the following chapters, when we use BDD we mean ROBDD.
+They have the nice property that for a given variable order, each BF is represented by exactly one ROBDD. In the following chapters, when we use BDD we mean ROBDD.
 
 \begin{example}
-Figure~\ref{fig:ROBDD} shows a ROBDD which represents the same BF as BDD from the previous example. While the BDD from Figure~\ref{fig:BDD} does not have ordered variables the ROBDD always goes from root to terminal node with $x_1$ followed by $x_2$ and $x_3$. Also, one $x_3$ node was deleted because both edges coming from it ended in $0$. Furthermore, both $x_2$ nodes share an isomorphic subtree.
+\label{ex:ROBDD}
+Figure~\ref{fig:ROBDD} shows a ROBDD which represents the same BF as the BDD from Example~\ref{ex:BDD}. While the BDD from Figure~\ref{fig:BDD} does not have ordered variables the ROBDD always goes from root to terminal node with $x_1$ followed by $x_2$ and $x_3$. Also, one $x_3$ node was deleted because both edges coming from it ended in $0$. Furthermore, both $x_2$ nodes share an isomorphic subtree.
 \end{example}
 
 %To have simpler algorithms for BDDs, we usually want to have some ordering on the set of variables $V$ such that for each path from the root of BDD to the terminal of the BDD has nodes in this order. These BDDs are called ordered BDDs (OBDDs). The ordering of BDDs is important, because two BDD representations of the same BF in different orderings can have very different sizes. odkazat sa na obrazok ze tam je ordered 
@@ -692,7 +695,7 @@ Figure~\ref{fig:ROBDD} shows a ROBDD which represents the same BF as BDD from th
 %porovnat nejake OBDD s jeho ROBDD, detailne (kde sa ukaze )
 %\end{example}
 
-For each operation on BFs (${\land}$, ${\lor}$, ${\neg}$) there is an algorithm on BDDs which can get the resulting BDD representing the application of the operation. For example, if we have BDD representing BF $\psi_1$ we can get BDD representing $\neg \psi_1$ by swapping terminal nodes $0$ and $1$. See for example Andersen~\cite{BDDdetails} for more details. %If we have another BDD representing BF $\phi_2$, we can get $\psi_1 \land \psi_2$ by using this algorithm.  Similarly an algorithm for ${\lor}$ can be defined.
+For each operation on BFs (${\land}$, ${\lor}$, ${\neg}$), there is an algorithm on BDDs which can get the resulting BDD representing the application of the operation. For example, if we have a BDD representing BF $\psi_1$, we can get a BDD representing $\neg \psi_1$ by swapping terminal nodes $0$ and $1$. See for example Andersen~\cite{BDDdetails} for more details. %If we have another BDD representing BF $\phi_2$, we can get $\psi_1 \land \psi_2$ by using this algorithm.  Similarly an algorithm for ${\lor}$ can be defined.
 
 %In the following we will use the term BDD instead of ROBDD.
 
