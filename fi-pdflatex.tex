@@ -175,6 +175,9 @@
 % for writing out rules of DQBF in NNF
 \usepackage{ebproof}
 
+% for complexity class
+%\usepackage[basic]{complexity}
+
 % for writing left aligned text in figures
 %\usepackage{caption}
 
@@ -225,6 +228,14 @@
 
 % space between quantifiers and formula
 \newcommand{\itholds}{\,}
+
+% complexity classes
+\newcommand{\ComplexityFont}[1]{%
+{\ensuremath{\mathsf{#1}}}%extra {} makes everyone happy.
+}
+\newcommand{\PSPACE}{\ComplexityFont{PSPACE}}
+\newcommand{\NP}{\ComplexityFont{NP}}
+\newcommand{\NEXPTIME}{\ComplexityFont{NEXPTIME}}
 
 %\renewcommand{\phi}{\varphi}
 
@@ -542,31 +553,37 @@ We start with two theorems that show when it is possible to push (extract) quant
   Let ${\diamond} \in \set{{\land},{\lor}}$ and $\psi,\psi_1,\psi_2 \in \DQBF{V}$. We assume that $x'$ and $y'$ are fresh variables, which do not occur in $\psi,\psi_1$ and $\psi_2$. The following equisatifiabilities hold for all DQBFs in NNF:
   \begin{align}
       %\forall x : \psi &\approx \psi \text{, if } x \not\in V_{\psi} \\
-      \forall x \itholds (\psi_1 \land \psi_2) &\approx (\forall x \itholds \psi_1) \land (\forall x' \itholds \psi_2\substitute{x}{x'}) \\
-      \forall x \itholds (\psi_1 \land \psi_2) &\approx (\psi_1^{-x} \land (\forall x \itholds \psi_2)) \text{, if } x \not\in V_{\psi_1} \\
-      \forall x \itholds (\psi_1 \lor \psi_2) &\approx \begin{multlined}[t][3cm](\psi_1 \lor (\forall x \itholds \psi_2)) \text{, if } x \not\in V_{\psi_1}\\
+      \forall x \itholds (\psi_1 \land \psi_2) &\approx (\forall x \itholds \psi_1) \land (\forall x' \itholds \psi_2\substitute{x}{x'}) \label{loc:unconj1} \\
+      \forall x \itholds (\psi_1 \land \psi_2) &\approx (\psi_1^{-x} \land (\forall x \itholds \psi_2)) \text{, if } x \not\in V_{\psi_1} \label{loc:unconj2} \\
+      \forall x \itholds (\psi_1 \lor \psi_2) &\approx \begin{multlined}[t][3cm](\psi_1 \lor (\forall x \itholds \psi_2)) \text{, if } x \not\in V_{\psi_1} \label{loc:undisj} \\
       \text{ and } x \not\in D_y \text{ for all } y \in \evars{\psi_1}\end{multlined} \\
-      \exists y(D_y) \itholds (\psi_1 \lor \psi_2) &\approx (\exists y(D_y) \itholds \psi_1) \lor (\exists y'(D_y) \itholds \psi_2\substitute{y}{y'}) \\
-      \exists y(D_y) \itholds (\psi_1 \diamond \psi_2) &\approx (\psi_1 \diamond (\exists y(D_y) \itholds \psi_2)) \text{, if } y \not\in V_{\psi_1} \\
-      \exists y_1(D_{y_1})\exists y_2(D_{y_2}) \itholds \psi &\approx \exists y_2(D_{y_2}) \exists y_1(D_{y_1}) \itholds \psi \\
-      \forall x_1\forall x_2 \itholds \psi &\approx \forall x_2\forall x_1 \itholds \psi \\
-      \forall x\exists y(D_y) \itholds \psi &\approx \exists y(D_y)\forall x \itholds \psi\text{, if } x \not\in D_y.
+      \exists y(D_y) \itholds (\psi_1 \lor \psi_2) &\approx (\exists y(D_y) \itholds \psi_1) \lor (\exists y'(D_y) \itholds \psi_2\substitute{y}{y'}) \label{loc:exdisj} \\
+      \exists y(D_y) \itholds (\psi_1 \diamond \psi_2) &\approx (\psi_1 \diamond (\exists y(D_y) \itholds \psi_2)) \text{, if } y \not\in V_{\psi_1} \label{loc:exboth} \\
+      \exists y_1(D_{y_1})\exists y_2(D_{y_2}) \itholds \psi &\approx \exists y_2(D_{y_2}) \exists y_1(D_{y_1}) \itholds \psi \label{loc:exswap} \\
+      \forall x_1\forall x_2 \itholds \psi &\approx \forall x_2\forall x_1 \itholds \psi \label{loc:unswap} \\
+      \forall x\exists y(D_y) \itholds \psi &\approx \exists y(D_y)\forall x \itholds \psi\text{, if } x \not\in D_y. \label{loc:bothswap}
   \end{align}
 \end{theorem}
 
 The next theorem shows that if DQBFs from the previous theorem occur as subformulas of DQBF $\psi$ they can be replaced without changing the satisfiability of $\psi$.
 
 \begin{theorem}
-  Let $\psi \in \DQBF{V}$ and $\psi_1, \psi_2$ be the formulas from previous theorem on each side of the same equality where $\psi_1$ is a subformula of $\psi$. Again, we assume that $x'$ and $y'$ are fresh variables which do not occur in $\psi$. Then $\psi \approx \psi'$ where $\psi'$ results from $\psi$ by replacing $\psi_1$ with $\psi_2$.
+  Let $\psi \in \DQBF{V}$, $\phi_1$ be the left side formula and $\phi_2$ be the right side formula  from the same equality from Theorem~\ref{thrm:quantLocalEq} where $\phi_1$ is a subformula of $\psi$. Again, the same assumptions for $x'$ and $y'$ variables hold as in Theorem~\ref{thrm:quantLocalEq} but also they do not occur in $\psi$. Then $\psi \approx \psi'$ where $\psi'$ results from $\psi$ by replacing $\phi_1$ with $\phi_2$.
 \end{theorem}
 \begin{proof}
-  TODO!!!
+  (\ref{loc:unconj1}) We show that $\seman{\psi} \not= \emptyset$ iff $\seman{\psi'} \not= \emptyset$. First, let $s \in \seman{\psi}$. We now show that for $s'$, where $s'(y) = s(y)\substitute{x}{x'}$ for $y \in \evars{\phi_2}$ and $s'(y) = s(y)$ otherwise, it holds $s' \in \seman{\psi'}$. Let $v \in \valtns{\psi'}$. We need to show that $v(s'(\psi')) = 1$. Because $s \in \seman{\psi}$ it holds that $v(s(\psi)) = 1$. For the case that $v(x') = v(x)$ we get $v(s(\psi)) = v(s'(\psi'))$, because BFs $s(\psi)$ and $s(\psi')$ differ only in some replacements of $x$ by $x'$. Therefore we assume that $v(x') \not= v(x)$. We know that $\psi$ and $\psi'$ differ only in the formulas $\phi_1$ and $\phi_2$, therefore we can only focus on the case that $v(s(\psi))$ depends on the value of $v(s(\phi_1))$. Also, $\psi$ is in NNF, which means that in the tree of operations, negation cannot be before $\phi_1$. This means that we can focus only on the case where $v(s(\phi_1)) = 1$, otherwise the value of $v(s(\psi))$ would not depend on $v(s(\phi_1))$. This means we need to show that $v(s'(\phi_2)) = 1$. We have that for $v(s(\phi_1)) = v(s(\forall x \itholds (\psi_1 \land \psi_2))) = v(s(\psi_1) \land s(\psi_2))$ to be equal to one, it has to hold that $v(s(\psi_1)) = 1$ and $v(s(\psi_2)) = 1$. Also, for $v'$ which is equal to $v$, except that $v'(x) \not= v(x)$, it holds that $v'(s(\psi)) = 1$. This is from the assumption that the value of $v(s(\psi))$ depends on $v(s(\phi_1))$, because $x$ is only in $\phi_1$. This means that $v'(s(\psi_2)) = 1$. Also $v'(s(\psi_2)) = v(s'(\psi_2\substitute{x}{x'}))$, because $v'(x) = v(x')$. All in all, we get $v(s(\psi_1)) = v(s'(\psi_1)) = 1$ and $v(s'(\psi_2\substitute{x}{x'})) = 1$ therefore $v(s'(\phi_2)) = v(s'((\forall x \itholds \psi_1) \land (\forall x' \itholds \psi_2\substitute{x}{x'}))) = 1$.
+  
+  For the other direction, let $s' \in \seman{\psi'}$. It can be easily shown by similar argument that $s$, where $s(y) = s'(y)\substitute{x'}{x}$ for $y \in \psi_2$ and $s(y) = s'(y)$ otherwise, is a satisfying Skolem functions mapping of $\psi$.
+  
+  (\ref{loc:unconj2}) This was proven by Ge-Ernst et al.~\cite[Theorem 4]{HQSquantifierLocalization}.
+  
+  (\ref{loc:exdisj}) Again, we show that $\seman{\psi} \not= \emptyset$ iff $\seman{\psi'} \not= \emptyset$. First, let $s \in \seman{\psi}$. It is easy to see, that $s'$, where $s'(y) = s'(y') = s(y)$ and for other variables $s'(v) = s(v)$, is a satisfying Skolem functions mapping of $\psi'$, because $s(\psi)$ and $s(\psi')$ are the same BFs. For the other direction, let $s' \in \seman{\psi'}$. Using similar arguments as in the case (\ref{loc:unconj1}) and realising that disjunction valuates to true if either of its operators is true, we can see that at least one of $s_1$ and $s_2$, where $s_1(y) = s'(y)$, $s_2(y) = s'(y')$ and for other variable $s_1(v) = s_2(v) = s'(v)$, is a satisfying Skolem functions mapping of $\psi$.
+  
+  (\ref{loc:undisj}, \ref{loc:exboth}, \ref{loc:exswap}, \ref{loc:unswap}, \ref{loc:bothswap}) Because $\uvars{\psi} = \uvars{\psi'}$, $\evars{\psi} = \evars{\psi'}$, and $\fvars{\psi} = \fvars{\psi'}$ and the dependency sets do not change, it holds that $\Scands{\psi} = \Scands{\psi'}$. Also, for any $s \in \Scands{\psi}$ it holds that $s(\psi)$ is the same BF as $s(\psi')$ which means that $\seman{\psi} = \seman{\psi'}$, therefore $\psi \approx \psi'$.
 \end{proof}
 
 \subsection{Quantifier Elimination}
-The next two theorems give a possibility to eliminate both universal and existential quantifiers. Universal quantifiers can be eliminated always but by doing it the resulting DQBF can contain new copies of existential variables.
-
-TODO: zacitovat tu treba, ze universal expansion je based na .... ale tu ukazeme verziu kde nahradzujeme vo vnutri subformule
+The next theorems give a possibility to eliminate both universal and existential quantifiers. The first theorem shows how to eliminate universal quantifiers by universal expansion. This can be always applied to any universal quantifier but by doing so the resulting DQBF can contain new copies of existential variables. The theorem is based on universal expansion for DQBFs in PNF~\cite{HQSsimpleAlg,NegationOfDQBFs}, here we generalise it to the case of subformulas in DQBFs in NNF.
 
 \begin{theorem}[Universal Expansion]
 \label{thrm:unExpan}
@@ -590,15 +607,6 @@ Let $\psi$ be the DQBF from Example~\ref{ex:DQBF:NNF}. Using universal expansion
 which (like $\psi$) is satisfiable.
 \end{example}
 
-% TODO: check if we need this:
-%In the case that $x \not\in V_{\psi_1}$ the situation is simpler --- we just remove the quantifier:
-%\begin{lemma}
-%Let $\psi, \psi_1 \in \DQBF{V}$ such that $\forall x : \psi_1$ is a subformula of $\psi$ and $x \not\in V_{\psi_1}$. Then $\psi \approx \psi'$ where $\psi'$ results from $\psi$ by replacing the subformula $\forall x : \psi_1$ by $\psi_1$.
-%\end{lemma}
-%\begin{proof}
-%  For $\psi$ to be a DQBF in NNF, it has to hold that $x$ is not quantified anywhere else than in the subformula $\forall x : \psi_1$. Then the equisatisfiability follows from the similar argument as was used in the proof of $\forall x : \psi_1 \approx \psi_1$ in~\cite[Theorem 3]{HQSquantifierLocalization}.
-%\end{proof}
-
 The conditions when existential elimination is possible are more strict:
 
 \begin{theorem}[{\cite[Theorem 5]{HQSquantifierLocalization}}]
@@ -620,18 +628,17 @@ be a DQBF that says that either $y_1$ has the same value as $x_1 \land x_2$ (whi
 which is still satisfiable.
 \end{example}
 
+% TODO: check if we need this:
+%In the case that $x \not\in V_{\psi_1}$ the situation is simpler --- we just remove the quantifier:
+%\begin{lemma}
+%Let $\psi, \psi_1 \in \DQBF{V}$ such that $\forall x : \psi_1$ is a subformula of $\psi$ and $x \not\in V_{\psi_1}$. Then $\psi \approx \psi'$ where $\psi'$ results from $\psi$ by replacing the subformula $\forall x : \psi_1$ by $\psi_1$.
+%\end{lemma}
+%\begin{proof}
+%  For $\psi$ to be a DQBF in NNF, it has to hold that $x$ is not quantified anywhere else than in the subformula $\forall x : \psi_1$. Then the equisatisfiability follows from the similar argument as was used in the proof of $\forall x : \psi_1 \approx \psi_1$ in~\cite[Theorem 3]{HQSquantifierLocalization}.
+%\end{proof}
 
 %dependency elimination - jedine ak to budem pouzivat, treba potom aj dokaz ze to funguje pre podformule - inak je to spomenute pri state of art
 
-%veci k zamysleniu - zrobit vseobecny dokaz alebo pre kazdu vec zvlast + ake priklady dat, asi dat priklad ku kazdej vete??
-
-
-% \begin{theorem}
-%   Let $\phi, \psi_1, \psi_2$ be a ??non-prenex?? DQBFs where $\psi_1$ is subformula of $\phi$ and $\psi_1 = \psi_2$. Assume that for each existential variable $y \in V_{\psi_1}^{\exists}$ the dependency set of $y$ in $\psi_1$ is equal to the dependency set of $y$ in $\psi_2$. Then it holds that $\phi = \phi\substitute{\psi_1}{\psi_2}$. 
-% \end{theorem}
-% \begin{proof}
-%   We show that if $s \in \seman{\phi}$ then $s \in \seman{\phi\substitute{\psi_1}{\psi_2}}$ and vice versa. Notice that $V_{\phi}^{\forall} = V_{\phi\substitute{\psi_1}{\psi_2}}^{\forall}$ and $V_{\psi_1}^{\forall} = V_{\psi_2}^{\forall}$. Let $s \in \seman{\phi}$ and assume that $s \not\in \seman{\phi\substitute{\psi_1}{\psi_2}}$.  That means there exists a valuation $v\colon V_{\phi}^{\forall} \to \set{0,1}$ such that $v(s(\phi)) = 1$ but $v(s(\phi\substitute{\psi_1}{\psi_2})) = 0$. Because these two formulas are the same except for the difference in $\psi_1$ and $\psi_2$ the change of evaluation has to come from the difference in evaluation of these two formulas. That is $v(s(\psi_1)) \not= v(s(\psi_2))$. If $\psi_1 = v$ for some $v \in V$, then $\psi_2 = v$ and then $v(s(\psi_1)) = v(s(\psi_2))$. This means both $\psi_1$ and $\psi_2$ are something more complex than just a variable which cannot have negation in front of it in $\phi$ (because negation can be only in front of a variable). This also means that BF $s(\phi)$ will have $s(\psi_1)$ only in sequence of conjunctions and disjunctions. But because $v(s(\phi))=1$ and $v(s(\phi\substitute{\psi_1}{\psi_2}) = 0$ where the only difference in these formulas are $s(\psi_1)$ and $s(\psi_2)$ it has to hold that $v(s(\psi_1)) = 1$ and $v(s(\psi_2)) = 0$. Let $s'$ be a restriction of $s$ on $V_{\psi_1}^{\exists} \cup V_{\psi_1}^{free}$. If $s' \in \seman{\psi_1}$ then from $\psi_1 = \psi_2$ it has to hold that $s' \in \seman{\psi_2}$ and so $v(s(\psi_2)) = 1$. This means that $s' \not\in \seman{\psi_1}$.
-% \end{proof}
 
 
 \section{Binary Decision Diagrams}
@@ -701,6 +708,13 @@ For each operation on BFs (${\land}$, ${\lor}$, ${\neg}$), there is an algorithm
 
 %\section{And-Inverter Graphs - je ich treba rozobrat???}
 
+\section{Quantifier Trees}
+we talk shit about quantifier trees in this sectuibsddshuhusdf
+
+\begin{definition}
+  
+\end{definition}
+
 \chapter{State of the Art}
 %problem - vytvorit algoritmus ktory zisti ze ci dana DQBF formula je splnitelna alebo nie pomocou BDDcok alebo jej podobnym strukturam (mozno dat do teorie)
 
@@ -754,9 +768,9 @@ The next solver is based on quantifier elimination. This solver's basic premise 
     \EndFor
 \EndWhile
 \If{resulting BF $\psi$ is SAT}
-	\State return SAT
+	\State \Return SAT
 \Else
-	\State return UNSAT
+	\State \Return UNSAT
 \EndIf
 \EndFunction
 \end{algorithmic}
@@ -797,8 +811,8 @@ The first and only preprocessing engine for DQBF called HQSpre~\cite{HQSpre1,HQS
 \subsection{Approximations}
 Another technique which is used in some solvers as preprocessing step is to find some BF or QBF approximations which can be used with existing solvers for BFs/QBFs to potentially give us faster result about the input DQBF (satisfiability for underapproximations, unsatisfiability for overapproximations). Gitina et al.~\cite{HQSsimpleAlg} introduced QBF approximations which are created by changing the dependencies of existential variables that result in QBF with the same matrix. However, these approximations can be precise only up to some level. By adding some information to these QBF overapproximation (thus changing the matrix), Finkenbeiner et al.~\cite{FastDQBFRefutation} were able to create more and more precise QBF overapproximations. For more thorough explanation of these approximations see again the work by Wimmer et al.~\cite[Section~3]{HQSpreJournal}.
 
-\subsection{PSPACE subclass}
-The last preprocessing technique is simply put just a check whether DQBF does not belong to a subclass of problems which are in PSPACE and if it does, it is transformed to QBF on which existing QBF solver is run. The simplest such subclass would be those DQBFs whose dependencies are linearly ordered. Then it can be easily transformed into QBF by reordering the quantifiers. Scholl et al.~\cite{PSPACEsubclass} investigated whether there is some another DQBF subclass which is in PSPACE. They show that DQBFs where the dependency sets are either equal or pairwise disjoint can be transformed into QBFs with just linear increase in size. Thus having a check on whether an input DQBF belongs to this class before running a DQBF solver and if it does transforming it into QBF and running a QBF solver can improve the efficiency. They show this by adding this preprocessing step to HQS which results in increase of solved instances.
+\subsection{$\PSPACE$ subclass}
+The last preprocessing technique is simply put just a check whether DQBF does not belong to a subclass of problems which are in $\PSPACE$ and if it does, it is transformed to QBF (which is $\PSPACE$-complete) on which existing QBF solver is run. The simplest such subclass would be those DQBFs whose dependencies are linearly ordered. Then it can be easily transformed into QBF by reordering the quantifiers. Scholl et al.~\cite{PSPACEsubclass} investigated whether there is some another DQBF subclass which is in $\PSPACE$. They show that DQBFs where the dependency sets are either equal or pairwise disjoint can be transformed into QBFs with just linear increase in size. Thus having a check on whether an input DQBF belongs to this class before running a DQBF solver and if it does transforming it into QBF and running a QBF solver can improve the efficiency. They show this by adding this preprocessing step to HQS which results in increase of solved instances.
 
 %As a note, 
 
@@ -818,12 +832,37 @@ The last preprocessing technique is simply put just a check whether DQBF does no
 \label{chap:algorithm}
 %TODO: decide the name, our/suggested/new/... algorithm
 
-v tejto kapitole popisem nas algoritmus ktory vyuziva BDDcka na solving DQBF
+In this chaoter we introdice our algorithm for solving satisfiability of DQBF using BDDs. First we give a high level eplanation of the algorithm and then we explain each part of it showing different heuristics for solving it???
 
 \section{High level defintion???}
+\begin{algorithm}
+\caption{???}
+\label{alg:????}
+\begin{algorithmic}
+\Function{SolveDQBF}{quantifier tree ???with root $r$??? ???}
+\State \Call{Localise}{???}
+\State (prefix, $\phi$) = \Call{TurnToBDD??}{???}
+\State \Call{ElimAllUnivVars}{DQBFprefix, $\phi$}
+\If{$\phi = 0$}
+    \State \Return UNSAT
+\Else
+    \State \Return SAT
+\EndIf
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
+The algorithm is shown in .... is a high level definition of out algorithm. In the next sections we explain more thoroughly each part of the algorithm. It takes as an input a DQBF $\psi$ in NNF represented using quantifier tree. First, using some heuristic function localise(????) recursively pushes the quantifiers inside the formula, usually by using rules from Theorem~\ref{thrm:quantLocalEq}. Next, we transform this quantifier tree into a tuple of quantifier prefix and a BF represented by BDD by recursively turning children of each node into this tuple of prefix and BDD and combining them together. something about pulling the quantifiers back??? the quantifiers are pulled back, however, we remove some of them??? During this some quantifiers can be eliminated by using theorems for quantifier eliminations (Theorem~\ref{thrm:unExpan} and \ref{thrm:exElim}), Section??? shows different heuristics how to decide which quantifiers are eliminated. Finally, the leftover quantifiers in the prefix are eliminated resulting in BDD which represents either $0$ or $1$ which tells us whether the formula is satisfiable or not.
+
 vysvetlit co je to quantifier tree (proste reprezentacia DQBF, kde kazdy non terminal node reprezentuje operaciu and alebo or na children (co su subformule) a pri kazdom tomto node su ulozene kvantifikatory; terminal nodes su literals) -- hodit mozno do kapitoly 1, plus obrazok
 
 algoritmus zacina s tymto stromom kde vsetky kvantifikatory su v root, pomocou theoremu o lokalizacii ich strcime dnu (popisat heuristiku ze ako ich strkame), potom rekurzivne prechadza tento strom, kde ziska s children formule, z ktorych vytiahne kvantifikatory a maticu prevedie do BDD a potom nejakou heuristikou sa rozhodne ktore kvantifikatory sa odstrania, tie sa odstrania (pouzitim theorems o odstranovani - pridat mazanie ak nie je v support set, nejakou heuristikou sa rozhodne v akom poradi) a return zvysny prefix s maticou v BDD
+
+
+\section{Heuristic to how to localise variables/Implementation???? of localise(??)}
+\begin{itemize}
+    \item we do not localise - for simple solver
+    \item when we localise for conjuction and univ/exist quantifier we choose this and this children to put it in etc. for disjunction and univ/exist this and this etc.
+\end{itemize}
 
 \section{Heuristics of deciding what to do on each level of quantifier tree}
 \begin{itemize}
@@ -833,17 +872,12 @@ algoritmus zacina s tymto stromom kde vsetky kvantifikatory su v root, pomocou t
     \item remove some dependencies to be able to remove exist vars???? - not possible??
 \end{itemize}
 
-\section{Heuristic to how to localise variables}
-\begin{itemize}
-    \item we do not localise - for simple solver
-    \item when we localise for conjuction and univ/exist quantifier we choose this and this children to put it in etc. for disjunction and univ/exist this and this etc.
-\end{itemize}
 
 \section{Heuristics for order of elimination of universal variables}
 \begin{itemize}
     \item the order is set on the beginning based on the number of existential variables that depend on them (from lowest to highest), so the created duplicates do not count in, i.e. for \[\forall x_1 \forall x_2 \forall x_3 \exists y_1(x_1, x_2) \exists y_2(x_1,x_2) \exists y_3(x_3) \exists y_4(x_3) \exists y_5 (x_3),\] the order is $x_1, x_2, x_3$, because both $x_1$ and $x_2$ only two depend on them, for $x_3$ it is three
     \item similarly, but the next universal variable to eliminate is the one with the minimal number of existential variables that depend on them (so also the existential duplicated count here), i. e. for the previous example, first $x_1$ is removed, but then we have \[\forall x_2 \forall x_3 \exists y_1(x_2) \exists y_2(x_2) \exists y_1'(x_2) \exists y_2'(x_2) \exists y_3(x_3) \exists y_4(x_3) \exists y_5 (x_3)\] and so $x_3$ is removed next, because there are four ex. variables (two original, two duplicates) that depend on $x_2$ now
-    \item something with creating depency tree, to find existential variables to remove as fast as possible (not sure if possible)
+    \item something with creating depency tree, to find existential variables to remove as fast as possible (not sure if possible) --- maybe possible, basically remove those universal vars that will make it possible to remove as much existential vars as possible on the level??? 
 \end{itemize}
 
 \chapter{Implementation}
