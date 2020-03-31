@@ -54,8 +54,7 @@
     type          = mgr,
     author        = Juraj S\'{i}\v{c},
     gender        = m,
-    advisor       = {Jan Strej\v{c}ek\\
-    \textbf{Co-advisor:} Martin Jon\'{a}\v{s}},
+    advisor       = {Jan Strej\v{c}ek},%\\ \textbf{Co-advisor:} Martin Jon\'{a}\v{s}},
     title         = {Satisfiability of DQBF Using Binary Decision Diagrams},
     TeXtitle      = {Satisfiability of DQBF Using Binary Decision Diagrams},
     keywords      = {dependency quantified Boolean formula, DQBF, binary decision diagram, BDD, satisfiability, solver},
@@ -247,18 +246,15 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{document}
+
 \chapter{Introduction}
 
 \chapter{Theory}
 In this chapter we give the definitions and some theoretical results of dependency quantified Boolean formulas (DQBFs) and binary decision diagrams (BDDs). For DQBFs we build up from Boolean formulas (BFs) to which we add quantifiers resulting in quantified Boolean formulas (QBFs). After this, we add explicit dependencies to the definition of QBFs which results in DQBFs. For these we give two forms, one that can only have quantifiers at the beginning of the formula and one that allows them deeper in the formula. For the latter we give some rules for transformation of DQBFs which we use for developing our solver in Chapter~\ref{chap:algorithm}. 
 
-In the last section of this chapter we define BDDs and recall some of their properties.% needed theory for our problem. We definition of dependency quantified Boolean formulas??? and BDDs?? citacie odkial vychadzam??
-
-%We define dependency quantified Boolean formulas building up from Boolean formulas to which we add quantifications followed by adding dependencies for these quantifications. We also give a 
+In the last section of this chapter we define BDDs and recall some of their properties.
 
 \section{Boolean Formulas}
-%definicia boolean formula (rekurzivna)
-
 We first start with defining Boolean formulas. For these we need a set of variables $V = \set{x_1, \dots, x_n}$ for which we can define a valuation function $v\colon V \to \{0,1\}$ that says whether each variable is true or false. We then define Boolean formulas as variables connected by logical operatives \emph{and} (${\land}$), \emph{or} (${\lor}$) and \emph{negation} (${\neg}$).
 
 \begin{definition}
@@ -283,24 +279,20 @@ A function $v\colon V \to \set{0,1}$ is called a \emph{valuation} over the set o
     \item if $\phi = (\phi_1 \lor \phi_2$), then $v(\phi) = 1$ if $v(\phi_1) = 1$ or $v(\phi_2) = 1$, otherwise $v(\phi) = 0$.
 \end{itemize}
 Each $\phi \in \BF{V}$ represents a \emph{Boolean function} $f_{\phi}\colon \valtns{V} \to \set{0,1}$ \emph{over $V$} such that $f_{\phi}(v) = v(\phi)$. Conversely, for each Boolean function we can find a BF representing it. The set of all Boolean functions over $V$ is denoted by $\BFuncs{V}$. The \emph{support set} $\supp{f}$ of Boolean function $f$ is defined as the set of variables occurring in a BF $\phi$ where $\phi$ represents $f$ and from all the BFs representing $f$, $\phi$ has the smallest number of variables occurring in it. That is, changing the values of variables that are not in the support set do not change the output value of $f$.
-%We will abuse notation and use $v(\phi)$ for extended $v$????? 
-%mozno napisat ako ze ten extend nejak oznacime (napr u_v) ale ak je to jasne tak abusneme notation a budeme pod $v(\phi)$ mysliet $u_v(\phi)$
 
 
-An important notion for BFs is \emph{satisfiability}. We say that $\phi \in \BF{V}$ is \emph{satisfiable} if there exists valuation $v \in \valtns{V}$ in which $\phi$ is true, that is $v(\phi) = 1$. Let $\phi_1, \phi_2 \in \BF{V}$. We say that they are \emph{equivalent}, denoted $\phi_1 \equiv \phi_2$, if for all valuations $v$ it holds that $v(\phi_1) = v(\phi_2)$. If they are either both satisfiable or they are both unsatisfiable, we call them \emph{equisatisfiable}, denoted $\phi_1 \approx \phi_2$. %Notice that equisatisfiability of two formulas is just talking about their satisfiability, which means that these formulas can be over different sets of variables.
+An important notion for BFs is \emph{satisfiability}. We say that $\phi \in \BF{V}$ is \emph{satisfiable} if there exists valuation $v \in \valtns{V}$ in which $\phi$ is true, that is $v(\phi) = 1$. Let $\phi_1, \phi_2 \in \BF{V}$. We say that they are \emph{equivalent}, denoted $\phi_1 \equiv \phi_2$, if for all valuations $v$ it holds that $v(\phi_1) = v(\phi_2)$. If they are either both satisfiable or they are both unsatisfiable, we call them \emph{equisatisfiable}, denoted $\phi_1 \approx \phi_2$.
 
 \begin{example}
 \label{ex:BF:prenex}
 Let
 \[\phi = ((x_1 \land x_2) \lequal (y_1 \lequal y_2)).\]
-%be BF where by $y_1 \lequal y_2$ we mean the formula $(y_1 \land y_2) \lor (\neg y_1 \land \neg y_2)$ (similarly for the ${\lequal}$ between $x_1\land x_2$ and $y_1 \lequal y_2$). 
 This formula says that if both $x_1$ and $x_2$ are true, then $y_1$ and $y_2$ must be same, otherwise they must be different. It is satisfiable, because in valuation $v$ such that $v(x_1) = v(x_2) = v(y_1) = v(y_2) = 1$ it holds that $\phi$ is evaluated to $v(\phi)=1$. The Boolean function $f_{\phi}$ that $\phi$ represents has support set $\supp{f_{\phi}} = \set{x_1, x_2, y_1, y_2}$.
 %This formula is also equisatisfiable to formula 
 %\[\phi' = (x \land y) \lor \neg x\] 
 %because $\phi'$ is also satisfiable: in valuation $v'$ where $v'(x) = v'(y) = 1$ it holds that $v'(\phi') = 1$. Notice that even though $\phi$ and $\phi'$ have different variables, the equisatisfiability still holds. However, $\phi \not= \phi'$ because if we add to $v'$ that $v'(x_1) = v'(x_2) = v'(y_1) = 1$ and $v'(y_2) = 0$ we get that $v'(\phi) \not= v'(\phi')$.
 \end{example}
 
-%definovat negation normal form + cnf
 \subsection{Conjuctive Normal Form}
 \label{sec:BF:CNF}
 To work with BFs it is usually easier to have them in some special form. The first one we define is called conjuctive normal form.
@@ -333,13 +325,11 @@ We say that BF $\phi$ is in negation normal form (NNF) if negation occurs only i
 \begin{example}
 Formula $\neg (x_1 \land (x_2 \lor \neg x_3))$ that is not in NNF is by using the first rule equal to $(\neg x_1 \lor \neg(x_2 \lor \neg x_3))$ which is by using the second rule equal to $(\neg x_1 \lor (\neg x_2 \land \neg\neg x_3))$. Finally, by using the third rule we get $(\neg x_1 \lor (\neg x_2 \land x_3))$ which is in NNF.
 \end{example}
-%toto asi zadefinujem pre QBF/DQBF ak vobec - alebo mozno to treba fakt tu, ked budem chciet hovorit ze HQSpre meni formulu????
 
 \section{Quantified Boolean Formulas}
 Having defined BFs, we can move to the next step on the way to defining DQBF by adding quantifiers. We add existential (${\exists}$) and universal (${\forall}$) quantifiers bounded to variables which results in the definition of \emph{quantified Boolean formulas} (QBFs). Usually, definitions of QBFs allow quantifiers everywhere inside formula but we only give definition of one special form of QBFs called prenex normal form. In this form, QBFs allow quantifiers only at the beginning of the formula. However, this does not change the expressibility as it is possible to transform every QBF into prenex normal form~\cite{prenexingQBFs}.
 
 %TODO: zmazat coloneqq a asi len nahradit s =
-%definicia QBF (ak budem robit aj non-prenex DQBF tak rekurzivna + nahradzovanie, inak prenex)
 \begin{definition}
 Let $V = \set{x_1,\dots,x_n}$ be a set of variables and $\phi \in \BF{V}$. A \emph{quantified Boolean formula} (QBF) $\psi$ over $V$ in closed prenex form is given by
 \[\psi \coloneqq Q_1 x_1 Q_2 x_2 \dots Q_n x_n \itholds \phi\]
@@ -348,7 +338,6 @@ where $x_i \in V$ are distinct for all $i \in \set{1,2,\dots,n}$ and $Q_i \in \s
 \end{definition}
 
 The BF $\phi$ is called the \emph{matrix} of $\psi$ and $Q_1 x_1 Q_2 x_2 \dots Q_n x_n$ is called the \emph{quantifier prefix} of $\psi$. A variable $x_i$ is called \emph{existential} if $Q_i = \exists$ and \emph{universal} if $Q_i = \forall$. The set of all existential variables of QBF $\psi$ is denoted by $\evars{\psi}$ and the set of all universal variables of $\psi$ is denoted by $\uvars{\psi}$. We define a level function $l\colon V \to \mathbb{N}$ which maps to each variable the number of quantifiers occurring before the variable in the formula. That is the variable $x_i \in V$ from QBF $\psi$ of Definition~\ref{def:QBF} has level $l(x_i) = i$. We denote the set of variables with level less than some $n \in \mathbb{N}$ as $V_{\psi}^{<n} = \set{x \in V | l(x) < n}$.
-%We call the variables $x_i$ such that $Q_i = \exists$ existential variables (denoted $V_{\psi}^{\exists}$) and the variables where $Q_i = \forall$ universal variables (denoted $V_{\psi}^{\forall}$). To each variable $x_i$ we assign a level (denoted $l(x_i)$), 
 
 Again, we define satisfiability. Usually, satisfiability for QBFs is defined trough valuation function as in BFs case where evaluation of QBFs follows the same rules as BFs with two newly added rules for quantifiers:
 \begin{itemize}
@@ -366,18 +355,6 @@ be a QBF where the matrix is formula $\phi$ from Example~\ref{ex:BF:prenex}. Thi
 \[((x_1 \land x_2) \lequal ((x_1 \land x_2) \lequal 1))\]
 which is true in all valuations.
 \end{example}
-
-%definicia semantiky (+splnitelnost)
-%Let $Q\BF{V}$ be the set of all quantified Boolean formulas over $V$ and $v\colon V \to \set{0,1}$ a valuation over the set of variables $V$. Again, we can extend $v$ to $Q\BF{V}$ where 
-%\begin{itemize}
-%    \item for $\phi \in \BF{V}$, $v(\phi)$ behaves like $v$ extended to $\BF{V}$ as explained in section TODO
-%    \item $v(\forall x Q_2 x_2 \dots Q_n x_n \phi) = 1$ if both $v(Q_2 x_2 \dots Q_n x_n \phi) = 1$ and ... TODO definovat nahrazdovanie + doplnit do definicie BF 1 a 0 konstanty
-%\end{itemize}
-%mozno pisat skor ze pre \psi z QBF, v(psi) je definovana pre tvar \psi = itemize ...
-%definovat bounded
-%Notice that in this definition of semantics the variables that are bounded with some quantifier do not care what they are evaluated to. That is priklad It can be seen that if addded $\exists x$ to unbounded variables $x$ to the beginning of any QBF, we would not need any valuation etcetc
-
-%We can also define satisfiability on QBF, similarly to BF. We say that QBF $\psi$ is satisfiable if there exists valuation $v$ such that $v(\psi) = 1$.
 
 \section{Dependency Quantified Boolean Formulas}
 Quantifiers have expanded the succinctness of BFs quite considerably. However, there is still one drawback of QBFs --- quantified variable $x$ depends on all variables that are quantified before $x$ in the formula. The question arises whether it is possible to give a definition of formula where the dependency relation is somehow explicitly given. The answer is yes, we can use \emph{dependency quantified Boolean formulas} (DQBFs).
@@ -424,11 +401,7 @@ which is obviously not true in all valuations.
 QBFs in PNF can be seen as a special case of DQBFs in PNF where the dependency sets are linearly ordered. That is a DQBF $\psi$ where for each two dependency sets $D_{y_1}$ and $D_{y_2}$ it holds that either $D_{y_1} \subseteq D_{y_2}$ or $D_{y_2} \subseteq D_{y_1}$, can be easily transformed to QBF by reordering the quantifiers.
 \end{remark}
 
-%TODO: asi povedat ze PCNF je DQBF in PNF kde BF je in CNF
-
 \subsection{Negation Normal Form}
-%tu dat nonprenex ak robim, semantika + priklady + dokazy o nahradzovani a eliminovani kvantifikatorov - dat dokaz ze ked equality tak to ide nahradit (kvoli tomu ze maju rovnake hodnoty volnych premennych)
-
 In this section we give the definition of the normal form of DQBF that is non-prenex. This allows quantifiers inside the formula. However, negation is only allowed in front of variables. %This restriction stems from the fact that prenex DQBFs are not syntactically closed under negation~\cite{NegationOfDQBFs}. %, therefore negation in front of some quantified subformula would make no sense.
 This form is also not closed which means it allows free variables. These variables are not bounded by any quantifier thus the definition of satisfiability has to take them into consideration. The definitions in this section are taken from Ge-Ernst et al.~\cite{HQSquantifierLocalization}.
 
@@ -514,10 +487,8 @@ Notice that each DQBF $\psi$ in PNF can be transformed into DQBF $\psi'$ in NNF 
 
 By $\psi\substitute{x_1}{x_2}$ where $\psi \in \DQBF{V}$, $x_1, x_2 \in V$, $x_2 \not\in V_{\psi}$ we denote the DQBF $\psi$ in which every occurence of $x_1$ (even in the dependency sets) is replaced by $x_2$. If $x_1 \not\in \qvars{\psi}$ and is not in any dependency set in $\psi$ then by $\psi\substitute{x_1}{\kappa}$, where $\kappa\in\set{0,1}$, we denote the DQBF $\psi$ in which every occurence of $x_1$ is replaced by $\kappa$.
 
-%dat definiciu semantiky
-The definition of satisfiability of DQBF in NNF follows the same way as in the previous section but now we have to decide what to do with free variables. In non-prenex case of QBFs, free variables are usually assumed to be existential variables with quantifiers at the beginning of the formula. In DQBF case this means that free variables would have empty dependency sets so the definition needs to follow that. We first define mapping, called \emph{Skolem functions mapping} which maps to each existential and free variables some Skolem function fulfilling conditions set by dependency sets. Then we define \emph{semantics} of DQBFs in NNF as the set of Skolem functions mappings which satisfy the formula. % follows this reasoning???? To have easier time with proofs we define semantics of DQBFs as a set of Skolem functions satisfying the formula.??? definition of semantics???? is a bit more convoluted. We first define Skolem function candidates from which we choose the set of 
-
-
+% semantics
+The definition of satisfiability of DQBF in NNF follows the same way as in the previous section but now we have to decide what to do with free variables. In non-prenex case of QBFs, free variables are usually assumed to be existential variables with quantifiers at the beginning of the formula. In DQBF case this means that free variables would have empty dependency sets so the definition needs to follow that. We first define mapping, called \emph{Skolem functions mapping} which maps to each existential and free variables some Skolem function fulfilling conditions set by dependency sets. Then we define \emph{semantics} of DQBFs in NNF as the set of Skolem functions mappings which satisfy the formula.
 
 \begin{definition}[Skolem Functions Mapping]
   Let $\psi \in \DQBF{V}$. We say that mapping $s\colon (\evars{\psi} \cup \fvars{\psi}) \to \BFuncs{\uvars{\psi}}$ is a \emph{Skolem functions mapping} of $\psi$ if
@@ -538,8 +509,7 @@ Formula $\psi$ is \emph{satisfiable} iff $\seman{\psi} \not= \emptyset$ and the 
 \label{ex:DQBF:NNF}
 To explain the semantics of DQBF in NNF we use the example by Ge-Ernst et al.~\cite{HQSquantifierLocalization}:
 \[\psi = \forall x_1 \forall x_2\itholds ((x_1 \lequal x_2) \lor \exists y (x_2)\itholds \neg(x_1 \lequal y)).\]
-The meaning behind this formula is that either $x_1$ and $x_2$ are the same or there is some $y$ which is dependent only on $x_2$ which is different from $x_1$. The Skolem functions mappings of $\psi$ are then $\Scands{\psi} = \{y\mapsto f_0$, $y\mapsto f_1$, $y\mapsto f_{x_2}$, $y\mapsto f_{\neg x_2}\}$ % then map $y$ to Boolean function which are represented either by $0,1,x_2$ or $\neg x_2$. It is pretty obvious that only 
-where $f_0$ is the Boolean function represented by Boolean formula $0$, $f_1$ is represented by $1$, $f_{x_2}$ by $x_2$ and $f_{\neg x_2}$ by $\neg x_2$. It is obvious that only $s = y \mapsto f_{x_2}$ is a satisfying mapping of $\psi$, since only $s(\psi) = ((x_1 \lequal x_2) \lor \neg(x_1 \lequal x_2))$ is true in all valuations.
+The meaning behind this formula is that either $x_1$ and $x_2$ are the same or there is some $y$ which is dependent only on $x_2$ which is different from $x_1$. The Skolem functions mappings of $\psi$ are then $\Scands{\psi} = \{y\mapsto f_0$, $y\mapsto f_1$, $y\mapsto f_{x_2}$, $y\mapsto f_{\neg x_2}\}$ where $f_0$ is the Boolean function represented by Boolean formula $0$, $f_1$ is represented by $1$, $f_{x_2}$ by $x_2$ and $f_{\neg x_2}$ by $\neg x_2$. It is obvious that only $s = y \mapsto f_{x_2}$ is a satisfying mapping of $\psi$, since only $s(\psi) = ((x_1 \lequal x_2) \lor \neg(x_1 \lequal x_2))$ is true in all valuations.
 \end{example}
 
 \subsection{Localising Quantifiers}
@@ -747,13 +717,10 @@ Furthermore, a solver for EPR can also be used directly for DQBF. Because EPR be
 \section{Clausal Abstraction -- dCAQE}
 Another DQBF solver called dCAQE~\cite{dCAQE} is based on clausal abstraction~\cite{ClausalAbstr}. This solver --- working again on DQBF in PCNF --- first puts universally and existentially quantified variables to some sets (called nodes) which are then divided into levels based on the ordering of dependencies of existential variables. The algorithm then constructs for each node on each level a BF that represents which clauses in CNF it can satisfy (for existential node) or falsify (for universal node). The algorithm then builds a candidate valuation by processing each level. For each level either this valuation is extended, or there is some conflict which means that the algorithm has to backtrack to some lower level and refine the abstraction, or the candidate valuation is a satisfying one which ends the algorithm.
 
-%odkaz na sekciu o PSPACE sublassse, ze je mozne ze tento solver nie je uplny
-
-%mozno spomenut fork splitting or some shit like that, v arXiv rozsirenej verzii maju nieco o tom v appendixe
+%mozno spomenut fork splitting or something like that, v arXiv rozsirenej verzii maju nieco o tom v appendixe
 
 \section{Quantifier Elimination -- HQS}
 The next solver is based on quantifier elimination. This solver's basic premise is simple --- it iteratively chooses some universal variable for universal expansion (Theorem~\ref{thrm:unExpan}) thus eliminating it and then eliminates all existential quantifiers that are dependent on all leftover universal quantifiers using Theroem~\ref{thrm:exElim}.
-%nejak vysvetlit ze pouzivaju AIG
 
 \begin{algorithm}
 \caption{Quantifier elimination algorithm}
@@ -778,12 +745,8 @@ The next solver is based on quantifier elimination. This solver's basic premise 
 
 Gitina et al.~\cite{HQSsimpleAlg} introduced the basic algorithm for solving DQBF in PCNF in this way. %(mozno spomenut ze to vlastne vymysleli aj v iDQ clanku, ako nejaky base solver ktory pouziva BDDcka) 
 Algorithm~\ref{alg:QE} shows simple pseudocode of this. In every step, this algorithm chooses (using some heuristic) an universal variable to eliminate. The authors used a heuristic where the universal variable is chosen based on the number of existential ones that depend on it --- they choose the one that has minimal number of dependencies. After that, all the existential variables that depend on everything are also eliminated. To use this algorithm it is important to choose a good representation of the matrix of the DQBF. For this the authors chose and-inverter graphs~\cite{FRAIGs}. % (AIG) which are tree-like structures where non-terminal nodes represent conjunction, terminal nodes are variables and these are connected with two types of nodes: normal ones and those that represent negation. With a proper implementation of operations they can be optimised in such a way that they reuse parts of the graphs resulting in functionally reduced AIGs~\cite{FRAIGs}.
-%mozno aj tu spomenut tie theorems
 
-%MYSLIENKA K TODO - heuristika ze vyberam podla poctu zavislosti v originalnom DQBF alebo v tom co sa mi postupne po odstranovani vytvara
-
-% bol zlepseny s tym ze pridali nejaky preprocessing, odstranovanie pure a daco vars a QBF solver ako subproceduru - dat pekny obrazok
-Following this technique, solver HQS was introduced~\cite{HQSquantifierElimination} which was enhanced by using QBF solver as a subprocedure. They still eliminate quantifiers in similar fashion but now they do it until the formula can be transformed to QBF (that is the dependency sets are linearly ordered). On this QBF they then run already existing solver for QBF called AIGSolve~\cite{AIGSolve} which can use more effective techniques developed for QBFs. Universal quantifiers to eliminate are chosen in the beginning in such a way that the number of universal eliminations is as small as possible while still the resulting formula is QBF. For this they build a dependency graph in which nodes are existential variables where $y_i$ is connected to $y_j$ if for their dependency sets it hold that $D_{y_i} \not\subseteq D_{y_j}$. They noticed that if this graph is acyclic, the formula can be seen as QBF. Furthermore, there is a cycle in this graph iff there is a simple cycle (between two nodes) in the graph. They use this to create an instance of MaxSAT problem which is a problem of finding a valuation of one BF while maximizing another formula. This instance then encodes which universal variables have to be eliminated so the dependency graph becomes acyclic while minimising the number of universal variables to eliminate. After finding the set of variables to eliminate, they follow with an improved quantifier elimination algorithm. They also improved it by adding a preprocessing step (see Section~\ref{sec:preprocessing}) and elimination of special types of variables called unit and pure.  %and already mentioned subprocedure that calls QBF solver AIGSolve.
+Following this technique, solver HQS was introduced~\cite{HQSquantifierElimination} which was enhanced by using QBF solver as a subprocedure. They still eliminate quantifiers in similar fashion but now they do it until the formula can be transformed to QBF (that is the dependency sets are linearly ordered). On this QBF they then run already existing solver for QBF called AIGSolve~\cite{AIGSolve} which can use more effective techniques developed for QBFs. Universal quantifiers to eliminate are chosen in the beginning in such a way that the number of universal eliminations is as small as possible while still the resulting formula is QBF. For this they build a dependency graph in which nodes are existential variables where $y_i$ is connected to $y_j$ if for their dependency sets it hold that $D_{y_i} \not\subseteq D_{y_j}$. They noticed that if this graph is acyclic, the formula can be seen as QBF. Furthermore, there is a cycle in this graph iff there is a simple cycle (between two nodes) in the graph. They use this to create an instance of MaxSAT problem which is a problem of finding a valuation of one BF while maximizing another formula. This instance then encodes which universal variables have to be eliminated so the dependency graph becomes acyclic while minimising the number of universal variables to eliminate. After finding the set of variables to eliminate, they follow with an improved quantifier elimination algorithm. They also improved it by adding a preprocessing step (see Section~\ref{sec:preprocessing}) and elimination of special types of variables called unit and pure. 
 
 The algorithm was changed a bit again by Wimmer et al.~\cite{HQSdependencyElimination}. The authors were interested in whether it is possible to somehow remove specific dependencies from the list of dependencies of existential variable. They have shown that it is possible, albeit at the expense of adding a new existential variable. This is similar to the universal expansion (Theroem~\ref{thrm:unExpan}), but by removing just one dependency we add just one new existential variable. Let for example
 \[\psi = \forall x_1 \dots \forall x_n \exists y_1(D_{y_1}) \dots \exists y_m(D_{y_m}) \itholds \phi\]
@@ -793,17 +756,12 @@ be a prenex DQBF where $\phi$ is a BF and $x_1 \in D_{y_1}$. We can now remove $
 \phi\left[((\neg x_1 \land y_1^0) \lor (x_1 \land y_1^1))/y_1\right].
 \end{multline*}
 Using this the authors do not look for a set of universal variables to eliminate, but for partial dependencies whose removal will result in a DQBF which can be transformed into QBF. Again, they create a dependency graph which is acyclic iff DQBF can be seen as QBF. But now they create a bipartite graph whose two sets of nodes are the set of universal variables and the set of existential variables which are connected based on whether universal variable is in the dependency set of existential one. Similarly to previous, they use this graph to solve an optimization problem that encodes which dependencies to remove to get QBF which can then be solved with AIGSolve.
-%This was good and all, but in~\cite{HQSdependencyElimination} they zaoberat sa whether it is possible to remove only some universal variables from dependency sets. They showed it is possible ....tu asi dat cely ten teorem ak som ho nedal do teorie...
 
 Last but not least, Ge-Ernst et al.~\cite{HQSquantifierLocalization} have given a theoretical foundations for non-prenex DQBFs and the possibility to push and eliminate quantifiers inside formulas as explained in Section~\ref{sec:quantLocalization}. Using this they improve HQS by adding another step in the algorithm, where they first push quantifiers as much as possible into the formula, eliminate the existential variables using Theorem~\ref{thrm:exElim} and then return the formula back to the prenex form. After this they start with the elimination of universal quantifiers as was explained in previous paragraphs.
 
 \section{Preprocessing}
 \label{sec:preprocessing}
 In previous sections, we give an overview of techniques used for implementations of different solvers. This sections explains some techniques that are used before the actual solvers run, called fittingly preprocessing.
-
-
-%We have just gave an overiew of different solvers for DQBF. However, 
-%preprocessing pre QBF je dolezity, ergo asi je aj pre DQBF a teda je vela vyzkumu na preprocessing techniques
 
 \subsection{HQSpre}
 The first and only preprocessing engine for DQBF called HQSpre~\cite{HQSpre1,HQSpre2,HQSpreJournal} took many techniques used for QBF preprocessing and lifted them to the DQBF case. We explain only one technique here, called \emph{gate extraction}. As was mentioned in Section~\ref{sec:BF:CNF}, transforming BF to an equisatisfiable formula in CNF can result in polynomial increase of the size of the formula by adding new variables. Gate extraction works in opposite direction --- it tries to extract this newly introduced variables and turn the formula back into one that is not in CNF. This does not mean that gate extraction works only on formulas in CNF, it can be used generally by finding connections between variables which make it possible to replace a variable by some Boolean function of existing variables. However, this technique can only be used by solvers which can work on DQBFs which are not in PCNF. Currently, that is only HQS. For a thorough explanation of other techniques used by HQSpre we refer the reader to the work by Wimmer et al.~\cite{HQSpreJournal}. 
@@ -814,19 +772,7 @@ Another technique which is used in some solvers as preprocessing step is to find
 \subsection{$\PSPACE$ subclass}
 The last preprocessing technique is simply put just a check whether DQBF does not belong to a subclass of problems which are in $\PSPACE$ and if it does, it is transformed to QBF (which is $\PSPACE$-complete) on which existing QBF solver is run. The simplest such subclass would be those DQBFs whose dependencies are linearly ordered. Then it can be easily transformed into QBF by reordering the quantifiers. Scholl et al.~\cite{PSPACEsubclass} investigated whether there is some another DQBF subclass which is in $\PSPACE$. They show that DQBFs where the dependency sets are either equal or pairwise disjoint can be transformed into QBFs with just linear increase in size. Thus having a check on whether an input DQBF belongs to this class before running a DQBF solver and if it does transforming it into QBF and running a QBF solver can improve the efficiency. They show this by adding this preprocessing step to HQS which results in increase of solved instances.
 
-%As a note, 
-
-%If we can find a subclass that is pspace we can translate to QBF - obviously for DQBF that is already in linear order can be seen as BQF
-%QBF can be viewed as a DQBF with linearly ordered dependencies. This is enough to make it PSPACE-complete and so, in PSPACECLANOK they were interested in whether there is some another sublass of DQBF which is PSPACE-complete. They have shown that  
-%existuje classa DQBFs ktore idu iba s polynomialnym zvacsenim previest na QBF ---> patri do PSPACE a je mozne to pouzit ako preprocessing step kde ak zistime ze sme v tejto classe tak pustime QBF solver dajaky
 %As a note toto vzislo z toho, ze clanok zrobil dajaky system ktory je rozsirenie QBF systemu kde pridali fork extension pravidlo. They showed that this system is complete and sound for DQBF, however, in dCAQEclanok (ale v appendixe extended version) and PSPACEclanok ukazali ze to tak nie je (nie je complete ci co). Obe tieto clanky ukazali ze tento system je complete pre tuto PSPACE classu. Zaroven dCAQE vyuziva tento fork extension ???a zle si myslia ze tato classa je NEXPTIME??? vo svojom algoritme, takze je moznost ze ich algoritmus nefunguje pre celu classu DQBF
-
-
-% vysvetlit prve dve clanky, ze ide o jednoducho univ. expansion -> exist. elimination pouzitim AIG a pridanim nejakych zaujimavych drobnosti sa vytvori QBF ktory sa hodi do nejakeho existujuceho solvru (pridat obrazok toho cyklu + naivny alg.), tu spomenut aj preprocessor ze je vysvetleny niekde
-% potom vysvetlit ze je dolezity spravny vyber univ. kv. na expansion a vysvetlit ze v naivnom alg. to je jednoduche proste tie na ktore zavisia najviac, v tych dalsich clankoch vytvoreny dependency graf ktory sa nejak riesi, neskor sa odstranuje priamo jedna zavislost pre exist. kvantifikatory
-% potom zacat hovorit o tom ze ako pchat kvantifikatory do vnutra, kde to nejak zrobili
-% vysvetlit preprocessor (hlavne gate reduction alebo jak to nazvat)
-% spomenut asi aj overapproximations
 
 \chapter{Our Algorithm}
 \label{chap:algorithm}
