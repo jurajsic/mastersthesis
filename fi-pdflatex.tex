@@ -229,9 +229,7 @@
 \newcommand{\itholds}{\,}
 
 % complexity classes
-\newcommand{\ComplexityFont}[1]{%
-{\ensuremath{\mathsf{#1}}}%extra {} makes everyone happy.
-}
+\newcommand{\ComplexityFont}[1]{\mathsf{#1}}
 \newcommand{\PSPACE}{\ComplexityFont{PSPACE}}
 \newcommand{\NP}{\ComplexityFont{NP}}
 \newcommand{\NEXPTIME}{\ComplexityFont{NEXPTIME}}
@@ -329,10 +327,9 @@ Formula $\neg (x_1 \land (x_2 \lor \neg x_3))$ that is not in NNF is by using th
 \section{Quantified Boolean Formulas}
 Having defined BFs, we can move to the next step on the way to defining DQBF by adding quantifiers. We add existential (${\exists}$) and universal (${\forall}$) quantifiers bounded to variables which results in the definition of \emph{quantified Boolean formulas} (QBFs). Usually, definitions of QBFs allow quantifiers everywhere inside formula but we only give definition of one special form of QBFs called prenex normal form. In this form, QBFs allow quantifiers only at the beginning of the formula. However, this does not change the expressibility as it is possible to transform every QBF into prenex normal form~\cite{prenexingQBFs}.
 
-%TODO: zmazat coloneqq a asi len nahradit s =
 \begin{definition}
-Let $V = \set{x_1,\dots,x_n}$ be a set of variables and $\phi \in \BF{V}$. A \emph{quantified Boolean formula} (QBF) $\psi$ over $V$ in closed prenex form is given by
-\[\psi \coloneqq Q_1 x_1 Q_2 x_2 \dots Q_n x_n \itholds \phi\]
+Let $V = \set{x_1,\dots,x_n}$ be a set of variables and $\phi \in \BF{V}$. A \emph{quantified Boolean formula} (QBF) $\psi$ \emph{over $V$} in \emph{prenex normal form} is given by
+\[\psi = Q_1 x_1 Q_2 x_2 \dots Q_n x_n \itholds \phi\]
 where $x_i \in V$ are distinct for all $i \in \set{1,2,\dots,n}$ and $Q_i \in \set{{\exists}, {\forall}}$.
 \label{def:QBF}
 \end{definition}
@@ -371,15 +368,13 @@ We start with the definition of DQBFs in prenex normal form on which we explain 
 \subsection{Prenex Normal Form}
 The first definition of DQBF form called prenex normal form is an analogy of the prenex normal form of QBFs.
 
-
-%definicia DQBF -ak robim nonprenex tak zacat s prenex ale vysvetlit ze pre jednoduchost zacneme s tym + semantika prenex + priklady
 \begin{definition}
   Let $V = \set{x_1, \dots, x_n, y_1, \dots, y_m}$ be a set of variables and $\phi \in \BF{V}$ a BF over $V$. A \emph{dependency quantified Boolean formula} (DQBF) $\psi$ in \emph{prenex normal form} (PNF) is given by
-  \[\psi \coloneqq \forall x_1 \dots \forall x_n \exists y_1 (D_1) \dots \exists y_m (D_m) \itholds \phi\]
+  \[\psi = \forall x_1 \dots \forall x_n \exists y_1 (D_1) \dots \exists y_m (D_m) \itholds \phi\]
   where $D_i \subseteq \set{x_1, \dots, x_n}$ for each $i \in \set{1,\dots,m}$ is a \emph{dependency set} of variable $y_i$.
   \label{def:DQBF:PNF}
 \end{definition}
-We call the BF $\phi$ the \emph{matrix} of $\psi$ and $\forall x_1 \dots \forall x_n \exists y_1 (D_1) \dots \exists y_m (D_m)$ the \emph{quantifier prefix} of $\psi$. We call the variables from $\evars{\psi} = \set{y_1,\dots,y_m}$ \emph{existential} and variables from $\uvars{\psi} = \set{x_1,\dots,x_n}$ \emph{universal}. We also say that $\psi$ is in \emph{prenex conjuctive normal form} (PCNF) if it is in PNF where the matrix is in CNF.
+BF $\phi$ is the \emph{matrix} of $\psi$ and $\forall x_1 \dots \forall x_n \exists y_1 (D_1) \dots \exists y_m (D_m)$ the \emph{quantifier prefix} of $\psi$. We call the variables from $\evars{\psi} = \set{y_1,\dots,y_m}$ \emph{existential} and variables from $\uvars{\psi} = \set{x_1,\dots,x_n}$ \emph{universal}. We also say that $\psi$ is in \emph{prenex conjuctive normal form} (PCNF) if it is in PNF where the matrix is in CNF.
 
 
 
@@ -558,7 +553,7 @@ The next theorems give a possibility to eliminate both universal and existential
 \begin{theorem}[Universal Expansion]
 \label{thrm:unExpan}
   Let $\psi, \psi_1 \in \DQBF{V}$ such that $\forall x \itholds \psi_1$ is a subformula of $\psi$ where $\psi_1$ does not include any quantifications other than the ones bounded to variables from the set $E_{x} = \set{y \in \evars{\psi_1} | x \in D_y}$ of all existential variables dependent on $x$. Let $\psi_2$ be a DQBF that results from $\psi_1$ by substituting each $y \in E_x$ with a new variable $y' \not\in V_{\psi}$ where we set $D_{y'} = D_y$. Then $\psi \approx \psi'$ where $\psi'$ results from $\psi$ by replacing the subformula $\forall x \itholds \psi_1$ by 
-  \[\xi \coloneqq (\psi_1^{-x}\substitute{x}{0} \land \psi_2^{-x}\substitute{x}{1}).\]
+  \[\xi = (\psi_1^{-x}\substitute{x}{0} \land \psi_2^{-x}\substitute{x}{1}).\]
 \end{theorem}
 \begin{proof}
   First notice that each $y \in E_x$ must be entirely inside $\psi_1$ (even the ''$\exists y$'' bit). This stems from the way the set $\DQBF{V}$ is constructed; the dependency sets of new existential variables can only be formed from free or completely new variables and if ''$\exists y$'' was outside $\forall x \itholds \psi_1$, then $x \in D_y$ would have to be a free or new variable. Also, because of the assumption that only quantifiers bounded to existential variables from $E_x$
@@ -616,7 +611,7 @@ which is still satisfiable.
 In this section we recall a definition of \emph{binary decision diagrams}~\cite{BDD} which is a succinct representation of BFs with an efficient polynomial time implementation of logical operations.
 
 \begin{definition}
-  Let $V$ be a set of variables. A \emph{binary decision diagram} (BDD) \emph{over $V$} is a rooted, directed, acyclic graph with two terminal nodes 0 and 1 and a set $N$ of non-terminal nodes, each representing a variable from $V$. Each $n \in N$ has two child nodes, low child and high child. For each $x \in V$ and every path $\sigma$ from root to a terminal node there is at most one $n \in N$ on $\sigma$ representing $x$.
+  Let $V$ be a set of variables. A \emph{binary decision diagram} (BDD) \emph{over $V$} is a rooted directed acyclic graph with two terminal nodes 0 and 1 and a set $N$ of non-terminal nodes, each representing a variable from $V$. Each $n \in N$ has two child nodes, low child and high child. For each $x \in V$ and every path $\sigma$ from root to a terminal node there is at most one $n \in N$ on $\sigma$ representing $x$.
 \end{definition}
 
 %We will give a definition of reduced ordered binary decision diagram, however we do not use that name and whenever we say BDD we mean ROBDD.
@@ -679,7 +674,7 @@ For each operation on BFs (${\land}$, ${\lor}$, ${\neg}$), there is an algorithm
 %\section{And-Inverter Graphs - je ich treba rozobrat???}
 
 \section{Quantifier Trees}
-we talk shit about quantifier trees in this sectuibsddshuhusdf
+While BDDs are a ... represantion?? of BFs, we also need a represenation of DQBFs. For this we define \emph{quantifier trees} which can represent DQBFs in NNF. hybguyguyguy uybuybu uybuybu gcvtrct trcvtrvu uybutvc
 
 \begin{definition}
   
@@ -706,7 +701,7 @@ However, we go into more details for solver HQS, because it is currently the bes
 
 %fast DQBF refutation - ze premienaju na QBF abo daco (bunsat)
 
-\section{First Solution - DQDPLL}
+\section{First Solution -- DQDPLL}
 The first solver that tackled the satisfiability problem for DQBF was based on DPLL~\cite{DPLL} algorithm which is successfully used for BF and QBF solvers. This algorithm works on formulas in CNF by searching for a satisfying assignment based on the clauses in CNF. By recursively choosing an assignment for literals and checking whether the remaining formula in CNF contains an empty clause (which implies unsatisfiability), DPLL searches trough all assignments until a satisfying one is found or all of them are decided to be unsatisfying. An adaptation called DQDPLL~\cite{DPLLalgorithm} was introduced for DQBF (in PCNF) which extended existing solutions for QBF by adding so-called Skolem clauses which encode the dependencies between existential and universal variables. However, by doing so the algorithm becomes too slow and results in an uncompetitive solver.
 
 \section{Instantiation -- iDQ and iProver}
@@ -769,7 +764,7 @@ The first and only preprocessing engine for DQBF called HQSpre~\cite{HQSpre1,HQS
 \subsection{Approximations}
 Another technique which is used in some solvers as preprocessing step is to find some BF or QBF approximations which can be used with existing solvers for BFs/QBFs to potentially give us faster result about the input DQBF (satisfiability for underapproximations, unsatisfiability for overapproximations). Gitina et al.~\cite{HQSsimpleAlg} introduced QBF approximations which are created by changing the dependencies of existential variables that result in QBF with the same matrix. However, these approximations can be precise only up to some level. By adding some information to these QBF overapproximation (thus changing the matrix), Finkenbeiner et al.~\cite{FastDQBFRefutation} were able to create more and more precise QBF overapproximations. For more thorough explanation of these approximations see again the work by Wimmer et al.~\cite[Section~3]{HQSpreJournal}.
 
-\subsection{$\PSPACE$ subclass}
+\subsection{\texorpdfstring{$\PSPACE$}{PSPACE} subclass}
 The last preprocessing technique is simply put just a check whether DQBF does not belong to a subclass of problems which are in $\PSPACE$ and if it does, it is transformed to QBF (which is $\PSPACE$-complete) on which existing QBF solver is run. The simplest such subclass would be those DQBFs whose dependencies are linearly ordered. Then it can be easily transformed into QBF by reordering the quantifiers. Scholl et al.~\cite{PSPACEsubclass} investigated whether there is some another DQBF subclass which is in $\PSPACE$. They show that DQBFs where the dependency sets are either equal or pairwise disjoint can be transformed into QBFs with just linear increase in size. Thus having a check on whether an input DQBF belongs to this class before running a DQBF solver and if it does transforming it into QBF and running a QBF solver can improve the efficiency. They show this by adding this preprocessing step to HQS which results in increase of solved instances.
 
 %As a note toto vzislo z toho, ze clanok zrobil dajaky system ktory je rozsirenie QBF systemu kde pridali fork extension pravidlo. They showed that this system is complete and sound for DQBF, however, in dCAQEclanok (ale v appendixe extended version) and PSPACEclanok ukazali ze to tak nie je (nie je complete ci co). Obe tieto clanky ukazali ze tento system je complete pre tuto PSPACE classu. Zaroven dCAQE vyuziva tento fork extension ???a zle si myslia ze tato classa je NEXPTIME??? vo svojom algoritme, takze je moznost ze ich algoritmus nefunguje pre celu classu DQBF

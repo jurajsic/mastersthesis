@@ -1,41 +1,38 @@
 @inproceedings{DQBFStateOfArt,
-author={Gergely Kov{\'a}sznai},
-title={What is the state-of-the-art in DQBF solving},
-year=2016,
-booktitle={MaCS-16. Joint Conference on Mathematics and Computer Science},
-url={http://ceur-ws.org/Vol-2046/kovasznai.pdf}
+title       = {What is the state-of-the-art in DQBF solving},
+author      = {Kov{\'a}sznai, Gergely},
+year        = {2016},
+booktitle   = {MaCS-16. Joint Conference on Mathematics and Computer Science},
+url         = {http://ceur-ws.org/Vol-2046/kovasznai.pdf}
 }
 
-%dat tu ten talk z 2015 tiez??
 @misc{DQBFStateOfArtTalk,
-title= {A Survey on DQBF: Formulas, Applications, Solving Approaches },
-author = {Gergely Kov{\'a}sznai},
-year = {2015},
-note= {Talk given at International Workshop on Quantification -- QUANTIFY 2015},
-URL= {http://fmv.jku.at/quantify15/Kovasznai_QUANTIFY2015.pdf},
+title       = {A Survey on DQBF: Formulas, Applications, Solving Approaches},
+author      = {Kov{\'a}sznai, Gergely},
+year        = {2015},
+note        = {Talk given at International Workshop on Quantification -- QUANTIFY 2015},
+URL         = {http://fmv.jku.at/quantify15/Kovasznai_QUANTIFY2015.pdf},
 }
 
 @InProceedings{DQBFStateOfArtNew,
-author="Scholl, Christoph
-and Wimmer, Ralf",
-editor="Beyersdorff, Olaf
-and Wintersteiger, Christoph M.",
-title="Dependency Quantified Boolean Formulas: An Overview of Solution Methods and Applications",
+title={Dependency Quantified Boolean Formulas: An Overview of Solution Methods and Applications},
+author={Scholl, Christoph and Wimmer, Ralf},
+%editor="Beyersdorff, Olaf and Wintersteiger, Christoph M.",
 booktitle="Theory and Applications of Satisfiability Testing -- SAT 2018",
 year="2018",
-publisher="Springer International Publishing",
-address="Cham",
+%publisher="Springer International Publishing",
+%address="Cham",
 pages="3--16",
-abstract="Dependency quantified Boolean formulas (DQBFs) as a generalization of quantified Boolean formulas (QBFs) have received considerable attention in research during the last years. Here we give an overview of the solution methods developed for DQBF so far. The exposition is complemented with the discussion of various applications that can be handled with DQBF solving.",
+%abstract="Dependency quantified Boolean formulas (DQBFs) as a generalization of quantified Boolean formulas (QBFs) have received considerable attention in research during the last years. Here we give an overview of the solution methods developed for DQBF so far. The exposition is complemented with the discussion of various applications that can be handled with DQBF solving.",
 doi="10.1007/978-3-319-94144-8_1",
-isbn="978-3-319-94144-8"
+isbn="978-3-319-94144-8",
 }
 
 @inproceedings{DPLLalgorithm,
   title={A DPLL Algorithm for Solving DQBF},
   author={Andreas Fr{\"o}hlich and Gergely Kov{\'a}sznai and Armin Biere},
   booktitle={Pragmatics of SAT (PoS 2012, aff. to SAT 2012)},
-  year={2012}
+  year={2012},
 }
 
 @InProceedings{dCAQE,
@@ -51,7 +48,7 @@ address="Cham",
 pages="388--405",
 abstract="Dependency quantified Boolean formulas (DQBF) is a logic admitting existential quantification over Boolean functions, which allows us to elegantly state synthesis problems in verification such as the search for invariants, programs, or winning regions of games. In this paper, we lift the clausal abstraction algorithm for quantified Boolean formulas (QBF) to DQBF. Clausal abstraction for QBF is an abstraction refinement algorithm that operates on a sequence of abstractions that represent the different quantifier levels. For DQBF we need to generalize this principle to partial orders of abstractions. The two challenges to overcome are: (1) Clauses may contain literals with incomparable dependencies, which we address by the recently proposed proof rule called Fork Extension, and (2) existential variables may have spurious dependencies, which we prevent by tracking consistency requirements during the execution. Our implementation {\$}{\$}{\backslash}textsc {\{}dCAQE{\}}{\$}{\$}solves significantly more formulas than the existing DQBF algorithms.",
 doi="10.1007/978-3-030-24258-9_27",
-isbn="978-3-030-24258-9"
+isbn="978-3-030-24258-9",
 }
 
 @inproceedings{iDQandDQDIMACS,
@@ -67,7 +64,7 @@ isbn="978-3-030-24258-9"
   bibsource = {EasyChair, https://easychair.org},
   issn      = {2398-7340},
   url       = {https://easychair.org/publications/paper/PRV},
-  doi       = {10.29007/1s5k}
+  doi       = {10.29007/1s5k},
 }
 
 @INPROCEEDINGS{HQSsimpleAlg,
@@ -112,7 +109,7 @@ address="Cham",
 pages="326--343",
 abstract="In this paper, we propose the elimination of dependencies to convert a given dependency quantified Boolean formula (DQBF) to an equisatisfiable QBF. We show how to select a set of dependencies to eliminate such that we arrive at a smallest equisatisfiable QBF in terms of existential variables that is achievable using dependency elimination. This approach is improved by taking so-called don't-care dependencies into account, which result from the application of dependency schemes to the formula and can be added to or removed from the formula at no cost. We have implemented this new method in the state-of-the-art DQBF solver HQS. Experiments show that dependency elimination is clearly superior to the previous method using variable elimination.",
 isbn="978-3-319-66263-3",
-doi="10.1007/978-3-319-66263-3_21"
+doi="10.1007/978-3-319-66263-3_21",
 }
 
 @INPROCEEDINGS{HQSquantifierLocalization,
@@ -154,7 +151,7 @@ address="Berlin, Heidelberg",
 pages="292--298",
 abstract="iProver is an instantiation-based theorem prover which is based on Inst-Gen calculus, complete for first-order logic. One of the distinctive features of iProver is a modular combination of instantiation and propositional reasoning. In particular, any state-of-the art SAT solver can be integrated into our framework. iProver incorporates state-of-the-art implementation techniques such as indexing, redundancy elimination, semantic selection and saturation algorithms. Redundancy elimination implemented in iProver include: dismatching constraints, blocking non-proper instantiations and propositional-based simplifications. In addition to instantiation, iProver implements ordered resolution calculus and a combination of instantiation and ordered resolution. In this paper we discuss the design of iProver and related implementation issues.",
 isbn="978-3-540-71070-7",
-doi="10.1007/978-3-540-71070-7_24"
+doi="10.1007/978-3-540-71070-7_24",
 }
 
 @TECHREPORT{FRAIGs,
@@ -163,7 +160,7 @@ doi="10.1007/978-3-540-71070-7_24"
     institution = {EECS Dept., UC Berkeley},
     month = {3},
     year = {2005},
-    url = {https://people.eecs.berkeley.edu/~alanmi/publications/2005/tech05_fraigs.pdf}
+    url = {https://people.eecs.berkeley.edu/~alanmi/publications/2005/tech05_fraigs.pdf},
 }
 
 @InProceedings{HQSpre1,
@@ -182,7 +179,7 @@ address="Cham",
 pages="173--190",
 abstract="For SAT and QBF formulas many techniques are applied in order to reduce/modify the number of variables and clauses of the formula, before the formula is passed to the actual solving algorithm. It is well known that these preprocessing techniques often reduce the computation time of the solver by orders of magnitude. In this paper we generalize different preprocessing techniques for SAT and QBF problems to dependency quantified Boolean formulas (DQBF) and describe how they need to be adapted to work with a DQBF solver core. We demonstrate their effectiveness both for CNF- and non-CNF-based DQBF algorithms.",
 isbn="978-3-319-24318-4",
-doi="10.1007/978-3-319-24318-4_13"
+doi="10.1007/978-3-319-24318-4_13",
 }
 
 @InProceedings{HQSpre2,
@@ -200,7 +197,7 @@ address="Berlin, Heidelberg",
 pages="373--390",
 abstract="We present our new preprocessor HQSpre, a state-of-the-art tool for simplifying quantified Boolean formulas (QBFs) and the first available preprocessor for dependency quantified Boolean formulas (DQBFs). The latter are a generalization of QBFs, resulting from adding so-called Henkin-quantifiers to QBFs. HQSpre applies most of the preprocessing techniques that have been proposed in the literature. It can be used both as a standalone tool and as a library. It is possible to tailor it towards different solver back-ends, e. g., to preserve the circuit structure of the formula when a non-CNF solver back-end is used. Extensive experiments show that HQSpre allows QBF solvers to solve more benchmark instances and is able to decide more instances on its own than state-of-the-art tools. The same impact can be observed in the DQBF domain as well.",
 isbn="978-3-662-54577-5",
-doi="10.1007/978-3-662-54577-5_21"
+doi="10.1007/978-3-662-54577-5_21",
 }
 
 @Article{HQSpreJournal,
@@ -224,7 +221,7 @@ doi="10.1007/978-3-662-54577-5_21"
         as well as implementation details contributing to the efficiency of the preprocessor.
         HQSpre has been used with obvious success by the winners of the DQBF track, and,
         even more interestingly, the QBF tracks of QBFEVAL'18.",
-    doi="10.3233/SAT190115"
+    doi="10.3233/SAT190115",
 }
 
 @InProceedings{FastDQBFRefutation,
@@ -240,7 +237,7 @@ address="Cham",
 pages="243--251",
 abstract="Dependency Quantified Boolean Formulas (DQBF) extend QBF with Henkin quantifiers, which allow for non-linear dependencies between the quantified variables. This extension is useful in verification problems for incomplete designs, such as the partial equivalence checking (PEC) problem, where a partial circuit, with some parts left open as ``black boxes'', is compared against a full circuit. The PEC problem is to decide whether the black boxes in the partial circuit can be filled in such a way that the two circuits become equivalent, while respecting that each black box only observes the subset of the signals that are designated as its input. We present a new algorithm that efficiently refutes unsatisfiable DQBF formulas. The algorithm detects situations in which already a subset of the possible assignments of the universally quantified variables suffices to rule out a satisfying assignment of the existentially quantified variables. Our experimental evaluation on PEC benchmarks shows that the new algorithm is a significant improvement both over approximative QBF-based methods, where our results are much more accurate, and over precise methods based on variable elimination, where the new algorithm scales better in the number of Henkin quantifiers.",
 isbn="978-3-319-09284-3",
-doi="10.1007/978-3-319-09284-3_19"
+doi="10.1007/978-3-319-09284-3_19",
 }
 
 @article{PSPACEsubclass,
@@ -252,7 +249,7 @@ doi="10.1007/978-3-319-09284-3_19"
   pages = {1584--1591},
   author = {Christoph Scholl and Jie-Hong Roland Jiang and Ralf Wimmer and Aile Ge-Ernst},
   title = {A {PSPACE} Subclass of Dependency Quantified Boolean Formulas and Its Effective Solving},
-  journal = {Proceedings of the {AAAI} Conference on Artificial Intelligence}
+  journal = {Proceedings of the {AAAI} Conference on Artificial Intelligence},
 }
 
 @article{NegationOfDQBFs,
@@ -266,7 +263,7 @@ doi = "10.1016/j.tcs.2013.12.020",
 url = "http://www.sciencedirect.com/science/article/pii/S0304397513009328",
 author = "Valeriy Balabanov and Hui-Ju Katherine Chiang and Jie-Hong R. Jiang",
 keywords = "Henkin quantifier, Quantified Boolean formula, Herbrand function, Skolem function, Resolution, Consensus",
-abstract = "Henkin quantifiers, when applied on Boolean formulae, yielding the so-called dependency quantified Boolean formulae (DQBFs), offer succinct descriptive power specifying variable dependencies. Despite their natural applications to games with incomplete information, logic synthesis with constrained input dependencies, etc., DQBFs remain a relatively unexplored subject however. This paper investigates their basic properties, including formula negation and complement, formula expansion, prenex and non-prenex form conversions, and resolution. In particular, the proposed DQBF formulation is established from a synthesis perspective concerned with Skolem-function models and Herbrand-function countermodels. Also a generalized resolution rule is shown to be sound, but incomplete, for DQBF evaluation."
+abstract = "Henkin quantifiers, when applied on Boolean formulae, yielding the so-called dependency quantified Boolean formulae (DQBFs), offer succinct descriptive power specifying variable dependencies. Despite their natural applications to games with incomplete information, logic synthesis with constrained input dependencies, etc., DQBFs remain a relatively unexplored subject however. This paper investigates their basic properties, including formula negation and complement, formula expansion, prenex and non-prenex form conversions, and resolution. In particular, the proposed DQBF formulation is established from a synthesis perspective concerned with Skolem-function models and Herbrand-function countermodels. Also a generalized resolution rule is shown to be sound, but incomplete, for DQBF evaluation.",
 }
 
 @InProceedings{prenexingQBFs,
@@ -285,7 +282,7 @@ address="Berlin, Heidelberg",
 pages="214--228",
 abstract="The majority of the currently available solvers for quantified Boolean formulas (QBFs) process input formulas only in prenex conjunctive normal form. However, the natural representation of practicably relevant problems in terms of QBFs usually results in formulas which are not in a specific normal form. Hence, in order to evaluate such QBFs with available solvers, suitable normal-form translations are required. In this paper, we report experimental results comparing different prenexing strategies on a class of structured benchmark problems. The problems under consideration encode the evaluation of nested counterfactuals over a propositional knowledge base, and span the entire polynomial hierarchy. The results show that different prenexing strategies influence the evaluation time in different ways across different solvers. In particular, some solvers are robust to the chosen strategies while others are not.",
 isbn="978-3-540-24605-3",
-doi="10.1007/978-3-540-24605-3_17"
+doi="10.1007/978-3-540-24605-3_17",
 }
 
 @InProceedings{DQBFProofSystem,
@@ -300,7 +297,7 @@ address="Cham",
 pages="314--325",
 abstract="This paper presents a sound and complete proof system for Dependency Quantified Boolean Formulas (DQBF) using resolution, universal reduction, and a new proof rule that we call fork extension. This opens new avenues for the development of efficient algorithms for DQBF.",
 isbn="978-3-319-66263-3",
-doi="10.1007/978-3-319-66263-3_20"
+doi="10.1007/978-3-319-66263-3_20",
 }
 
 @article{BDD,
@@ -327,7 +324,7 @@ doi="10.1007/978-3-319-66263-3_20"
   title         = {Lecture notes},
   year          = {1999},
   publisher={IT University of Copenhagen},
-  url = {https://www.cmi.ac.in/~madhavan/courses/verification-2011/andersen-bdd.pdf}
+  url = {https://www.cmi.ac.in/~madhavan/courses/verification-2011/andersen-bdd.pdf},
 }
 
 @Inbook{Tseitin,
@@ -343,7 +340,7 @@ pages="466--483",
 abstract="The question of the minimum complexity of derivation of a given formula in classical propositional calculus is considered in this article and it is proved that estimates of complexity may vary considerably among the various forms of propositional calculus. The forms of propositional calculus used in the present article are somewhat unusual, {\textdagger} but the results obtained for them can, in principle, be extended to the usual forms of propositional calculus.",
 isbn="978-3-642-81955-1",
 doi="10.1007/978-3-642-81955-1_28",
-url="https://doi.org/10.1007/978-3-642-81955-1_28"
+url="https://doi.org/10.1007/978-3-642-81955-1_28",
 }
 
 @article{DPLL,
@@ -361,7 +358,7 @@ doi = {10.1145/368273.368557},
 journal = {Commun. ACM},
 month = jul,
 pages = {394–397},
-numpages = {4}
+numpages = {4},
 }
 
 @Inproceedings{ClausalAbstr,
@@ -379,7 +376,7 @@ numpages = {4}
   title = {QBF Evaluation 2018},
   year = 2018,
   url = {http://www.qbflib.org/event_page.php?year=2018},
-  urldate = {2020-03-14}
+  urldate = {2020-03-14},
 }
 
 @online{QBFeval19,
@@ -387,5 +384,5 @@ numpages = {4}
   title = {QBF Evaluation 2019},
   year = 2019,
   url = {http://www.qbflib.org/event_page.php?year=2019},
-  urldate = {2020-03-14}
+  urldate = {2020-03-14},
 }
