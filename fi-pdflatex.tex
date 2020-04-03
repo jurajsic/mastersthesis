@@ -174,11 +174,8 @@
 % for writing out rules of DQBF in NNF
 \usepackage{ebproof}
 
-% for complexity class
-%\usepackage[basic]{complexity}
-
-% for writing left aligned text in figures
-%\usepackage{caption}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,automata,positioning}
 
 %% We will define several mathematical sectioning commands.
 \newtheorem{theorem}{Theorem}[chapter] %% The numbering of theorems
@@ -618,20 +615,33 @@ In this section we recall a definition of \emph{binary decision diagrams}~\cite{
 
 Let $v\colon V \to \{0,1\}$ be a valuation over $V$. BDD $\beta$ in this valuation is evaluated to 0 or 1 by starting in the root and for every $n \in N$, representing some $x \in V$, either moving to low child if $v(x) = 0$ or to high child if $v(x) = 1$. The resulting terminal node is then the evaluation $v(\beta)$ of $\beta$ in $v$. BDD $\beta$ then represents a Boolean formula $\phi \in \BF{V}$ if for each valuation $v$ it holds that $v(\beta) = v(\phi)$.
 
-\begin{figure}[ht!]
+In figures, non-terminal nodes are denoted by the variable they represent, terminal nodes are shown as boxes with the constant they represent, edges to low children are dashed and edges to high children are full.
+
+\begin{figure}[ht]
     \centering
-    \subcaptionbox{\label{fig:BDD}BDD}
-        {\includegraphics{figures/bdd1.pdf}}
-    \subcaptionbox{\label{fig:ROBDD}ROBDD}
-        {\includegraphics{figures/bdd2.pdf}}
+    \begin{subfigure}[b]{.5\linewidth}
+        \centering
+        \includegraphics{figures/bdd1.pdf}
+        \caption{BDD}
+        \label{fig:BDD}
+    \end{subfigure}%
+    \begin{subfigure}[b]{.5\linewidth}
+        \centering
+        \includegraphics{figures/bdd2.pdf}
+        \caption{ROBDD}
+        \label{fig:ROBDD}
+    \end{subfigure}
+    %\subcaptionbox{\label{fig:BDD}BDD}
+    %    {\includegraphics{figures/bdd1.pdf}}
+    %\subcaptionbox{\label{fig:ROBDD}ROBDD}
+    %    {\includegraphics{figures/bdd2.pdf}}
     \caption{An example of BDD and ROBDD that represent the same BF $(\neg x_1 \land x_2 \land x_3) \lor (x_1 \land \neg (x_1 \lequal x_2))$}
-    \label{fig:my_label}
+    \label{fig:BDDandROBDD}
 \end{figure}
 
 \begin{example}
 \label{ex:BDD}
-Figure~\ref{fig:BDD} shows an example of a BDD where edges to low children are dashed and to high children are full, non-terminal nodes are denoted by the variable they represent and terminal nodes are shown as boxes with the constant they represent. %We also show two copies of terminal nodes, this is only for better visualization, they are still the same two. To show nicer picture, the non-terminal nodes (boxe) 
-This BDD represents the BF $(\neg x_1 \land x_2 \land x_3) \lor (x_1 \land \neg (x_1 \lequal x_2))$. 
+Figure~\ref{fig:BDD} shows an example of a BDD representing the BF $(\neg x_1 \land x_2 \land x_3) \lor (x_1 \land \neg (x_1 \lequal x_2))$. 
 \end{example}
 
 To have simpler algorithms for BDDs, we actually use \emph{reduced ordered BDDs} (ROBDDs) which are BDDs such that 
@@ -674,11 +684,44 @@ For each operation on BFs (${\land}$, ${\lor}$, ${\neg}$), there is an algorithm
 %\section{And-Inverter Graphs - je ich treba rozobrat???}
 
 \section{Quantifier Trees}
-While BDDs are a ... represantion?? of BFs, we also need a represenation of DQBFs. For this we define \emph{quantifier trees} which can represent DQBFs in NNF. hybguyguyguy uybuybu uybuybu gcvtrct trcvtrvu uybutvc
+While BDDs are a good represantion of BFs, we also need a represenation for DQBFs. For this we define \emph{quantifier trees} which can represent DQBFs in NNF.
 
 \begin{definition}
-  
+  Let $V$ be a set of variables. A \emph{quantifier tree} \emph{over $V$} is a rooted directed tree in which each non-terminal node is assigned to a DQBF prefix and operation ${\diamond} \in \set{{\land},{\lor}}$ and each terminal node to a literal from $V$ (a variable $v \in V$ or its negation).
 \end{definition}
+
+Each DQBF in NNF can be represented by a quantifier tree by starting from literals and recursively creating subtrees for each operation. 
+
+In figures, the assigned DQBF prefix to non-terminal node $n$ is always shown on the edge coming to the node $n$, while the nodes are labelled either by the assigned operation or literal (see Figure~\ref{fig:QTex}). For the root, we add an extra ''edge'', just to show the quantifier prefix before the whole formula.
+
+\begin{figure}[ht]
+    \centering
+    \begin{tikzpicture}[->,>={Stealth[scale=1.3,angle'=90]},node distance=2cm,initial distance=1.3cm,initial text=$\forall x_1 \exists y_1(x_1) $,every state/.style={minimum size=0pt}]
+    \node[state,initial above] (1) {${\land}$};
+    \node[state, below of=1] (2) {$x_1$};
+    \node[state, left of=2] (3) {${\lor}$};
+    \node[state, right of=2] (4) {${\lor}$};
+    \node[state, below right = 1.3cm and 0.4 cm of 4,inner sep=1pt] (5) {$\neg y_1$};
+    \node[state, below left = 1.3cm and 0.4 cm of 4] (6) {$x_2$};
+    \node[state, below right = 1.3cm and 0.4cm of 3,inner sep=1pt] (7) {$\neg x_1$};
+    \node[state, below left = 1.3cm and 0.4cm of 3] (8) {$y_2$};
+    
+    \draw (1) edge[right] node{$\forall x_2$} (4)
+          (1) edge[left] node{$\exists y_2(\emptyset)$} (3)
+          (1) edge (2)
+          (3) edge (7)
+          (3) edge (8)
+          (4) edge (5)
+          (4) edge (6)
+          ;
+    \end{tikzpicture}
+    \caption{An example of quantifier tree}
+    \label{fig:QTex}
+\end{figure}
+
+\begin{example}
+  Figure~\ref{fig:QTex} shows an example of quantifier tree representing DQBF \[\forall x_1 \exists y_1(x_1) (\exists y_2(\emptyset) \itholds (y_2 \lor \neg x_1) \land x_1 \land \forall x_2 \itholds (x_2 \lor \neg y_1)).\]
+\end{example}
 
 \chapter{State of the Art}
 %problem - vytvorit algoritmus ktory zisti ze ci dana DQBF formula je splnitelna alebo nie pomocou BDDcok alebo jej podobnym strukturam (mozno dat do teorie)
