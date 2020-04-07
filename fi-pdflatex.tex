@@ -556,6 +556,7 @@ It is obviously not satisfiable because whether $s(y) = 0$ or $s(y) = 1$ we alwa
 \[\forall x \itholds (\exists y(\emptyset) \itholds (x \land y) \lor \exists y'(\emptyset) \itholds (\neg x \land \neg y'))\]
 which is satisfiable for $s$ where $s(y) = 1$ and $s(y') = 0$. To fix this, we need to restrict the variables that can occur in the disjuncts. As the next theorem shows, it is enough that universal variables that occur in both disjuncts (including in dependency sets) are only those from the dependency set of $y$.
 
+This shit I am writing here does not work for \[\forall x_1 \forall x_2 \itholds (\exists y(\emptyset) \itholds (x_1 \land y) \lor (x_2 \land y)) \lor (\neg x_1 \land \neg x_2)\]
 \begin{theorem}
   Let $\psi,\psi_1,\psi_2 \in \DQBF{V}$ such that $\exists y(D_y) \itholds (\psi_1 \lor \psi_2)$ is a subformula of $\psi$. Let 
   \[A_{\psi_1} = \Set{x \in \uvars{\psi} | x \in \vars{\psi_1} \text{ or } x \in D_{y_1} \text{ for some } y_1 \in \vars{\psi_1}}\]
