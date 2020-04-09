@@ -459,12 +459,14 @@ We first give the definition of the set $\DQBF{V}$ of DQBFs in \emph{negation no
     %\end{centering}
     \flushleft{where (\ref{disconjrule}) refers to}
     \begin{multline}
-        \tag{1} \label{disconjrule}
+        \tag{1} 
+        \label{disconjrule}
         \qvars{\psi_1} \cap \qvars{\psi_2} = \emptyset \text{\quad and\quad} \fvars{\psi_1} \cap \qvars{\psi_2} = \emptyset \text{\quad and\quad} \fvars{\psi_2} \cap \qvars{\psi_1} = \emptyset
     \end{multline}
     \flushleft{and (\ref{existrule}) refers to}
     \begin{equation}
-        \tag{2} \label{existrule}
+        \tag{2} 
+        \label{existrule}
         D_v \subseteq V \setminus (\qvars{\psi} \cup \set{v})
     \end{equation}
     \caption{Rules defining the syntax of DQBFs in NNF (based on Ge-Ernst et al.~\cite{HQSquantifierLocalization}).}
@@ -515,63 +517,73 @@ Now that we have defined DQBFs we give some theoretical results which show the e
 
 We start with two theorems that show when it is possible to push (extract) quantifiers in (from) the formula. %The first theorem is from~\cite[Theorem 3]{HQSquantifierLocalization} where ... is replaced by ... from~\cite[Theorem 4]{HQSquantifierLocalization}
 
+%\let\oldtheequation\theequation
+%\renewcommand{\theequation}{\alph{equation}}
 \begin{theorem}[{\cite[Theorems 3,4]{HQSquantifierLocalization}}]
 \label{thrm:quantLocalEq}
   Let ${\diamond} \in \set{{\land},{\lor}}$ and $\psi,\psi_1,\psi_2 \in \DQBF{V}$. We assume that $x'$ and $y'$ are fresh variables, which do not occur in $\psi,\psi_1$ and $\psi_2$. The following equisatifiabilities hold for all DQBFs in NNF:
   \begin{align}
       %\forall x : \psi &\approx \psi \text{, if } x \not\in V_{\psi} \\
-      \forall x \itholds (\psi_1 \land \psi_2) &\approx (\forall x \itholds \psi_1) \land (\forall x' \itholds \psi_2\substitute{x}{x'}) \label{loc:unconj1} \\
-      \forall x \itholds (\psi_1 \land \psi_2) &\approx (\psi_1^{-x} \land (\forall x \itholds \psi_2)) \text{, if } x \not\in V_{\psi_1} \label{loc:unconj2} \\
-      \forall x \itholds (\psi_1 \lor \psi_2) &\approx \begin{multlined}[t][3cm](\psi_1 \lor (\forall x \itholds \psi_2)) \text{, if } x \not\in V_{\psi_1} \label{loc:undisj} \\
+      \forall x \itholds (\psi_1 \land \psi_2) &\approx (\forall x \itholds \psi_1) \land (\forall x' \itholds \psi_2\substitute{x}{x'}) \tag{a} \label{loc:unconj1} \\
+      \forall x \itholds (\psi_1 \land \psi_2) &\approx (\psi_1^{-x} \land (\forall x \itholds \psi_2)) \text{, if } x \not\in V_{\psi_1} \tag{b} \label{loc:unconj2} \\
+      \forall x \itholds (\psi_1 \diamond \psi_2) &\approx \begin{multlined}[t][3cm](\psi_1 \diamond (\forall x \itholds \psi_2)) \text{, if } x \not\in V_{\psi_1} \tag{c} \label{loc:undisj} \\
       \text{ and } x \not\in D_y \text{ for all } y \in \evars{\psi_1}\end{multlined} \\
-      \exists y(D_y) \itholds (\psi_1 \lor \psi_2) &\approx (\exists y(D_y) \itholds \psi_1) \lor (\exists y'(D_y) \itholds \psi_2\substitute{y}{y'}) \label{loc:exdisj} \\
-      \exists y(D_y) \itholds (\psi_1 \diamond \psi_2) &\approx (\psi_1 \diamond (\exists y(D_y) \itholds \psi_2)) \text{, if } y \not\in V_{\psi_1} \label{loc:exboth} \\
-      \exists y_1(D_{y_1})\exists y_2(D_{y_2}) \itholds \psi &\approx \exists y_2(D_{y_2}) \exists y_1(D_{y_1}) \itholds \psi \label{loc:exswap} \\
-      \forall x_1\forall x_2 \itholds \psi &\approx \forall x_2\forall x_1 \itholds \psi \label{loc:unswap} \\
-      \forall x\exists y(D_y) \itholds \psi &\approx \exists y(D_y)\forall x \itholds \psi\text{, if } x \not\in D_y. \label{loc:bothswap}
+      \exists y(D_y) \itholds (\psi_1 \lor \psi_2) &\approx (\exists y(D_y) \itholds \psi_1) \lor (\exists y'(D_y) \itholds \psi_2\substitute{y}{y'}) \tag{d} \label{loc:exdisj} \\
+      \exists y(D_y) \itholds (\psi_1 \diamond \psi_2) &\approx (\psi_1 \diamond (\exists y(D_y) \itholds \psi_2)) \text{, if } y \not\in V_{\psi_1} \tag{e} \label{loc:exboth} \\
+      \exists y_1(D_{y_1})\exists y_2(D_{y_2}) \itholds \psi &\approx \exists y_2(D_{y_2}) \exists y_1(D_{y_1}) \itholds \psi \tag{f} \label{loc:exswap} \\
+      \forall x_1\forall x_2 \itholds \psi &\approx \forall x_2\forall x_1 \itholds \psi \tag{g} \label{loc:unswap} \\
+      \forall x\exists y(D_y) \itholds \psi &\approx \exists y(D_y)\forall x \itholds \psi\text{, if } x \not\in D_y. \tag{h} \label{loc:bothswap}
   \end{align}
 \end{theorem}
+%\renewcommand{\theequation}{\oldtheequation}
 
-To make these rules more usable for DQBF in NNF we have to show that they also work while replacing subformulas. This was not proven by Ge-Ernst et al.~\cite{HQSquantifierLocalization} even though they used it for replacing subformulas. As we will show, this was used erroneously because the rule~(\ref{loc:exdisj}) does not generally hold. However, for other rules there is no problem as the next theorem shows. % that if DQBFs from the previous theorem occur as subformulas of DQBF $\psi$ they can be replaced without changing the satisfiability of $\psi$. 
+To make these rules more usable for DQBF in NNF we have to show that they also work while replacing subformulas. This was not proven by Ge-Ernst et al.~\cite{HQSquantifierLocalization} even though they used it for replacing subformulas. As we will show, this was used erroneously because the rule~\eqref{loc:exdisj} does not generally hold. However, for other rules there is no problem as the next theorem shows. % that if DQBFs from the previous theorem occur as subformulas of DQBF $\psi$ they can be replaced without changing the satisfiability of $\psi$. 
 
 \begin{theorem}
   \label{thrm:quantLocalSubformulas}
-  Let $\psi \in \DQBF{V}$, $\phi_1$ be the left side formula and $\phi_2$ be the right side formula  from the same equality from Theorem~\ref{thrm:quantLocalEq} (except~(\ref{loc:exdisj})) where $\phi_1$ is a subformula of $\psi$. Again, the same assumptions for $x'$ and $y'$ variables hold as in Theorem~\ref{thrm:quantLocalEq} but also they do not occur in $\psi$. Then $\psi \approx \psi'$ where $\psi'$ results from $\psi$ by replacing $\phi_1$ with $\phi_2$.
+  Let $\psi \in \DQBF{V}$, $\phi$ be the left side formula and $\phi'$ be the right side formula  from the same equality from Theorem~\ref{thrm:quantLocalEq} (except~\eqref{loc:exdisj}) where $\phi$ is a subformula of $\psi$. Again, the same assumptions for $x'$ and $y'$ variables hold as in Theorem~\ref{thrm:quantLocalEq} but also they do not occur in $\psi$. Then $\psi \approx \psi'$ where $\psi'$ results from $\psi$ by replacing $\phi$ with $\phi'$.
 \end{theorem}
 \begin{proof}
-  (\ref{loc:unconj1}) We show that $\seman{\psi} \not= \emptyset$ iff $\seman{\psi'} \not= \emptyset$. First, let $s \in \seman{\psi}$. We now show that for $s'$, where $s'(y) = s(y)\substitute{x}{x'}$ for $y \in \evars{\phi_2}$ and $s'(y) = s(y)$ otherwise, it holds $s' \in \seman{\psi'}$. Let $v \in \valtns{\psi'}$. We need to show that $v(s'(\psi')) = 1$. Because $s \in \seman{\psi}$ it holds that $v(s(\psi)) = 1$. For the case that $v(x') = v(x)$ we get $v(s(\psi)) = v(s'(\psi'))$, because BFs $s(\psi)$ and $s(\psi')$ differ only in some replacements of $x$ by $x'$. Therefore we assume that $v(x') \not= v(x)$. We know that $\psi$ and $\psi'$ differ only in the formulas $\phi_1$ and $\phi_2$, therefore we can only focus on the case that $v(s(\psi))$ depends on the value of $v(s(\phi_1))$. Also, $\psi$ is in NNF, which means that in the tree of operations, negation cannot be before $\phi_1$. This means that we can focus only on the case where $v(s(\phi_1)) = 1$, otherwise the value of $v(s(\psi))$ would not depend on $v(s(\phi_1))$. This means we need to show that $v(s'(\phi_2)) = 1$. We have that for $v(s(\phi_1)) = v(s(\forall x \itholds (\psi_1 \land \psi_2))) = v(s(\psi_1) \land s(\psi_2))$ to be equal to one, it has to hold that $v(s(\psi_1)) = 1$ and $v(s(\psi_2)) = 1$. Also, for $v'$ which is equal to $v$, except that $v'(x) \not= v(x)$, it holds that $v'(s(\psi)) = 1$. This is from the assumption that the value of $v(s(\psi))$ depends on $v(s(\phi_1))$, because $x$ is only in $\phi_1$. This means that $v'(s(\psi_2)) = 1$. Also $v'(s(\psi_2)) = v(s'(\psi_2\substitute{x}{x'}))$, because $v'(x) = v(x')$. All in all, we get $v(s(\psi_1)) = v(s'(\psi_1)) = 1$ and $v(s'(\psi_2\substitute{x}{x'})) = 1$ therefore $v(s'(\phi_2)) = v(s'((\forall x \itholds \psi_1) \land (\forall x' \itholds \psi_2\substitute{x}{x'}))) = 1$.
+  \eqref{loc:unconj1} We show that $\seman{\psi} \not= \emptyset$ iff $\seman{\psi'} \not= \emptyset$. First, let $s \in \seman{\psi}$. We now show that for $s'$, where $s'(y) = s(y)\substitute{x}{x'}$ for $y \in \evars{\phi'}$ and $s'(y) = s(y)$ otherwise, it holds $s' \in \seman{\psi'}$. Let $v \in \valtns{\psi'}$. We need to show that $v(s'(\psi')) = 1$. Because $s \in \seman{\psi}$ it holds that $v(s(\psi)) = 1$. For the case that $v(x') = v(x)$ we get $v(s(\psi)) = v(s'(\psi'))$, because BFs $s(\psi)$ and $s(\psi')$ differ only in some replacements of $x$ by $x'$. Therefore we assume that $v(x') \not= v(x)$. We know that $\psi$ and $\psi'$ differ only in the formulas $\phi$ and $\phi'$, therefore we can only focus on the case that $v(s(\psi))$ depends on the subformula $s(\phi)$. Also, $\psi$ is in NNF, which means that in the tree of operations, negation cannot be before $\phi$. This means that we can focus only on the case where $v(s(\phi)) = 1$, otherwise the value of $v(s(\psi))$ would not depend on the subformula $s(\phi)$. This means we need to show that $v(s'(\phi')) = 1$. We have that for $v(s(\phi)) = v(s(\forall x \itholds (\psi_1 \land \psi_2))) = v(s(\psi_1) \land s(\psi_2))$ to be equal to one, it has to hold that $v(s(\psi_1)) = 1$ and $v(s(\psi_2)) = 1$. Also, for $v'$ which is equal to $v$, except that $v'(x) \not= v(x)$, it holds that $v'(s(\psi)) = 1$. This is from the assumption that the value of $v(s(\psi))$ depends on $v(s(\phi))$, because $x$ is only in $\phi$. This means that $v'(s(\psi_2)) = 1$. Also $v'(s(\psi_2)) = v(s'(\psi_2\substitute{x}{x'}))$, because $v'(x) = v(x')$. All in all, we get $v(s(\psi_1)) = v(s'(\psi_1)) = 1$ and $v(s'(\psi_2\substitute{x}{x'})) = 1$ therefore $v(s'(\phi')) = v(s'((\forall x \itholds \psi_1) \land (\forall x' \itholds \psi_2\substitute{x}{x'}))) = 1$.
   
   For the other direction, let $s' \in \seman{\psi'}$. It can be easily shown by similar argument that $s$, where $s(y) = s'(y)\substitute{x'}{x}$ for $y \in \psi_2$ and $s(y) = s'(y)$ otherwise, is a satisfying Skolem functions mapping of $\psi$.
   
-  (\ref{loc:unconj2}) This was proven by Ge-Ernst et al.~\cite[Theorem 4]{HQSquantifierLocalization}.
+  \eqref{loc:unconj2} This was proven by Ge-Ernst et al.~\cite[Theorem 4]{HQSquantifierLocalization}.
   
   %(\ref{loc:exdisj}) Again, we show that $\seman{\psi} \not= \emptyset$ iff $\seman{\psi'} \not= \emptyset$. First, let $s \in \seman{\psi}$. It is easy to see, that $s'$, where $s'(y) = s'(y') = s(y)$ and for other variables $s'(v) = s(v)$, is a satisfying Skolem functions mapping of $\psi'$, because $s(\psi)$ and $s(\psi')$ are the same BFs. For the other direction, let $s' \in \seman{\psi'}$. Using similar arguments as in the case (\ref{loc:unconj1}) and realising that disjunction valuates to true if either of its operators is true, we can see that at least one of $s_1$ and $s_2$, where $s_1(y) = s'(y)$, $s_2(y) = s'(y')$ and for other variable $s_1(v) = s_2(v) = s'(v)$, is a satisfying Skolem functions mapping of $\psi$.
   
-  (\ref{loc:undisj}, \ref{loc:exboth}, \ref{loc:exswap}, \ref{loc:unswap}, \ref{loc:bothswap}) Because $\uvars{\psi} = \uvars{\psi'}$, $\evars{\psi} = \evars{\psi'}$, and $\fvars{\psi} = \fvars{\psi'}$ and the dependency sets do not change, it holds that $\Scands{\psi} = \Scands{\psi'}$. Also, for any $s \in \Scands{\psi}$ it holds that $s(\psi)$ is the same BF as $s(\psi')$ which means that $\seman{\psi} = \seman{\psi'}$, therefore $\psi \approx \psi'$.
+  \eqref{loc:undisj}\eqref{loc:exboth}\eqref{loc:exswap}\eqref{loc:unswap}\eqref{loc:bothswap} Because $\uvars{\psi} = \uvars{\psi'}$, $\evars{\psi} = \evars{\psi'}$, and $\fvars{\psi} = \fvars{\psi'}$ and the dependency sets do not change, it holds that $\Scands{\psi} = \Scands{\psi'}$. Also, for any $s \in \Scands{\psi}$ it holds that $s(\psi)$ is the same BF as $s(\psi')$ which means that $\seman{\psi} = \seman{\psi'}$, therefore $\psi \approx \psi'$.
 \end{proof}
 
-As we already mentioned, the rule~(\ref{loc:exdisj}) as it stands cannot be generally used for replacing subformulas. We show it on the following formula:
+As we already mentioned, the rule~\eqref{loc:exdisj} as it stands cannot be generally used for replacing subformulas. We show it on the following formula:
 \[\forall x \exists y(\emptyset) \itholds ((x \land y) \lor (\neg x \land \neg y)).\]
 It is obviously not satisfiable because whether $s(y) = 0$ or $s(y) = 1$ we always can find valuation in which both disjuncts are not true. However if we assumed that rule~(\ref{loc:exdisj}) can be used also for subformulas we would get
 \[\forall x \itholds (\exists y(\emptyset) \itholds (x \land y) \lor \exists y'(\emptyset) \itholds (\neg x \land \neg y'))\]
-which is satisfiable for $s$ where $s(y) = 1$ and $s(y') = 0$. To fix this, we need to restrict the variables that can occur in the disjuncts. As the next theorem shows, it is enough that universal variables that occur in both disjuncts (including in dependency sets) are only those from the dependency set of $y$.
+which is satisfiable for $s$ where $s(y) = 1$ and $s(y') = 0$. To fix this, we need to restrict the variables that can occur in the disjuncts. When we look at this formula, it would appear that the problem arises from having universal variable $x$ on which $y$ is not dependent in both disjuncts. However, we can find an example when even if both disjuncts contain different sets of universal variables (other than the ones from $D_y$), this rule does not work. For example for
+\[\forall x_1 \forall x_2 \itholds (\exists y(\emptyset) \itholds ((x_1 \land y) \lor (x_2 \land \neg y)) \lor (\neg x_1 \land \neg x_2)),\]
+which is not satisfiable, we have that $x_1 \land y$ contains $x_1$ which is not in $x_2 \land y$ and $x_2$ is only in the second disjunct. However, after applying the rule~\eqref{loc:exdisj} we get
+\[\forall x_1 \forall x_2 \itholds ((\exists y(\emptyset) \itholds (x_1 \land y) \lor \exists y'(\emptyset) \itholds (x_2 \land \neg y')) \lor (\neg x_1 \land \neg x_2)),\]
+which becomes satisfiable. The problem here is that $x_1$ and $x_2$ are in $\neg x_1 \land \neg x_2$ which is outside the subformula on which we are applying the rule $\eqref{loc:exdisj}$.
 
-This shit I am writing here does not work for \[\forall x_1 \forall x_2 \itholds (\exists y(\emptyset) \itholds (x_1 \land y) \lor (x_2 \land y)) \lor (\neg x_1 \land \neg x_2)\]
+
+
+the intersection of universal variables (including those on which existential are dependent on) of both disjuncts  As the next theorem shows, it is enough that universal variables that occur in both disjuncts (including in dependency sets) are only those from the dependency set of $y$.
+
 \begin{theorem}
   Let $\psi,\psi_1,\psi_2 \in \DQBF{V}$ such that $\exists y(D_y) \itholds (\psi_1 \lor \psi_2)$ is a subformula of $\psi$. Let 
   \[A_{\psi_1} = \Set{x \in \uvars{\psi} | x \in \vars{\psi_1} \text{ or } x \in D_{y_1} \text{ for some } y_1 \in \vars{\psi_1}}\]
   and 
-  \[A_{\psi_2} = \Set{x \in \uvars{\psi} | x \in \vars{\psi_2} \text{ or } x \in D_{y_2} \text{ for some } y_2 \in \vars{\psi_2}}\] 
-  where $A_{\psi_1} \cap A_{\psi_2} \subseteq D_y \cup \fvars{\psi}$.
+  \[A_{\psi_2} = \Set{x \in \uvars{\psi} | x \in \vars{\psi_2} \text{ or } x \in D_{y_2} \text{ for some } y_2 \in \vars{\psi_2}}.\] 
+  %where $A_{\psi_1} \cap A_{\psi_2} \subseteq D_y$.
   %\[\fvars{\psi_1 \lor \psi_2} \cup \evars{\psi_1 \lor \psi_2} \subseteq D_y \cup \fvars{\psi} \cup \Set{y' \in \evars{\psi} | D_y' \subseteq D_y \cup \uvars{\psi_1 \lor \psi_2}}.\] 
   Let $y'$ be a new variable not occurring in $\psi, \psi_1$ or $\psi_2$. Then $\psi \approx \psi'$ where $\psi'$ results from $\psi$ by replacing the subformula $\exists y(D_y) \itholds (\psi_1 \lor \psi_2)$ by \[(\exists y(D_y) \itholds \psi_1) \lor (\exists y'(D_y) \itholds \psi_2\substitute{y}{y'}).\]
 \end{theorem}
 \begin{proof}
-   First, the assumption $A_{\psi_1} \cap A_{\psi_2} \subseteq D_y \cup \fvars{\psi}$ tells us that for any two $s,s' \in \Scands{\psi}$ it holds that $s(\psi_1) \cap s'(\psi_2) \subseteq D_y$. Now, let $\phi_1 = \exists y(D_y) \itholds (\psi_1 \lor \psi_2)$ and $\phi_2 = \exists y(D_y) \itholds \psi_1) \lor (\exists y'(D_y) \itholds \psi_2\substitute{y}{y'})$. We prove that $\seman{\psi} \not= \emptyset$ iff $\seman{\psi'} \not= \emptyset$.
+   First, the assumption $A_{\psi_1} \cap A_{\psi_2} \subseteq D_y \cup \fvars{\psi}$ tells us that for any two $s,s' \in \Scands{\psi}$ it holds that $s(\psi_1) \cap s'(\psi_2) \subseteq D_y$. Now, let $\phi = \exists y(D_y) \itholds (\psi_1 \lor \psi_2)$ and $\phi' = \exists y(D_y) \itholds \psi_1) \lor (\exists y'(D_y) \itholds \psi_2\substitute{y}{y'})$. We prove that $\seman{\psi} \not= \emptyset$ iff $\seman{\psi'} \not= \emptyset$.
   
   First, let $s \in \seman{\psi}$. It is easy to see, that $s'$, where $s'(y) = s'(y') = s(y)$ and for other variables $s'(v) = s(v)$, is a satisfying Skolem functions mapping of $\psi'$, because $s(\psi)$ and $s(\psi')$ are the same BFs.
   
-  Now assume that $s' \in \seman{\psi'}$. We will prove that for some $s$, where $s(y)$ is a combination of  $s'(y)$ and $s'(y')$, and $s(v) = s'(v)$ for other variables, is a satisfying Skolem functions mapping of $\psi'$. Let $v \in \valtns{\psi'}$ be a valuation and $v_{D_y}$ its restriction to $D_y$. With similar reasoning as in the proof of case~(\ref{loc:unconj1}) of Theorem~\ref{thrm:quantLocalSubformulas} we only need to show that $v(s(\phi_1)) = 1$ assuming that $v(s'(\phi_2)) = 1$. From this assumption we can infer that $v(s'(\psi_1)) = 1$ or $v(s'(\psi_2\substitute{y}{y'})) = 1$. Without loss of generality assume that $v(s'(\psi_1)) = 1$. Then we set $s(y)(v_{D_y})$ to $s'(y)(v_{D_y})$ which means that $v(s(\psi_1)) = 1$, therefore $v(s(\phi_1)) = 1$. However, we need to show that for different valuation $v' \in \valtns{\psi'}$ such that $v'(x) = v(x)$ for $x \in D_y$ (therefore $v_{D_y}' = v_{D_y}$) it also holds that $v'(s'(\psi_1)) = 1$ (and so $v'(s(\phi_1)) = 1$). Assume now it does not hold. For $v'(s'(\phi_2))$ to be equal to $1$ it would have to hold then that $v'(s'(\psi_2\substitute{y}{y'})) = 1$. There needs to be a valuation with restriction to $D_y$ equal to $v_{D_y}$ such that it evaluates $s'(\psi_2\substitute{y}{y'})$ to $0$, otherwise we could set $s(y)(v_{D_y})$ to $s'(y')(v_{D_y})$. For simplicity, assume that $v$ is such a valuation, therefore $v(s'(\psi_2\substitute{y}{y'})) = 0$. This means that we can create valuation $v''$ where we set variables from $s'(\psi_1)$ to the same value as $v$ and variables from $s'(\psi_2\substitute{y}{y'})$ to the same value as $v'$ (others do not matter). This is possible because variables occurring both in $s'(\psi_1)$ and $s'(\psi_2\substitute{y}{y'})$ are only those that are in $D_y$ (see the beginning of the proof) and $v_{D_y} = v_{D_y}'$. However, in this valuation it holds that $v''(s'(\psi_1)) = v''(s'(\psi_2\substitute{y}{y'})) = 0$ which means that $v''(s'(\phi_2)) = 0$ which is contradiction .... with what... this is not true, it does not have to be equal to 1, it is only subformula......
+  Now assume that $s' \in \seman{\psi'}$. We will prove that for some $s$, where $s(y)$ is a combination of  $s'(y)$ and $s'(y')$, and $s(v) = s'(v)$ for other variables, is a satisfying Skolem functions mapping of $\psi'$. Let $v \in \valtns{\psi'}$ be a valuation and $v_{D_y}$ its restriction to $D_y$. With similar reasoning as in the proof of case~(\ref{loc:unconj1}) of Theorem~\ref{thrm:quantLocalSubformulas} we only need to show that $v(s(\phi)) = 1$ assuming that $v(s'(\phi')) = 1$. From this assumption we can infer that $v(s'(\psi_1)) = 1$ or $v(s'(\psi_2\substitute{y}{y'})) = 1$. Without loss of generality assume that $v(s'(\psi_1)) = 1$. Then we set $s(y)(v_{D_y})$ to $s'(y)(v_{D_y})$ which means that $v(s(\psi_1)) = 1$, therefore $v(s(\phi)) = 1$. However, we need to show that for different valuation $v' \in \valtns{\psi'}$ such that $v'(x) = v(x)$ for $x \in D_y$ (therefore $v_{D_y}' = v_{D_y}$) it also holds that $v'(s'(\psi_1)) = 1$ (and so $v'(s(\phi)) = 1$). Assume now it does not hold. For $v'(s'(\phi'))$ to be equal to $1$ it would have to hold then that $v'(s'(\psi_2\substitute{y}{y'})) = 1$. There needs to be a valuation with restriction to $D_y$ equal to $v_{D_y}$ such that it evaluates $s'(\psi_2\substitute{y}{y'})$ to $0$, otherwise we could set $s(y)(v_{D_y})$ to $s'(y')(v_{D_y})$. For simplicity, assume that $v$ is such a valuation, therefore $v(s'(\psi_2\substitute{y}{y'})) = 0$. This means that we can create valuation $v''$ where we set variables from $s'(\psi_1)$ to the same value as $v$ and variables from $s'(\psi_2\substitute{y}{y'})$ to the same value as $v'$ (others do not matter). This is possible because variables occurring both in $s'(\psi_1)$ and $s'(\psi_2\substitute{y}{y'})$ are only those that are in $D_y$ (see the beginning of the proof) and $v_{D_y} = v_{D_y}'$. However, in this valuation it holds that $v''(s'(\psi_1)) = v''(s'(\psi_2\substitute{y}{y'})) = 0$ which means that $v''(s'(\phi')) = 0$ which is contradiction .... with what... this is not true, it does not have to be equal to 1, it is only subformula......
 \end{proof}
 
 \begin{remark}
@@ -735,7 +747,7 @@ While BDDs are a good represantion of BFs, we also need a represenation for DQBF
   Let $V$ be a set of variables. A \emph{quantifier tree} \emph{over $V$} is a rooted directed tree with labelling $l$ which assigns to each non-terminal node an operation ${\diamond} \in \set{{\land},{\lor}}$ and to each terminal node a literal from $V$ (a variable $v \in V$ or its negation), and a prefix mapping $Q$ which maps to each node some DQBF prefix.
 \end{definition}
 
-A quantifier tree with root $r$ represents a DQBF formula where children of the node $r$ are subformulas connected with the operator $\qtlabel{r}$ (or if $\qtlabel{r}$ is a literal it represents this literal) with quantifier prefix $\prefix{r}$. However, not each quantifier tree represents a proper DQBF formula, we restrict ourselves only to the set of quantifier trees which represent some formula.
+A quantifier tree with root $r$ represents a DQBF formula where children of the node $r$ are subformulas connected with the operation $\qtlabel{r}$ (or if $\qtlabel{r}$ is a literal it represents this literal) with quantifier prefix $\prefix{r}$. However, not each quantifier tree represents a proper DQBF formula, we restrict ourselves only to the set of quantifier trees which represent some formula.
 
 %TODO change in algorithm to \vars{n} everywhere because \evars{n}/\uvars{n} have differnet meaning
 We denote the set of children of node $n$ as $\children{n}$. We also abuse notation and use $\prefix{n}$ as a set of variables which are in this quantifier prefix. somethingsomething $\eprefix{n}$ is set of existential variable in $\prefix{n}$someting soemign We use $\vars{n}, \evars{n}$ and $\uvars{n}$  TODO
@@ -802,18 +814,15 @@ The next solver is based on quantifier elimination. This solver's basic premise 
 \label{alg:QE}
 \begin{algorithmic}[1]
 \Function{SolveDQBF}{DQBF $\psi$ in PCNF}
-\While{$V_{\psi}^{\forall}$ is not empty}%there is some universal variable $x$ in $\psi$
-    \State choose $x$ from $V_{\psi}^{\forall}$
+\While{$\uvars{\psi}$ is not empty}%there is some universal variable $x$ in $\psi$
+    \State choose and remove $x$ from $\uvars{\psi}$
     \State $\psi = \forall\text{-expansion}(x,\psi)$% universal expansion
-    \ForAll{$y \in V_{\psi}^{\exists}$ s. t. $D_y = V_{\psi}^{\forall}$} %existential variables $y$ such that they depend on all universal variables in $\psi$
+    \ForAll{$y \in \evars{\psi}$ s. t. $D_y = \uvars{\psi}$} %existential variables $y$ such that they depend on all universal variables in $\psi$
         \State $\psi = \exists\text{-elimination}(y,\psi)$% existential expansion
+        \State remove $y$ from $\evars{\psi}$
     \EndFor
 \EndWhile
-\If{resulting BF $\psi$ is SAT}
-	\State \Return SAT
-\Else
-	\State \Return UNSAT
-\EndIf
+\State return SAT($\psi$)
 \EndFunction
 \end{algorithmic}
 \end{algorithm}
@@ -839,6 +848,7 @@ Last but not least, Ge-Ernst et al.~\cite{HQSquantifierLocalization} have given 
 In previous sections, we give an overview of techniques used for implementations of different solvers. This sections explains some techniques that are used before the actual solvers run, called fittingly preprocessing.
 
 \subsection{HQSpre}
+\label{sec:HQSpre}
 The first and only preprocessing engine for DQBF called HQSpre~\cite{HQSpre1,HQSpre2,HQSpreJournal} took many techniques used for QBF preprocessing and lifted them to the DQBF case. We explain only one technique here, called \emph{gate extraction}. As was mentioned in Section~\ref{sec:BF:CNF}, transforming BF to an equisatisfiable formula in CNF can result in polynomial increase of the size of the formula by adding new variables. Gate extraction works in opposite direction --- it tries to extract this newly introduced variables and turn the formula back into one that is not in CNF. This does not mean that gate extraction works only on formulas in CNF, it can be used generally by finding connections between variables which make it possible to replace a variable by some Boolean function of existing variables. However, this technique can only be used by solvers which can work on DQBFs which are not in PCNF. Currently, that is only HQS. For a thorough explanation of other techniques used by HQSpre we refer the reader to the work by Wimmer et al.~\cite{HQSpreJournal}. 
 
 \subsection{Approximations}
@@ -849,11 +859,11 @@ The last preprocessing technique is simply put just a check whether DQBF does no
 
 %As a note toto vzislo z toho, ze clanok zrobil dajaky system ktory je rozsirenie QBF systemu kde pridali fork extension pravidlo. They showed that this system is complete and sound for DQBF, however, in dCAQEclanok (ale v appendixe extended version) and PSPACEclanok ukazali ze to tak nie je (nie je complete ci co). Obe tieto clanky ukazali ze tento system je complete pre tuto PSPACE classu. Zaroven dCAQE vyuziva tento fork extension ???a zle si myslia ze tato classa je NEXPTIME??? vo svojom algoritme, takze je moznost ze ich algoritmus nefunguje pre celu classu DQBF
 
-\chapter{Our Algorithm}
+\chapter{Suggested Algorithm}
 \label{chap:algorithm}
 %TODO: decide the name, our/suggested/new/... algorithm
 
-In this chaoter we introdice our algorithm for solving satisfiability of DQBF using BDDs. First we give a high level eplanation of the algorithm and then we explain each part of it showing different heuristics for solving it???
+In this chaoter we introdice the ??suggested?? algorithm for solving satisfiability of DQBF using BDDs. First we give a high level eplanation of the algorithm and then we explain each part of it showing different heuristics for solving it???
 
 \section{High level defintion???}
 \begin{algorithm}
@@ -862,8 +872,8 @@ In this chaoter we introdice our algorithm for solving satisfiability of DQBF us
   \begin{algorithmic}[1]
     \Function{SolveDQBF}{DQBF formula $\psi$ represented as quantifier tree with root $r$}
     \State \Call{Localise}{$r$}
-    \State (DQBFprefix, $\phi$) = \Call{TurnToPrefixAndBDD}{$r$}
-    \State \Call{ElimAllUnivVars}{DQBFprefix, $\phi$}
+    \State $\phi$ = \Call{TurnToBDD}{$r$}
+    \State \Call{EliminateAllQuantifiers}{$r$, $\phi$} \label{alg:general:elimination}
     \If{$\phi = 0$}
       \State \Return UNSAT
     \Else
@@ -881,7 +891,9 @@ The algorithm is shown in .... is a high level definition of out algorithm. In t
 
 
 \section{Localising quantifiers}
-In this section we give a ... of the function \textproc{Localise} from Algorithm~\ref{alg:general}. We use two ...implementations... of this algorithm: one that basically does nothing, which means that after doing \textproc{TurnToPrefixAndBDD}, the resulting quantifier prefix will be the same as the quantifier prefix of the input formula $\psi$ and another that actually pushes quantifier inside. This second ???implementation??? is based on the algorithm which is used for localising quantifiers in the solver HQS~\cite{HQSquantifierLocalization}.
+% TODO we assume that \fvars{n} is empty and all \qvars{n} are in \prefix{n}
+In this section we give a ... of the function \textproc{Localise} from Algorithm~\ref{alg:general} which uses rules from Theorem~\ref{thrm:quantLocalEq} to push quantifiers as deep inside a formula as it is possible. %We use two ...implementations... of this algorithm: one that basically does nothing, which means that after doing \textproc{TurnToPrefixAndBDD}, the resulting quantifier prefix will be the same as the quantifier prefix of the input formula $\psi$ and another that actually pushes quantifier inside. This second ???implementation??? is based on the algorithm which is used for localising quantifiers in the solver HQS~\cite{HQSquantifierLocalization}. However, we update it with the fix for disjunction????
+%TODO cely tento algoritmus je based na tom co robia v HQS
 %\begin{itemize}
 %    \item we do not localise - for simple solver
 %    \item when we localise for conjuction and univ/exist quantifier we choose this and this children to put it in etc. for disjunction and univ/exist this and this etc.
@@ -904,9 +916,55 @@ In this section we give a ... of the function \textproc{Localise} from Algorithm
   \end{algorithmic}
 \end{algorithm}
 
-Algirithm~\ref{alg:localise} shows this implementation of localising. Function \textproc{Localise} first, based on the assigned operator to node $n$ either calls \textproc{LocaliseOR} or \textproc{LocaliseAND}. These functions push variables to the children based on the rules from Theorem~\ref{thrm:quantLocalEq}. After that it recursively runs \textproc{Localise} on the children of $n$. Notice that this algorithm does not do anything for terminal nodes. 
+Algirithm~\ref{alg:localise} shows this implementation of localising. Function \textproc{Localise} first, based on the assigned operation to node $n$ either calls \textproc{LocaliseOR} or \textproc{LocaliseAND}. These functions push variables from $\prefix{n}$ to the children of $n$ based on the rules from Theorem~\ref{thrm:quantLocalEq}. After that, the algorithm recursively runs \textproc{Localise} on the children of $n$. Notice, that this algorithm does not do anything for terminal nodes, because for them we cannot push quantifiers anymore.
 
-\begin{algorithm}[ht]
+\begin{algorithm}
+  \caption{Quantifier localisation for conjuction}
+  \label{alg:localiseand}
+  \begin{algorithmic}[1]
+    \Function{LocaliseAND}{n}
+      \While{$\eprefix{n} \not= \emptyset$}\label{localiseand:existbegin}
+        \State $y \gets \Call{GetNextExistVarToPush}{\null}$\label{localiseand:getevar}
+        \State $yChildren \gets \set{n' \in \children{n} | y \in \vars{n'}}$\label{localiseand:egetchildren}
+        \If{$yChildren = \children{n}$}\label{localiseand:echildtest}%\Comment{$y$ is in every child}
+          \State break
+        \Else
+          \State $n_y \gets \Call{CombineChildren}{yChildren, {\land}}$\label{localiseand:ecombine}
+          \State $\children{n} \gets (\children{n} \setminus yChildren) \cup n_y$\label{localiseand:echildrenupdate}
+          % TODO, explain that even though we do not rename, the algorithm still work, also explain what pushing means
+          \State \Call{PushVar}{$y$, $n_y$}\label{localiseand:epush}
+          \State remove $y$ from $\prefix{n}$\label{localiseand:eremove}
+        \EndIf
+      \EndWhile\label{localiseand:existend}
+      %\Statex \(\triangleright\) get all univ vars on which none of the exist vars in quantifier prefix depends
+      \State $U \gets \set{x \in \uprefix{n} | x \not\in D_y \text{ for all } y \in \eprefix{n}}$\label{localiseand:upossible}
+      \ForAll{$x \in U$}\label{localiseand:univbegin}
+        \ForAll{$n' \in \children{n}$}
+          \If{$x \in V_{n'}$}
+            \State \Call{PushVar}{$x$, $n'$}\label{localiseand:upush}
+          \Else
+            \State remove $x$ from dependencies of all $y \in \evars{n'}$\label{localiseand:uremovedep}
+          \EndIf
+        \EndFor
+        \State remove $x$ from $\prefix{n}$\label{localiseand:uremove}
+      \EndFor\label{localiseand:univend}
+    \EndFunction
+  \end{algorithmic}
+\end{algorithm}
+
+The implementation of \textproc{LocaliseAND} is shown in Algorithm~\ref{alg:localiseand}. We first push existential variables on lines~\ref{localiseand:existbegin}-\ref{localiseand:existend} and then universal on lines~\ref{localiseand:univbegin}-\ref{localiseand:univend}. We do it in this order because according to rule \eqref{loc:bothswap} from Theorem~\ref{thrm:quantLocalEq} we can only push universal variables if there are no existential variables in the prefix that depend on them. By pushing existential quantifiers first, the number of universal variables that we are able to push might increase. Also, according to~\eqref{loc:exswap} and~\eqref{loc:unswap} it does not matter in what order we push variables.
+
+In the part that pushes existential variables, we want to apply the rule~\eqref{loc:exboth} for as many existential variables from $\prefix{n}$ as possible. On line~\ref{localiseand:getevar} we first get the existential variable $y$ to apply the rule on. We choose the one that is in fewest children of $n$ as possible, that is the size of the set $yChildren$ on line~\ref{localiseand:egetchildren} is minimal from all the existential variables from $\prefix{n}$. This is because to apply the rule~\eqref{loc:exboth} we need to combine the children from the set $yChildren$ to create a new child $n_y$ (line~\ref{localiseand:ecombine}) into which it can be pushed (line~\ref{localiseand:epush}). This new child $n_y$ is then a quantifier tree with $l(n_y) = {\land}$, $\prefix{n_y} = \emptyset$ and $children(n_y) = yChildren$. Obviously, the sets of children containing each existential variables are actually computed before the while loop so we can easily find the variable with the minimal set. Also, during the combining of children to a new child, these sets are only updated, not recomputed. The while loop finishes after either all existential variables were pushed inside or we got to a variable that is in every child (line~\ref{localiseand:echildtest}) and therefore it is not possible to push it inside. Also, when we find such a variable, because all other variables have to have the sets $yChildren$ at least as large as the found variable, this means that all remaining variables are also in all children.
+
+After pushing all possible existential variables we can start pushing universal ones using rules \eqref{loc:unconj1} and \eqref{loc:unconj2}. First we find the set $U$ of all universal variables in $\prefix{n}$ such that no leftover existential variable in $\prefix{n}$ depends on them. For all these variables we can then either push them into every child (line~\ref{localiseand:upush}) using rules \eqref{loc:unconj1} or \eqref{loc:unconj2}, or if a child does not contain one of the variables $x$, we can by using rule \eqref{loc:unconj2} delete all dependencies on $x$ from the child (line~\ref{localiseand:uremovedep}). Here, we should sometime create a new variables (from rule \eqref{loc:unconj1}). However, this is not needed%TODO as we will explain in next section???
+
+% TODO add theorem about elimination of variables not in support set
+% TODO fix quantifier tree section
+% TODO fix theorem about diajunction
+
+%TODO example
+
+\begin{algorithm}
   \caption{Quantifier localisation for disjunction}
   \label{alg:localiseor}
   \begin{algorithmic}[1]
@@ -935,61 +993,102 @@ Algirithm~\ref{alg:localise} shows this implementation of localising. Function \
 
 
 
-\begin{algorithm}[ht]
-  \caption{Quantifier localisation for conjuction}
-  \label{alg:localiseand}
+say about pushing here, that we delete immediately if it is not in support set
+
+\section{Turning to BDD}
+In this section we give an overview of the function \textproc{TurnToBDD} which as the name suggests turns the matrix of the formula to BDD. During this, local elimination of quantifiers in subformulas can occur, which might result in simpler final result. 
+
+\begin{algorithm}
+  \caption{Quantifier tree to BDD}
+  \label{alg:turntobdd}
   \begin{algorithmic}[1]
-    \Function{LocaliseAND}{n}
-      \While{$\prefix{n} \cap \evars{n} \not= \emptyset$}
-        \State $y \gets \Call{GetNextExistVarToPush}{\null}$
-        \State $yChildren \gets \set{n' \in \children{n} | y \in \evars{n'}}$
-        \If{$yChildren = \children{n}$}%\Comment{$y$ is in every child}
-          \State break
-        \Else
-          \State $n_y \gets \Call{CombineChildren}{yChildren, {\land}}$
-          \State $\children{n} \gets (\children{n} \setminus yChildren) \cup n_y$
-          % TODO, explain that even though we do not rename, the algorithm still work, also explain what pushing means
-          \State \Call{PushVar}{$y$, $n_y$}
-          \State remove $y$ from $\prefix{n}$
-        \EndIf
-      \EndWhile
-      %\Statex \(\triangleright\) get all univ vars on which none of the exist vars in quantifier prefix depends
-      \State $pushableUVars \gets \set{x \in \prefix{n} \cap \uvars{n} | x \not\in D_y \text{ for all } y \in \prefix{n} \cap \evars{n}}$
-      \ForAll{$x \in pushableUVars$} 
+    \Function{TurnToBDD}{node $n$}
+      \If{$\qtlabel{n}$ is a literal}
+        \State return $\qtlabel{n}$ \label{turntobdd:returnterminal}
+      \Else
+        %\If{$\qtlabel{n} = {\lor}$}
+        %  \State $\psi_n = 0$
+        %\Else
+        %  \State $\psi_n = 1$
+        %\EndIf
+        \State $childBDDs = \emptyset$
         \ForAll{$n' \in \children{n}$}
-          \If{$x \in V_{n'}$}
-            \State \Call{PushVar}{$x$, $n'$}
-          \Else
-            \State remove $x$ from dependencies of all $y \in \evars{n'}$
-          \EndIf
+          \State $\phi_{n'} = \Call{TurnToBDD}{n'}$ \label{turntobdd:callforchild}
+          \State \Call{EliminateQuantifiers}{$n'$, $\psi_{n'}$} \label{turntobdd:eliminate}
+          \State $\prefix{n} = \prefix{n} \cup \prefix{n'}$ \label{turntobdd:pullquantifiers}
+          \State $childBDDs = childBDDs \cup \set{\phi_{n'}}$ %\label{}
+          %\If{$\qtlabel{n} = {\lor}$}
+          %  \State $\psi_n = \psi_n \lor \psi_{n'}$
+          %\Else
+          %  \State $\psi_n = \psi_n \land \psi_{n'}$
+          %\EndIf
         \EndFor
-        \State remove $x$ from $\prefix{n}$
-      \EndFor
+        \State return $\Call{ApplyOperation}{\qtlabel{n}, childBDDs}$ \label{turntobdd:returnnonterminal}
+      \EndIf
     \EndFunction
   \end{algorithmic}
 \end{algorithm}
 
-say about pushing here, that we delete immediately if it is not in support set
+Algorithm~\ref{alg:turntobdd} shows how this function can be implemented. Based on the type of the node $n$ it decides what to do. For terminal nodes, it just return the BDD representing the literal $\qtlabel{n}$ (line~\ref{turntobdd:returnterminal}). For non-terminal nodes, it calls itself recursively for all children of $n$ (line~\ref{turntobdd:callforchild}), eliminates some variables in it (line~\ref{turntobdd:eliminate}), and finally pulls quantifiers from them (line~\ref{turntobdd:pullquantifiers}). The quantifiers can be pulled from the children based on the rules \eqref{loc:unconj1}, \eqref{loc:undisj}, and \eqref{loc:exboth} of Theorem~\ref{thrm:quantLocalEq}. Also (\ref{loc:unconj1}) is used to rename all the copies which were created by using the same rule during localisation back to the original variable. 
+% TODO povedat v implementacii ze duplikaciu nerobim
+On line~\ref{turntobdd:returnnonterminal} the algorithm returns the resulting BDD which is the application of the operation $\qtlabel{n}$ on the children BDDs.
 
-\section{Heuristics of deciding what to do on each level of quantifier tree}
+For the elimination of the quantifiers on line~\ref{turntobdd:eliminate} we can do these three things:
 \begin{itemize}
-    \item nothing - simple solver (maybe have it a heuristic which variables to localise???, so we say none and we get simple solver; we could put it with how to localise???)
-    \item eliminate only those that are not in support set -- useless, it will basically do what nothing does, because we assume that input formula has already only those variables in quantifier prefix which are in support set, just pushing it inside and then taking them out will not delete anyone --- it might delete some dependecies though (but nothing should do same, if we assume that nothing is doing localising)
-    \item eliminate only exist vars (or maybe just some univ. vars - those that only few exist vars depend on (probably 0, maybe 1 or 2) or those that will allow me to remove some exist vars)??? - basically eliminate only when no (a few) new variables are created
-    \item remove everything possible (all universal vars and possible exist. vars, in iteration -> one universal var, all possible existential vars (based on theorem~\ref{thrm:exElim}) and so on) - tree solver
-    \item remove some dependencies to be able to remove exist vars???? - not possible??
+    \item nothing -- we do not eliminate any variables from the BDD,
+    %\item eliminate only those that are not in support set -- useless, it will basically do what nothing does, because we assume that input formula has already only those variables in quantifier prefix which are in support set, just pushing it inside and then taking them out will not delete anyone --- it might delete some dependencies though (but nothing should do same, if we assume that nothing is doing localising)
+    \item eliminate only ``simple'' quantifiers -- we eliminate the universal variables using Theorem~\ref{thrm:unExpan} only if they do not create new variables (that is no existential variable depend on them) and all possible existential variables using Theorem~\ref{thrm:exElim} (this elimination technique is used in HQS~\cite{HQSquantifierLocalization}), %we eliminate exist vars (or maybe just some univ. vars - those that only few exist vars depend on (probably 0, maybe 1 or 2) or those that will allow me to remove some exist vars)??? - basically eliminate only when no (a few) new variables are created
+    \item eliminate all possible quantifiers -- we iteratively eliminate universal variables using Theorem~\ref{thrm:unExpan} and again all possible existential variables using Theorem~\ref{thrm:exElim}. This is the same elimination as in function \textproc{EliminateAllQuantifiers} on line~\ref{alg:general:elimination} of Algorithm~\ref{alg:general}, see the next section for more details. %remove everything possible (all universal vars and possible exist. vars, in iteration -> one universal var, all possible existential vars (based on theorem~\ref{thrm:exElim}) and so on) - tree solver
+    %\item remove some dependencies to be able to remove exist vars???? - not possible??
 \end{itemize}
 
+% TODO add example
 
-\section{Heuristics for order of elimination of universal variables}
+\section{Quantifier Elimination}
+% TODO say in implementation that we do not eliminate last existential variables, we also delete variables not in support set
+In this section we explain how the algorithm for eliminating all quantifiers looks like. This algorihtm is implemented as function \textproc{EliminateAllQuantifiers}, which is used in Algorithm~\ref{alg:general} for eliminating all quantifiers in the final formula (line~\ref{alg:general:elimination}) and can also be used while eliminating quantifiers during transformation to BDDs (line~\ref{turntobdd:eliminate} of Algorithm~\ref{alg:turntobdd}).
+
+\begin{algorithm}
+  \caption{Quantifier elimination algorithm}
+  \label{alg:allelimination}
+  \begin{algorithmic}[1]
+    \Function{EliminateAllQuantifiers}{$n$, $\phi_n$}
+      \While{$\uprefix{n}$ is not empty}%there is some universal variable $x$ in $\psi$
+        \State choose $x$ from $\uprefix{n}$\label{allelimination:choose}
+        \State $\phi_n = \forall\text{-expansion}(x,\phi_n)$\Comment{Theorem~\ref{thrm:unExpan}} \label{allelimination:uelim}
+        \State remove $x$ from $\prefix{n}$\label{allelimination:uremove}
+        \State $Q_{\forall} = \set{x \in \vars{\phi_n} | x \in \uprefix{n'} \text{ for some ancestor } n' \text{ of } n}$\label{allelimination:uset}
+        \State $Q_{\exists} = \set{y \in \vars{\phi_n} | y \in \eprefix{n'} \text{ for some ancestor } n' \text{ of } n}$\label{allelimination:eset}
+        \State $E = \set{y \in \eprefix{n} | Q_{\forall} \subseteq D_y \text{ and } D_{y'} \subseteq D_y \text{ for all } y \in Q_{\exists}}$\label{allelimination:etoremove}
+        \ForAll{$y \in E$}\label{allelimination:eelimforstart}
+          \State $\phi_n = \exists\text{-elimination}(y,\phi_n)$\Comment{Theorem~\ref{thrm:exElim}}\label{allelimination:eelim}
+          \State remove $y$ from $\prefix{n}$\label{allelimination:eremove}
+        \EndFor\label{allelimination:eelimforend}
+      \EndWhile
+    \EndFunction
+  \end{algorithmic}
+\end{algorithm}
+
+Algorithm~\ref{alg:allelimination} shows this function which takes as input a node $n$ and BDD $\psi_n$ representing the matrix of DQBF represented by subtree rooted in $n$. This algorithm is similar to Algorithm~\ref{alg:QE} which is used in HQS. However, while that one was used only for DQBF in PNF, this algorithm works for any subformula. It iteratively eliminates universal variables occuring in prefix $\prefix{n}$ using universal expansion (Theorem~\ref{thrm:unExpan}) and also all possible existential variables using Theorem~\ref{thrm:exElim}. The next universal variable to eliminate is chosen on line~\ref{allelimination:choose} by some heuristic after which we eliminate it from $\psi_n$ and remove it from the quantifier prefix of $n$ (lines~\ref{allelimination:uelim}~and~\ref{allelimination:uremove}). On lines~\ref{allelimination:uset}~and~\ref{allelimination:eset} the sets $Q_{\forall}$ and $Q_{\exists}$ are initialized which are the sets of all universal and existential variables occurring in $\phi_n$. We find them by going trough quantifier prefixes of all ancestors of $n$ (we assume that $n$ is ancestor to itself). We use these sets to compute the set $E$ on line~\ref{allelimination:etoremove} of all existential variables from prefix $\prefix{n}$ which fulfill the conditions set by Theorem~\ref{thrm:exElim}. These variables are those that can be existentially eliminated which we do on lines~\ref{allelimination:eelimforstart}-\ref{allelimination:eelimforend}.
+
+The heuristics we use for choosing the next universal variable to eliminate on line~\ref{allelimination:choose} are these:
 \begin{itemize}
-    \item the order is set on the beginning based on the number of existential variables that depend on them (from lowest to highest), so the created duplicates do not count in, i.e. for \[\forall x_1 \forall x_2 \forall x_3 \exists y_1(x_1, x_2) \exists y_2(x_1,x_2) \exists y_3(x_3) \exists y_4(x_3) \exists y_5 (x_3),\] the order is $x_1, x_2, x_3$, because both $x_1$ and $x_2$ only two depend on them, for $x_3$ it is three
-    \item similarly, but the next universal variable to eliminate is the one with the minimal number of existential variables that depend on them (so also the existential duplicated count here), i. e. for the previous example, first $x_1$ is removed, but then we have \[\forall x_2 \forall x_3 \exists y_1(x_2) \exists y_2(x_2) \exists y_1'(x_2) \exists y_2'(x_2) \exists y_3(x_3) \exists y_4(x_3) \exists y_5 (x_3)\] and so $x_3$ is removed next, because there are four ex. variables (two original, two duplicates) that depend on $x_2$ now
-    \item remove based on leftover variables if universal expansion would be done, i.e. if are thinking about removing $x$ in formula $\forall x \itholds \psi$, then we check how much variables are in $V_{\psi\substitute{x}{0}} \cup V_{\psi\substitute{z}{1}}$ and we choose that universal variable for which this number is lowest
-    \item something with creating depency tree, to find existential variables to remove as fast as possible (not sure if possible) --- maybe possible, basically remove those universal vars that will make it possible to remove as much existential vars as possible on the level??? 
+    \item The order of universal variables from $\uprefix{n}$ is set at the beginning based on the number of existential variables that depend on them (from lowest to highest). This is done so the number of created existential variables do not grow so fast. %so the created duplicates do not count in, i.e. 
+    As an example, let
+    \[\forall x_1 \forall x_2 \forall x_3 \exists y_1(x_1, x_2) \exists y_2(x_1,x_2) \exists y_3(x_3) \exists y_4(x_3) \exists y_5 (x_3)\]
+    be the quantifier prefix $\prefix{n}$. The order is either $x_1, x_2, x_3$ or $x_2, x_1, x_3$, because for both $x_1$ and $x_2$ only two existential variables $y_1$ and $y_2$ depend on them while for $x_3$ it is three ($y_3$, $y_4$, $y_5$). This heuristic was introduced with HQS~\cite{HQSquantifierElimination}, 
+    \item The next heuristic is similar, but the order is not set at the beginning. The next universal variable to eliminate is then the one with the current lowest number of existential variables that depend on it. This means that the existential variables which were created as a copies during universal expansion also count here. For example, take $\prefix{n}$ from the previous example. In this heuristic, at the beginning either $x_1$ or $x_2$ is chosen as in the previous one, because two existential variables depend on them while on $x_3$ three depend. Assume that $x_1$ was chosen and eliminated without any other variable getting removed. The quantifier prefix $\prefix{n}$ is then
+    \[\forall x_2 \forall x_3 \exists y_1(x_2) \exists y_2(x_2) \exists y_1'(x_2) \exists y_2'(x_2) \exists y_3(x_3) \exists y_4(x_3) \exists y_5 (x_3)\]
+    where $y_1'$ and $y_2'$ were created as copies of $y_1$ and $y_2$ during universal expansion. Now, in the previous heuristic $x_2$ would be chosen. However, here $x_3$ is chosen because it still depends only on three variables, while $x_2$ now depends on four. This heuristic was introduced by Gitina et al.~\cite{HQSsimpleAlg}.
+    \item Another heuristic we use is based on the number of variables in the BDDs representing the two conjuncts used for universal expansion in Theorem~\ref{thrm:unExpan}. That is, let $x \in \uprefix{n}$ and $\psi_1^{-x}\substitute{x}{0}$, $\psi_2^{-x}\substitute{x}{1}$
+    be the two conjuncts from Theorem~\ref{thrm:unExpan} as if we were doing universal expansion. Because the operation of replacing variables with constants is fast for BDDs, we can create BDDs for these two formulas and check for the amount of variables in both of them, that is the number of variables in the set $\vars{\psi_1^{-x}\substitute{x}{0}} \cup \psi_2^{-x}\substitute{x}{1}$. We can do this for all universal variables and choose the one with the lowest number of variables in this set. If there are multiple such variables, we can also use one of the previous heuristics to choose from them.
+    %\item something with creating depency tree, to find existential variables to remove as fast as possible (not sure if possible) --- maybe possible, basically remove those universal vars that will make it possible to remove as much existential vars as possible on the level??? 
 \end{itemize}
 
 \chapter{Implementation}
+We implemented the algorithm from Chapter~\ref{chap:algorithm} in C\texttt{++} using version 3.0.0 of the CUDD\footnote{\url{https://github.com/ivmai/cudd}} package~\cite{CUDD} for BDD manipulation, version 2.2.0 of the cxxopts\footnote{\url{https://github.com/jarro2783/cxxopts}} library for parsing command-line arguments and preprocessor HQSpre~\cite{HQSpre2}, more specifically the version that was used with HQS with quantifier localisation~\cite{HQSquantifierLocalization}. As was explained in Section~\ref{sec:preprocessing}, HQSpre can extract logical gates from variables in the formula that can be then replaced by them resulting in formula with fewer variables. This results in a formula that does not need to be in PCNF, which most solvers cannot handle. However, as HQS, our solver can work with non-PCNF formulas, stemming from the fact that we represent matrices as either BDDs or quantifier trees. This means that we can use this feature of HQSpre, similarly as it is used for HQS. First we check how many gates can be extracted. If this number is low (we use less than 5), then we run preprocessor normally, without caring whether these gates will get destroyed or not. If there is enough gates, then we run preprocessor normally on a copy of the formula to check if it can solve it. It it cannot, we run the preprocessor with gate preservation setting on. This will ensure that during preprocessing no clause from which these gates are extracted is touched and at the end of preprocessing we can extract these creates while creating BDD or quantifier tree.
+
+%TODO ak nemam odstranovat nic pocas odlokalizovania, tak odlokalizovanie ani nerob
 
 \chapter{Experimental results}
 popisat na com testujeme a ze sme pouzili benchexec
