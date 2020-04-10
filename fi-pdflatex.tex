@@ -403,7 +403,7 @@ In this section we give the definition of the normal form of DQBF that is non-pr
 This form is also not closed which means it allows free variables. These variables are not bounded by any quantifier thus the definition of satisfiability has to take them into consideration. The definitions in this section are taken from Ge-Ernst et al.~\cite{HQSquantifierLocalization}.
 
 
-We first give the definition of the set $\DQBF{V}$ of DQBFs in \emph{negation normal form} where we use the rules form Figure~\ref{fig:DQBFrules}. Each rule has the list of conditions (over the line) that has to hold so that the resulting formula under the line is in $\DQBF{V}$. For each formula $\psi$ we also define the set of existential $\evars{\psi}$, universal $\uvars{\psi}$, and free $\fvars{\psi}$ variables. We also use $\qvars{\psi} = \evars{\psi} \cup \uvars{\psi}$ and $V_{\psi} = \qvars{\psi} \cup \fvars{\psi}$.  Furthermore, $\psi^{-v}$ result from $\psi$ where $v$ is removed from every dependency set in $\psi$. 
+We first give the definition of the set $\DQBF{V}$ of DQBFs in \emph{negation normal form} where we use the rules form Figure~\ref{fig:DQBFrules}. Each rule has the list of conditions (over the line) that has to hold so that the resulting formula under the line is in $\DQBF{V}$. For each formula $\psi$ we also define the set of existential $\evars{\psi}$, universal $\uvars{\psi}$, and free $\fvars{\psi}$ variables. We also use $\qvars{\psi} = \evars{\psi} \cup \uvars{\psi}$ and $V_{\psi} = \qvars{\psi} \cup \fvars{\psi}$.  Furthermore, $\psi^{-v}$ results from $\psi$ where $v$ is removed from every dependency set in $\psi$. 
 
 \begin{figure}[htp]
     \renewcommand{\arraystretch}{2}
@@ -477,7 +477,7 @@ We first give the definition of the set $\DQBF{V}$ of DQBFs in \emph{negation no
   Let $V$ be a set of variables. The set $\DQBF{V}$ of \emph{DQBFs in negation normal form} (NNF) over $V$ is defined to be the smallest set satisfying the rules from Figure~\ref{fig:DQBFrules}.
 \end{definition}
 \begin{remark}
-In the definition by Ge-Ernst et al.~\cite{HQSquantifierLocalization} the last two rules in Figure~\ref{fig:DQBFrules} have condition $v \in \fvars{\psi}$ instead of $v \in V \setminus \qvars{V}$. This condition is too strong and does not allow some formulas which are valid. For example, as we show in the next section, we can transform DQBFs by pushing quantifiers inside the formula and this way we can end up with a formula $\forall x \itholds \psi$ where $x \not\in V_{\psi}$. However, according to the definition by Ge-Ernst et al.~\cite{HQSquantifierLocalization} this would not be a valid formula.
+In the definition by Ge-Ernst et al.~\cite{HQSquantifierLocalization} the last two rules in Figure~\ref{fig:DQBFrules} have condition $v \in \fvars{\psi}$ instead of $v \in V \setminus \qvars{V}$. This condition is too strong and does not allow some formulas which are valid. For example, as we show in the next section, we can transform DQBFs by pushing quantifiers inside the formula and this way we can end up with a formula $\forall x \itholds \psi$ where $x \not\in V_{\psi}$. However, according to the aforementioned definition this would not be a valid formula.
 \end{remark}
 
 \begin{remark}
@@ -515,21 +515,21 @@ The meaning behind this formula is that either $x_1$ and $x_2$ are the same or t
 \label{sec:quantLocalization}
 Now that we have defined DQBFs we give some theoretical results which show the equisatisfiability of different DQBFs which can result in their simplification. These results can be then used for developing a DQBF solver which checks whether an input DQBF is satisfiable or not.
 
-We start with two theorems that show when it is possible to push (extract) quantifiers in (from) the formula. %The first theorem is from~\cite[Theorem 3]{HQSquantifierLocalization} where ... is replaced by ... from~\cite[Theorem 4]{HQSquantifierLocalization}
+We start with a theorem that show some rules by which we can push (extract) quantifiers in (from) the formula. %The first theorem is from~\cite[Theorem 3]{HQSquantifierLocalization} where ... is replaced by ... from~\cite[Theorem 4]{HQSquantifierLocalization}
 
 %\let\oldtheequation\theequation
 %\renewcommand{\theequation}{\alph{equation}}
 \begin{theorem}[{\cite[Theorems 3,4]{HQSquantifierLocalization}}]
 \label{thrm:quantLocalEq}
-  Let ${\diamond} \in \set{{\land},{\lor}}$ and $\psi,\psi_1,\psi_2 \in \DQBF{V}$. We assume that $x'$ and $y'$ are fresh variables, which do not occur in $\psi,\psi_1$ and $\psi_2$. The following equisatifiabilities hold for all DQBFs in NNF:
+  Let ${\diamond} \in \set{{\land},{\lor}}$ and $\psi,\psi_1,\psi_2 \in \DQBF{V}$. We assume that $x'$ and $y'$ are fresh variables, which do not occur in $\psi,\psi_1$ and $\psi_2$. Then we have
   \begin{align}
       %\forall x : \psi &\approx \psi \text{, if } x \not\in V_{\psi} \\
-      \forall x \itholds (\psi_1 \land \psi_2) &\approx (\forall x \itholds \psi_1) \land (\forall x' \itholds \psi_2\substitute{x}{x'}) \tag{a} \label{loc:unconj1} \\
-      \forall x \itholds (\psi_1 \land \psi_2) &\approx (\psi_1^{-x} \land (\forall x \itholds \psi_2)) \text{, if } x \not\in V_{\psi_1} \tag{b} \label{loc:unconj2} \\
-      \forall x \itholds (\psi_1 \diamond \psi_2) &\approx \begin{multlined}[t][3cm](\psi_1 \diamond (\forall x \itholds \psi_2)) \text{, if } x \not\in V_{\psi_1} \tag{c} \label{loc:undisj} \\
+      \forall x \itholds (\psi_1 \land \psi_2) &\approx \left(\forall x \itholds \psi_1 \land \forall x' \itholds \psi_2\substitute{x}{x'}\right) \tag{a} \label{loc:unconj1} \\
+      \forall x \itholds (\psi_1 \land \psi_2) &\approx \left(\psi_1^{-x} \land \forall x \itholds \psi_2\right) \text{, if } x \not\in V_{\psi_1} \tag{b} \label{loc:unconj2} \\
+      \forall x \itholds (\psi_1 \diamond \psi_2) &\approx \begin{multlined}[t][3cm]\left(\psi_1 \diamond \forall x \itholds \psi_2\right) \text{, if } x \not\in V_{\psi_1} \tag{c} \label{loc:undisj} \\
       \text{ and } x \not\in D_y \text{ for all } y \in \evars{\psi_1}\end{multlined} \\
-      \exists y(D_y) \itholds (\psi_1 \lor \psi_2) &\approx (\exists y(D_y) \itholds \psi_1) \lor (\exists y'(D_y) \itholds \psi_2\substitute{y}{y'}) \tag{d} \label{loc:exdisj} \\
-      \exists y(D_y) \itholds (\psi_1 \diamond \psi_2) &\approx (\psi_1 \diamond (\exists y(D_y) \itholds \psi_2)) \text{, if } y \not\in V_{\psi_1} \tag{e} \label{loc:exboth} \\
+      \exists y(D_y) \itholds (\psi_1 \lor \psi_2) &\approx \left(\exists y(D_y) \itholds \psi_1 \lor \exists y'(D_y) \itholds \psi_2\substitute{y}{y'}\right) \tag{d} \label{loc:exdisj} \\
+      \exists y(D_y) \itholds (\psi_1 \diamond \psi_2) &\approx \left(\psi_1 \diamond \exists y(D_y) \itholds \psi_2\right) \text{, if } y \not\in V_{\psi_1} \tag{e} \label{loc:exboth} \\
       \exists y_1(D_{y_1})\exists y_2(D_{y_2}) \itholds \psi &\approx \exists y_2(D_{y_2}) \exists y_1(D_{y_1}) \itholds \psi \tag{f} \label{loc:exswap} \\
       \forall x_1\forall x_2 \itholds \psi &\approx \forall x_2\forall x_1 \itholds \psi \tag{g} \label{loc:unswap} \\
       \forall x\exists y(D_y) \itholds \psi &\approx \exists y(D_y)\forall x \itholds \psi\text{, if } x \not\in D_y. \tag{h} \label{loc:bothswap}
@@ -537,14 +537,14 @@ We start with two theorems that show when it is possible to push (extract) quant
 \end{theorem}
 %\renewcommand{\theequation}{\oldtheequation}
 
-To make these rules more usable for DQBF in NNF we have to show that they also work while replacing subformulas. This was not proven by Ge-Ernst et al.~\cite{HQSquantifierLocalization} even though they used it for replacing subformulas. As we will show, this was used erroneously because the rule~\eqref{loc:exdisj} does not generally hold. However, for other rules there is no problem as the next theorem shows. % that if DQBFs from the previous theorem occur as subformulas of DQBF $\psi$ they can be replaced without changing the satisfiability of $\psi$. 
+To make these rules more usable for DQBF in NNF we have to show that they also work while replacing subformulas. Except for~\eqref{loc:unconj2}, this was not proven by Ge-Ernst et al.~\cite{HQSquantifierLocalization} even though they used it for replacing subformulas. As we will show, this was used erroneously because the rule~\eqref{loc:exdisj} does not generally hold. However, for other rules there is no problem as the next theorem shows. % that if DQBFs from the previous theorem occur as subformulas of DQBF $\psi$ they can be replaced without changing the satisfiability of $\psi$. 
 
 \begin{theorem}
   \label{thrm:quantLocalSubformulas}
-  Let $\psi \in \DQBF{V}$, $\phi$ be the left side formula and $\phi'$ be the right side formula  from the same equality from Theorem~\ref{thrm:quantLocalEq} (except~\eqref{loc:exdisj}) where $\phi$ is a subformula of $\psi$. Again, the same assumptions for $x'$ and $y'$ variables hold as in Theorem~\ref{thrm:quantLocalEq} but also they do not occur in $\psi$. Then $\psi \approx \psi'$ where $\psi'$ results from $\psi$ by replacing $\phi$ with $\phi'$.
+  Let $\psi \in \DQBF{V}$, $\phi$ be the left side formula and $\phi'$ be the right side formula  from the same equality other than~\eqref{loc:exdisj} from Theorem~\ref{thrm:quantLocalEq} where $\phi$ is a subformula of $\psi$. Again, the same assumptions for $x'$ and $y'$ variables hold as in Theorem~\ref{thrm:quantLocalEq} but also they do not occur in $\psi$. Then $\psi \approx \psi'$ where $\psi'$ results from $\psi$ by replacing $\phi$ with $\phi'$.
 \end{theorem}
 \begin{proof}
-  \eqref{loc:unconj1} We show that $\seman{\psi} \not= \emptyset$ iff $\seman{\psi'} \not= \emptyset$. First, let $s \in \seman{\psi}$. We now show that for $s'$, where $s'(y) = s(y)\substitute{x}{x'}$ for $y \in \evars{\phi'}$ and $s'(y) = s(y)$ otherwise, it holds $s' \in \seman{\psi'}$. Let $v \in \valtns{\psi'}$. We need to show that $v(s'(\psi')) = 1$. Because $s \in \seman{\psi}$ it holds that $v(s(\psi)) = 1$. For the case that $v(x') = v(x)$ we get $v(s(\psi)) = v(s'(\psi'))$, because BFs $s(\psi)$ and $s(\psi')$ differ only in some replacements of $x$ by $x'$. Therefore we assume that $v(x') \not= v(x)$. We know that $\psi$ and $\psi'$ differ only in the formulas $\phi$ and $\phi'$, therefore we can only focus on the case that $v(s(\psi))$ depends on the subformula $s(\phi)$. Also, $\psi$ is in NNF, which means that in the tree of operations, negation cannot be before $\phi$. This means that we can focus only on the case where $v(s(\phi)) = 1$, otherwise the value of $v(s(\psi))$ would not depend on the subformula $s(\phi)$. This means we need to show that $v(s'(\phi')) = 1$. We have that for $v(s(\phi)) = v(s(\forall x \itholds (\psi_1 \land \psi_2))) = v(s(\psi_1) \land s(\psi_2))$ to be equal to one, it has to hold that $v(s(\psi_1)) = 1$ and $v(s(\psi_2)) = 1$. Also, for $v'$ which is equal to $v$, except that $v'(x) \not= v(x)$, it holds that $v'(s(\psi)) = 1$. This is from the assumption that the value of $v(s(\psi))$ depends on $v(s(\phi))$, because $x$ is only in $\phi$. This means that $v'(s(\psi_2)) = 1$. Also $v'(s(\psi_2)) = v(s'(\psi_2\substitute{x}{x'}))$, because $v'(x) = v(x')$. All in all, we get $v(s(\psi_1)) = v(s'(\psi_1)) = 1$ and $v(s'(\psi_2\substitute{x}{x'})) = 1$ therefore $v(s'(\phi')) = v(s'((\forall x \itholds \psi_1) \land (\forall x' \itholds \psi_2\substitute{x}{x'}))) = 1$.
+  \eqref{loc:unconj1} We show that $\seman{\psi} \not= \emptyset$ iff $\seman{\psi'} \not= \emptyset$. First, let $s \in \seman{\psi}$. We now show that for $s'$, where $s'(y) = s(y)\substitute{x}{x'}$ for $y \in \evars{\phi'}$ and $s'(y) = s(y)$ otherwise, it holds $s' \in \seman{\psi'}$. Let $v \in \valtns{\psi'}$. We need to show that $v(s'(\psi')) = 1$. Because $s \in \seman{\psi}$ it holds that $v(s(\psi)) = 1$. For the case that $v(x') = v(x)$ we get $v(s(\psi)) = v(s'(\psi'))$, because BFs $s(\psi)$ and $s(\psi')$ differ only in some replacements of $x$ by $x'$. Therefore we assume that $v(x') \not= v(x)$. We know that $\psi$ and $\psi'$ differ only in the formulas $\phi$ and $\phi'$, therefore we can only focus on the case that the value of $v(s(\psi))$ depends on the subformula $s(\phi)$ (that is the value of $v(s(\psi))$ would change if the value of $v(s(\phi))$ changed). Also, $\psi$ is in NNF, which means that in the tree of operations, negation cannot be before $\phi$. This means that we can focus only on the case where $v(s(\phi)) = 1$, otherwise the value of $v(s(\psi))$ would not depend on the subformula $s(\phi)$. This means we need to show that $v(s'(\phi')) = 1$. We have that for $v(s(\phi)) = v(s(\forall x \itholds (\psi_1 \land \psi_2))) = v(s(\psi_1) \land s(\psi_2))$ to be equal to one, it has to hold that $v(s(\psi_1)) = 1$ and $v(s(\psi_2)) = 1$. Also, for $v'$ which is equal to $v$, except that $v'(x) \not= v(x)$, it holds that $v'(s(\psi)) = 1$. This is from the assumption that the value of $v(s(\psi))$ depends on $v(s(\phi))$, because $x$ is only in $\phi$. This means that $v'(s(\psi_2)) = 1$. Also $v'(s(\psi_2)) = v(s'(\psi_2\substitute{x}{x'}))$, because $v'(x) = v(x')$. All in all, we get $v(s(\psi_1)) = v(s'(\psi_1)) = 1$ and $v(s'(\psi_2\substitute{x}{x'})) = 1$ therefore $v(s'(\phi')) = v(s'((\forall x \itholds \psi_1) \land (\forall x' \itholds \psi_2\substitute{x}{x'}))) = 1$.
   
   For the other direction, let $s' \in \seman{\psi'}$. It can be easily shown by similar argument that $s$, where $s(y) = s'(y)\substitute{x'}{x}$ for $y \in \psi_2$ and $s(y) = s'(y)$ otherwise, is a satisfying Skolem functions mapping of $\psi$.
   
@@ -557,41 +557,63 @@ To make these rules more usable for DQBF in NNF we have to show that they also w
 
 As we already mentioned, the rule~\eqref{loc:exdisj} as it stands cannot be generally used for replacing subformulas. We show it on the following formula:
 \[\forall x \exists y(\emptyset) \itholds ((x \land y) \lor (\neg x \land \neg y)).\]
-It is obviously not satisfiable because whether $s(y) = 0$ or $s(y) = 1$ we always can find valuation in which both disjuncts are not true. However if we assumed that rule~(\ref{loc:exdisj}) can be used also for subformulas we would get
-\[\forall x \itholds (\exists y(\emptyset) \itholds (x \land y) \lor \exists y'(\emptyset) \itholds (\neg x \land \neg y'))\]
+It is obviously not satisfiable because whether $s(y) = 0$ or $s(y) = 1$ we always can find valuation in which both disjuncts are not true. However if we assumed that rule~(\ref{loc:exdisj}) can be also used for subformulas we would get
+\[\forall x \itholds (\exists y(\emptyset) \itholds (x \land y) \lor \exists y'(\emptyset) \itholds (\neg x \land \neg y')),\]
 which is satisfiable for $s$ where $s(y) = 1$ and $s(y') = 0$. To fix this, we need to restrict the variables that can occur in the disjuncts. When we look at this formula, it would appear that the problem arises from having universal variable $x$ on which $y$ is not dependent in both disjuncts. However, we can find an example when even if both disjuncts contain different sets of universal variables (other than the ones from $D_y$), this rule does not work. For example for
 \[\forall x_1 \forall x_2 \itholds (\exists y(\emptyset) \itholds ((x_1 \land y) \lor (x_2 \land \neg y)) \lor (\neg x_1 \land \neg x_2)),\]
-which is not satisfiable, we have that $x_1 \land y$ contains $x_1$ which is not in $x_2 \land y$ and $x_2$ is only in the second disjunct. However, after applying the rule~\eqref{loc:exdisj} we get
+which is not satisfiable, we have that $(x_1 \land y)$ contains $x_1$ which is not in $(x_2 \land \neg y)$ and $x_2$ is only in the second disjunct. However, after applying the rule~\eqref{loc:exdisj} we get
 \[\forall x_1 \forall x_2 \itholds ((\exists y(\emptyset) \itholds (x_1 \land y) \lor \exists y'(\emptyset) \itholds (x_2 \land \neg y')) \lor (\neg x_1 \land \neg x_2)),\]
-which becomes satisfiable. The problem here is that $x_1$ and $x_2$ are in $\neg x_1 \land \neg x_2$ which is outside the subformula on which we are applying the rule $\eqref{loc:exdisj}$.
-
-
-
-the intersection of universal variables (including those on which existential are dependent on) of both disjuncts  As the next theorem shows, it is enough that universal variables that occur in both disjuncts (including in dependency sets) are only those from the dependency set of $y$.
+which becomes satisfiable. The problem here is that $x_1$ and $x_2$ are in $(\neg x_1 \land \neg x_2)$ which is outside the subformula on which we are applying the rule $\eqref{loc:exdisj}$. Therefore, we can put in a condition, that the sets of universal variables (except the ones from $D_y$) from the disjuncts are disjoint and as the next theorem shows, it is enough that universal variables from one of these disjuncts are not ouside this subformula. We also need to not only look at the universal variables occurring in the disjuncts, but also at the ones from the dependency sets of existential variables occurring in the disjuncts.
 
 \begin{theorem}
-  Let $\psi,\psi_1,\psi_2 \in \DQBF{V}$ such that $\exists y(D_y) \itholds (\psi_1 \lor \psi_2)$ is a subformula of $\psi$. Let 
-  \[A_{\psi_1} = \Set{x \in \uvars{\psi} | x \in \vars{\psi_1} \text{ or } x \in D_{y_1} \text{ for some } y_1 \in \vars{\psi_1}}\]
+  Let $\psi,\psi_1,\psi_2 \in \DQBF{V}$ such that $\exists y(D_y) \itholds (\psi_1 \lor \psi_2)$ is a subformula of $\psi$ and $y'$ be a new variable not occurring in $\psi, \psi_1$ or $\psi_2$. Let 
+  \[A_{\psi_1} = \Set{x \in \uvars{\psi} \setminus D_y | x \in \vars{\psi_1} \text{ or } x \in D_{y_1} \text{ for some } y_1 \in \vars{\psi_1} \cap \evars{\psi}}\]
   and 
-  \[A_{\psi_2} = \Set{x \in \uvars{\psi} | x \in \vars{\psi_2} \text{ or } x \in D_{y_2} \text{ for some } y_2 \in \vars{\psi_2}}.\] 
-  %where $A_{\psi_1} \cap A_{\psi_2} \subseteq D_y$.
+  \[A_{\psi_2} = \Set{x \in \uvars{\psi} \setminus D_y | x \in \vars{\psi_2} \text{ or } x \in D_{y_2} \text{ for some } y_2 \in \vars{\psi_2} \cap \evars{\psi}}.\] 
   %\[\fvars{\psi_1 \lor \psi_2} \cup \evars{\psi_1 \lor \psi_2} \subseteq D_y \cup \fvars{\psi} \cup \Set{y' \in \evars{\psi} | D_y' \subseteq D_y \cup \uvars{\psi_1 \lor \psi_2}}.\] 
-  Let $y'$ be a new variable not occurring in $\psi, \psi_1$ or $\psi_2$. Then $\psi \approx \psi'$ where $\psi'$ results from $\psi$ by replacing the subformula $\exists y(D_y) \itholds (\psi_1 \lor \psi_2)$ by \[(\exists y(D_y) \itholds \psi_1) \lor (\exists y'(D_y) \itholds \psi_2\substitute{y}{y'}).\]
+  Assume that $A_{\psi_1} \cap A_{\psi_2} = \emptyset$ and the variables from $A_{\psi_1}$ (or $A_{\psi_2}$) do not occur in $\psi$ outside the subformula $\exists y(D_y) \itholds (\psi_1 \lor \psi_2)$ or in the dependency set of some existential variable in $\psi$ outside the subformula $\exists y(D_y) \itholds (\psi_1 \lor \psi_2)$. Then $\psi \approx \psi'$ where $\psi'$ results from $\psi$ by replacing the subformula $\exists y(D_y) \itholds (\psi_1 \lor \psi_2)$ by \[\left(\exists y(D_y) \itholds \psi_1 \lor \exists y'(D_y) \itholds \psi_2\substitute{y}{y'}\right).\]
 \end{theorem}
 \begin{proof}
-   First, the assumption $A_{\psi_1} \cap A_{\psi_2} \subseteq D_y \cup \fvars{\psi}$ tells us that for any two $s,s' \in \Scands{\psi}$ it holds that $s(\psi_1) \cap s'(\psi_2) \subseteq D_y$. Now, let $\phi = \exists y(D_y) \itholds (\psi_1 \lor \psi_2)$ and $\phi' = \exists y(D_y) \itholds \psi_1) \lor (\exists y'(D_y) \itholds \psi_2\substitute{y}{y'})$. We prove that $\seman{\psi} \not= \emptyset$ iff $\seman{\psi'} \not= \emptyset$.
+  Let $\phi = \exists y(D_y) \itholds (\psi_1 \lor \psi_2)$ and $\phi' = (\exists y(D_y) \itholds \psi_1 \lor \exists y'(D_y) \itholds \psi_2\substitute{y}{y'})$. We prove that $\seman{\psi} \not= \emptyset$ iff $\seman{\psi'} \not= \emptyset$.
   
   First, let $s \in \seman{\psi}$. It is easy to see, that $s'$, where $s'(y) = s'(y') = s(y)$ and for other variables $s'(v) = s(v)$, is a satisfying Skolem functions mapping of $\psi'$, because $s(\psi)$ and $s(\psi')$ are the same BFs.
   
-  Now assume that $s' \in \seman{\psi'}$. We will prove that for some $s$, where $s(y)$ is a combination of  $s'(y)$ and $s'(y')$, and $s(v) = s'(v)$ for other variables, is a satisfying Skolem functions mapping of $\psi'$. Let $v \in \valtns{\psi'}$ be a valuation and $v_{D_y}$ its restriction to $D_y$. With similar reasoning as in the proof of case~(\ref{loc:unconj1}) of Theorem~\ref{thrm:quantLocalSubformulas} we only need to show that $v(s(\phi)) = 1$ assuming that $v(s'(\phi')) = 1$. From this assumption we can infer that $v(s'(\psi_1)) = 1$ or $v(s'(\psi_2\substitute{y}{y'})) = 1$. Without loss of generality assume that $v(s'(\psi_1)) = 1$. Then we set $s(y)(v_{D_y})$ to $s'(y)(v_{D_y})$ which means that $v(s(\psi_1)) = 1$, therefore $v(s(\phi)) = 1$. However, we need to show that for different valuation $v' \in \valtns{\psi'}$ such that $v'(x) = v(x)$ for $x \in D_y$ (therefore $v_{D_y}' = v_{D_y}$) it also holds that $v'(s'(\psi_1)) = 1$ (and so $v'(s(\phi)) = 1$). Assume now it does not hold. For $v'(s'(\phi'))$ to be equal to $1$ it would have to hold then that $v'(s'(\psi_2\substitute{y}{y'})) = 1$. There needs to be a valuation with restriction to $D_y$ equal to $v_{D_y}$ such that it evaluates $s'(\psi_2\substitute{y}{y'})$ to $0$, otherwise we could set $s(y)(v_{D_y})$ to $s'(y')(v_{D_y})$. For simplicity, assume that $v$ is such a valuation, therefore $v(s'(\psi_2\substitute{y}{y'})) = 0$. This means that we can create valuation $v''$ where we set variables from $s'(\psi_1)$ to the same value as $v$ and variables from $s'(\psi_2\substitute{y}{y'})$ to the same value as $v'$ (others do not matter). This is possible because variables occurring both in $s'(\psi_1)$ and $s'(\psi_2\substitute{y}{y'})$ are only those that are in $D_y$ (see the beginning of the proof) and $v_{D_y} = v_{D_y}'$. However, in this valuation it holds that $v''(s'(\psi_1)) = v''(s'(\psi_2\substitute{y}{y'})) = 0$ which means that $v''(s'(\phi')) = 0$ which is contradiction .... with what... this is not true, it does not have to be equal to 1, it is only subformula......
+  Now, assume that $s' \in \seman{\psi'}$. Let $s$ be a Skolem function mapping of $\psi'$ such that for $v_{D_y} \in \valtns{D_y}$ we set 
+  \begin{itemize}
+      \item $s(y)(v_{D_y}) = s'(y)(v_{D_y})$ if for all valuations $v \in \valtns{\uvars{\psi}}$ with restriction to $D_y$ equal to $v_{D_y}$, for which it holds that the value of $v(s'(\psi'))$ depends on the subformula $s'(\phi')$, we have $v(s'(\psi_1)) = 1$,
+      \item $s(y)(v_{D_y}) = s'(y')(v_{D_y})$ otherwise.
+  \end{itemize}
+  We set $s(v) = s'(v)$ for other variables. We show that $s \in \seman{\psi}$. Let $v \in \valtns{\uvars{\psi}}$ and $v_{D_y}$ its restriction to $D_y$. With similar reasoning as in the proof of case~\eqref{loc:unconj1} of Theorem~\ref{thrm:quantLocalSubformulas} we can assume that the value of $v(s'(\psi'))$ depends on the subformula $s'(\phi')$ and $v(s'(\phi')) = 1$. We need to show that $v(s(\phi)) = 1$. Because $s'(\phi')$ is a disjunction it has to hold that $v(s'(\psi_1)) = 1$ or $v(s'(\psi_2\substitute{y}{y'})) = 1$. If they're both equal to 1, then it does not matter whether $s(y)(v_{D_y}) = s'(y)(v_{D_y})$ or $s(y)(v_{D_y}) = s'(y')(v_{D_y})$, it will always hold that $v(s(\phi)) = 1$. If we have $v(s'(\psi_1)) = 0$ or $v(s'(\psi_2\substitute{y}{y'})) = 1$, then because from the way we defined $s$, we get $s(y)(v_{D_y}) = s'(y')(v_{D_y})$ and so $v(s(\psi_2)) = 1$ and therefore $v(s(\phi)) = 1$. For the last case, $v(s'(\psi_1)) = 1$ or $v(s'(\psi_2\substitute{y}{y'})) = 0$, we need to show that $s(y)(v_{D_y}) = s'(y)(v_{D_y})$. For that, it has to hold that for valuation $v' \in \valtns{\uvars{\psi}}$ with restriction to $D_y$ (labelled $v'_{D_y}$) equal to $v_{D_y}$ where the value of $v'(s'(\psi'))$ depends on the subformula $s'(\phi')$, we have $v'(s'(\psi_1)) = 1$. Assume that this not hold, that $v'(s'(\psi_1)) = 0$. Then, because the value of $v'(s'(\psi'))$ (which has to be equal to 1 from $s' \in \seman{\psi'}$) depends on the subformula $s'(\phi')$ it has to hold that $v'(s'(\phi')) = 1$ (again, the similar argument with $\phi'$ being in NNF as in proof of Theorem~\ref{thrm:quantLocalSubformulas}). Let $v'' \in \valtns{\uvars{\psi}}$ such that $v''(x) = v'(x)$ for all $x \in A_{\psi_1}$ and $v''(x) = v(x)$ otherwise. Because $s'(\psi_1)$ contains only variables from 
+  
+  %First, the assumption $A_{\psi_1} \cap A_{\psi_2} \subseteq D_y$ tells us that for any two $s,s' \in \Scands{\psi}$ it holds that the variables occurring both in $s(\psi_1)$ and $s'(\psi_2)$ are from $D_y$. 
+  
+  %We will prove that for some $s$, where $s(y)$ is a combination of  $s'(y)$ and $s'(y')$, and $s(v) = s'(v)$ for other variables, is a satisfying Skolem functions mapping of $\psi'$. Let $v \in \valtns{\psi'}$ be a valuation and $v_{D_y}$ its restriction to $D_y$. With similar reasoning as in the proof of case~(\ref{loc:unconj1}) of Theorem~\ref{thrm:quantLocalSubformulas} we only need to show that $v(s(\phi)) = 1$ assuming that $v(s'(\phi')) = 1$. From this assumption we can infer that $v(s'(\psi_1)) = 1$ or $v(s'(\psi_2\substitute{y}{y'})) = 1$. Without loss of generality assume that $v(s'(\psi_1)) = 1$. Then we set $s(y)(v_{D_y})$ to $s'(y)(v_{D_y})$ which means that $v(s(\psi_1)) = 1$, therefore $v(s(\phi)) = 1$. However, we need to show that for different valuation $v' \in \valtns{\psi'}$ such that $v'(x) = v(x)$ for $x \in D_y$ (therefore $v_{D_y}' = v_{D_y}$) it also holds that $v'(s'(\psi_1)) = 1$ (and so $v'(s(\phi)) = 1$). Assume now it does not hold. For $v'(s'(\phi'))$ to be equal to $1$ it would have to hold then that $v'(s'(\psi_2\substitute{y}{y'})) = 1$. There needs to be a valuation with restriction to $D_y$ equal to $v_{D_y}$ such that it evaluates $s'(\psi_2\substitute{y}{y'})$ to $0$, otherwise we could set $s(y)(v_{D_y})$ to $s'(y')(v_{D_y})$. For simplicity, assume that $v$ is such a valuation, therefore $v(s'(\psi_2\substitute{y}{y'})) = 0$. This means that we can create valuation $v''$ where we set variables from $s'(\psi_1)$ to the same value as $v$ and variables from $s'(\psi_2\substitute{y}{y'})$ to the same value as $v'$ (others do not matter). This is possible because variables occurring both in $s'(\psi_1)$ and $s'(\psi_2\substitute{y}{y'})$ are only those that are in $D_y$ (see the beginning of the proof) and $v_{D_y} = v_{D_y}'$. However, in this valuation it holds that $v''(s'(\psi_1)) = v''(s'(\psi_2\substitute{y}{y'})) = 0$ which means that $v''(s'(\phi')) = 0$ which is contradiction .... with what... this is not true, it does not have to be equal to 1, it is only subformula......
 \end{proof}
 
-\begin{remark}
-  The condition .... basically means that the set of universal variables occurring both in $\psi_1$ and $\psi_2$ are those from $D_y$ and for existential variable $y''$ to occur in both of them it needs to hold that $D_{y''} \subseteq D_{y}$.
-\end{remark}
+%\begin{remark}
+%  The condition .... basically means that the set of universal variables occurring both in $\psi_1$ and $\psi_2$ are those from $D_y$ and for existential variable $y''$ to occur in both of them it needs to hold that $D_{y''} \subseteq D_{y}$.
+%\end{remark}
 
 \subsection{Quantifier Elimination}
-The next theorems give a possibility to eliminate both universal and existential quantifiers. The first theorem shows how to eliminate universal quantifiers by universal expansion. This can be always applied to any universal quantifier but by doing so the resulting DQBF can contain new copies of existential variables. The theorem is based on universal expansion for DQBFs in PNF~\cite{HQSsimpleAlg,NegationOfDQBFs}, here we generalise it to the case of subformulas in DQBFs in NNF.
+In this section we show haw we can eliminate both universal and existential quantifiers. Firstly, we show that for a simple case where the quantified variable is not in the formula, we can just remove it.
+
+\begin{lemma}
+Let $\psi_1 \in \DQBF{V}$. Then
+\begin{align}
+    \forall x \itholds \psi_1 &\approx \psi_1^{-x} \text{, if } x \not\in \vars{\psi_1}\tag{i}\label{elim:univ}\\
+    \exists y(D_y) \itholds \psi_1^{-y} &\approx \psi_1^{-y} \text{, if } y \not\in \vars{\psi_1}.\tag{j}\label{elim:exist}
+\end{align}
+Let $\psi \in \DQBF{V}$ such that the left side of one of the previous equisatisfiabilities is its subformula. Then $\psi \approx \psi'$ where $\psi'$ results from $\psi$ by replacing this subformula with the equisatisfiable right side.
+\end{lemma}
+\begin{proof}
+  We show the general case $\psi \approx \psi'$ for both equisatisfiabilities.
+  
+  \eqref{elim:univ} Again, we want to prove $\seman{\psi} = \seman{\psi'}$. For $s \in \seman{\psi'}$ it is obvious that also $s \in \seman{\psi}$. For $s \in \seman{\psi}$ we can create $s'$ where $s'(y) = s(y)\substitute{x}{0}$ where $s(y)\substitute{x}{0}$ is a boolean function which can be represented by a BF that represents $s(y)$ with $x$ substituted by $0$. Then $s' \in \seman{\psi'}$ because for each valuation $v \in \valtns{\uvars{\psi}}$, $v(x) = 0$, we have $v(s'(\psi')) = v(s(\psi)) = 1$.
+  
+  \eqref{elim:exist} Stems from the fact that $s(\psi) = s(\psi')$ for any $s \in \Scands{\psi}$.
+\end{proof}
+
+The next theorem shows how to eliminate universal quantifiers generally by universal expansion. This can be always applied to any universal quantifier but by doing so the resulting DQBF can contain new copies of existential variables. The theorem is based on universal expansion for DQBFs in PNF~\cite{HQSsimpleAlg,NegationOfDQBFs}, here we generalise it to the case of subformulas in DQBFs in NNF.
 
 \begin{theorem}[Universal Expansion]
 \label{thrm:unExpan}
@@ -635,17 +657,6 @@ be a DQBF that says that either $y_1$ has the same value as $x_1 \land x_2$ (whi
 \end{multline*}
 which is still satisfiable.
 \end{example}
-
-% TODO: check if we need this:
-%In the case that $x \not\in V_{\psi_1}$ the situation is simpler --- we just remove the quantifier:
-%\begin{lemma}
-%Let $\psi, \psi_1 \in \DQBF{V}$ such that $\forall x : \psi_1$ is a subformula of $\psi$ and $x \not\in V_{\psi_1}$. Then $\psi \approx \psi'$ where $\psi'$ results from $\psi$ by replacing the subformula $\forall x : \psi_1$ by $\psi_1$.
-%\end{lemma}
-%\begin{proof}
-%  For $\psi$ to be a DQBF in NNF, it has to hold that $x$ is not quantified anywhere else than in the subformula $\forall x : \psi_1$. Then the equisatisfiability follows from the similar argument as was used in the proof of $\forall x : \psi_1 \approx \psi_1$ in~\cite[Theorem 3]{HQSquantifierLocalization}.
-%\end{proof}
-
-%dependency elimination - jedine ak to budem pouzivat, treba potom aj dokaz ze to funguje pre podformule - inak je to spomenute pri state of art
 
 
 
