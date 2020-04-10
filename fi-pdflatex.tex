@@ -230,11 +230,25 @@
 % space between quantifiers and formula
 \newcommand{\itholds}{\,}
 
+% Stuff for quantifier trees
+% l(#1) labelling of node #1 in quantifier tree
+\newcommand{\qtlabel}[1]{l({#1})}
+% Q(#1) quantifier prefix of node #1 in quantifier tree
+\newcommand{\prefix}[1]{Q({#1})}
+% set of existential variables in quantifier tree of node #1
+\newcommand{\eprefix}[1]{Q_{\exists}(#1)}
+% set of universal variables in quantifier tree of node #1
+\newcommand{\uprefix}[1]{Q_{\forall}(#1)}
+% children(#1) the set of children of node #1
+\newcommand{\children}[1]{children({#1})}
+
 % complexity classes
 \newcommand{\ComplexityFont}[1]{\mathsf{#1}}
 \newcommand{\PSPACE}{\ComplexityFont{PSPACE}}
 \newcommand{\NP}{\ComplexityFont{NP}}
 \newcommand{\NEXPTIME}{\ComplexityFont{NEXPTIME}}
+
+\newcommand{\DQDIMACS}[0]{\texttt{DQDIMACS}}
 
 %\renewcommand{\phi}{\varphi}
 
@@ -400,7 +414,7 @@ QBFs in PNF can be seen as a special case of DQBFs in PNF where the dependency s
 
 \subsection{Negation Normal Form}
 In this section we give the definition of the normal form of DQBF that is non-prenex. This allows quantifiers inside the formula. However, negation is only allowed in front of variables. %This restriction stems from the fact that prenex DQBFs are not syntactically closed under negation~\cite{NegationOfDQBFs}. %, therefore negation in front of some quantified subformula would make no sense.
-This form is also not closed which means it allows free variables. These variables are not bounded by any quantifier thus the definition of satisfiability has to take them into consideration. The definitions in this section are taken from Ge-Ernst et al.~\cite{HQSquantifierLocalization}.
+This form is also not closed which means it allows free variables. These variables are not bounded by any quantifier thus the definition of satisfiability has to take them into consideration. The definitions in this section are taken from Ge-Ernst et al.~\cite{HQSquantifierLocalisation}.
 
 
 We first give the definition of the set $\DQBF{V}$ of DQBFs in \emph{negation normal form} where we use the rules form Figure~\ref{fig:DQBFrules}. Each rule has the list of conditions (over the line) that has to hold so that the resulting formula under the line is in $\DQBF{V}$. For each formula $\psi$ we also define the set of existential $\evars{\psi}$, universal $\uvars{\psi}$, and free $\fvars{\psi}$ variables. We also use $\qvars{\psi} = \evars{\psi} \cup \uvars{\psi}$ and $V_{\psi} = \qvars{\psi} \cup \fvars{\psi}$.  Furthermore, $\psi^{-v}$ results from $\psi$ where $v$ is removed from every dependency set in $\psi$. 
@@ -469,15 +483,15 @@ We first give the definition of the set $\DQBF{V}$ of DQBFs in \emph{negation no
         \label{existrule}
         D_v \subseteq V \setminus (\qvars{\psi} \cup \set{v})
     \end{equation}
-    \caption{Rules defining the syntax of DQBFs in NNF (based on Ge-Ernst et al.~\cite{HQSquantifierLocalization}).}
+    \caption{Rules defining the syntax of DQBFs in NNF (based on Ge-Ernst et al.~\cite{HQSquantifierLocalisation}).}
     \label{fig:DQBFrules}
 \end{figure}
 
 \begin{definition}
-  Let $V$ be a set of variables. The set $\DQBF{V}$ of \emph{DQBFs in negation normal form} (NNF) over $V$ is defined to be the smallest set satisfying the rules from Figure~\ref{fig:DQBFrules}.
+  Let $V$ be a set of variables. The set $\DQBF{V}$ of \emph{DQBFs in negation normal form} (NNF) \emph{over $V$} is defined to be the smallest set satisfying the rules from Figure~\ref{fig:DQBFrules}.
 \end{definition}
 \begin{remark}
-In the definition by Ge-Ernst et al.~\cite{HQSquantifierLocalization} the last two rules in Figure~\ref{fig:DQBFrules} have condition $v \in \fvars{\psi}$ instead of $v \in V \setminus \qvars{V}$. This condition is too strong and does not allow some formulas which are valid. For example, as we show in the next section, we can transform DQBFs by pushing quantifiers inside the formula and this way we can end up with a formula $\forall x \itholds \psi$ where $x \not\in V_{\psi}$. However, according to the aforementioned definition this would not be a valid formula.
+In the definition by Ge-Ernst et al.~\cite{HQSquantifierLocalisation} the last two rules in Figure~\ref{fig:DQBFrules} have condition $v \in \fvars{\psi}$ instead of $v \in V \setminus \qvars{V}$. This condition is too strong and does not allow some formulas which are valid. For example, as we show in the next section, we can transform DQBFs by pushing quantifiers inside the formula and this way we can end up with a formula $\forall x \itholds \psi$ where $x \not\in V_{\psi}$. However, according to the aforementioned definition this would not be a valid formula.
 \end{remark}
 
 \begin{remark}
@@ -506,20 +520,18 @@ The set of all Skolem functions mappings of $\psi$ is denoted by $\Scands{\psi}$
 Formula $\psi$ is \emph{satisfiable} iff $\seman{\psi} \not= \emptyset$ and the elements of $\seman{\psi}$ are \emph{satisfiying} Skolem functions mappings of $\psi$. We say that two formulas $\psi_1$ and $\psi_2$ are \emph{equisatisfiable}, denoted $\psi_1 \approx \psi_2$, if both are either satisfiable or both are unsatisfiable.
 \begin{example}
 \label{ex:DQBF:NNF}
-To explain the semantics of DQBF in NNF we use the example by Ge-Ernst et al.~\cite{HQSquantifierLocalization}:
+To explain the semantics of DQBF in NNF we use the example by Ge-Ernst et al.~\cite{HQSquantifierLocalisation}:
 \[\psi = \forall x_1 \forall x_2\itholds ((x_1 \lequal x_2) \lor \exists y (x_2)\itholds \neg(x_1 \lequal y)).\]
 The meaning behind this formula is that either $x_1$ and $x_2$ are the same or there is some $y$ which is dependent only on $x_2$ which is different from $x_1$. The Skolem functions mappings of $\psi$ are then $\Scands{\psi} = \{y\mapsto f_0$, $y\mapsto f_1$, $y\mapsto f_{x_2}$, $y\mapsto f_{\neg x_2}\}$ where $f_0$ is the Boolean function represented by Boolean formula $0$, $f_1$ is represented by $1$, $f_{x_2}$ by $x_2$ and $f_{\neg x_2}$ by $\neg x_2$. It is obvious that only $s = y \mapsto f_{x_2}$ is a satisfying mapping of $\psi$, since only $s(\psi) = ((x_1 \lequal x_2) \lor \neg(x_1 \lequal x_2))$ is true in all valuations.
 \end{example}
 
 \subsection{Shifting Quantifiers}
-\label{sec:quantLocalization}
+\label{sec:quantLocalisation}
 Now that we have defined DQBFs we give some theoretical results which show the equisatisfiability of different DQBFs which can result in their simplification. These results can be then used for developing a DQBF solver which checks whether an input DQBF is satisfiable or not.
 
-We start with a theorem that show some rules by which we can push (extract) quantifiers in (from) the formula. %The first theorem is from~\cite[Theorem 3]{HQSquantifierLocalization} where ... is replaced by ... from~\cite[Theorem 4]{HQSquantifierLocalization}
+We start with a theorem that show some rules by which we can push (extract) quantifiers in (from) the formula. 
 
-%\let\oldtheequation\theequation
-%\renewcommand{\theequation}{\alph{equation}}
-\begin{theorem}[{\cite[Theorems 3,4]{HQSquantifierLocalization}}]
+\begin{theorem}[{\cite[Theorems 3,4]{HQSquantifierLocalisation}}]
 \label{thrm:quantLocalEq}
   Let ${\diamond} \in \set{{\land},{\lor}}$ and $\psi,\psi_1,\psi_2 \in \DQBF{V}$. We assume that $x'$ and $y'$ are fresh variables, which do not occur in $\psi,\psi_1$ and $\psi_2$. Then we have
   \begin{align}
@@ -535,9 +547,8 @@ We start with a theorem that show some rules by which we can push (extract) quan
       \forall x\exists y(D_y) \itholds \psi &\approx \exists y(D_y)\forall x \itholds \psi\text{, if } x \not\in D_y. \tag{h} \label{loc:bothswap}
   \end{align}
 \end{theorem}
-%\renewcommand{\theequation}{\oldtheequation}
 
-To make these rules more usable for DQBF in NNF we have to show that they also work while replacing subformulas. Except for~\eqref{loc:unconj2}, this was not proven by Ge-Ernst et al.~\cite{HQSquantifierLocalization} even though they used it for replacing subformulas. As we will show, this was used erroneously because the rule~\eqref{loc:exdisj} does not generally hold. However, for other rules there is no problem as the next theorem shows. % that if DQBFs from the previous theorem occur as subformulas of DQBF $\psi$ they can be replaced without changing the satisfiability of $\psi$. 
+To make these rules more usable for DQBF in NNF we have to show that they also work while replacing subformulas. Except for~\eqref{loc:unconj2}, this was not proven by Ge-Ernst et al.~\cite{HQSquantifierLocalisation} even though they used it for replacing subformulas. As we will show, this was used erroneously because the rule~\eqref{loc:exdisj} does not generally hold. However, for other rules there is no problem as the next theorem shows.
 
 \begin{theorem}
   \label{thrm:quantLocalSubformulas}
@@ -548,7 +559,7 @@ To make these rules more usable for DQBF in NNF we have to show that they also w
   
   For the other direction, let $s' \in \seman{\psi'}$. It can be easily shown by similar argument that $s$, where $s(y) = s'(y)\substitute{x'}{x}$ for $y \in \psi_2$ and $s(y) = s'(y)$ otherwise, is a satisfying Skolem functions mapping of $\psi$.
   
-  \eqref{loc:unconj2} This was proven by Ge-Ernst et al.~\cite[Theorem 4]{HQSquantifierLocalization}.
+  \eqref{loc:unconj2} This was proven by Ge-Ernst et al.~\cite[Theorem 4]{HQSquantifierLocalisation}.
   
   %(\ref{loc:exdisj}) Again, we show that $\seman{\psi} \not= \emptyset$ iff $\seman{\psi'} \not= \emptyset$. First, let $s \in \seman{\psi}$. It is easy to see, that $s'$, where $s'(y) = s'(y') = s(y)$ and for other variables $s'(v) = s(v)$, is a satisfying Skolem functions mapping of $\psi'$, because $s(\psi)$ and $s(\psi')$ are the same BFs. For the other direction, let $s' \in \seman{\psi'}$. Using similar arguments as in the case (\ref{loc:unconj1}) and realising that disjunction valuates to true if either of its operators is true, we can see that at least one of $s_1$ and $s_2$, where $s_1(y) = s'(y)$, $s_2(y) = s'(y')$ and for other variable $s_1(v) = s_2(v) = s'(v)$, is a satisfying Skolem functions mapping of $\psi$.
   
@@ -566,6 +577,7 @@ which is not satisfiable, we have that $(x_1 \land y)$ contains $x_1$ which is n
 which becomes satisfiable. The problem here is that $x_1$ and $x_2$ are in $(\neg x_1 \land \neg x_2)$ which is outside the subformula on which we are applying the rule $\eqref{loc:exdisj}$. Therefore, we can put in a condition, that the sets of universal variables (except the ones from $D_y$) from the disjuncts are disjoint and as the next theorem shows, it is enough that universal variables from one of these disjuncts are not ouside this subformula. We also need to not only look at the universal variables occurring in the disjuncts, but also at the ones from the dependency sets of existential variables occurring in the disjuncts.
 
 \begin{theorem}
+  \label{thrm:localisedijunction}
   Let $\psi,\psi_1,\psi_2 \in \DQBF{V}$ such that $\exists y(D_y) \itholds (\psi_1 \lor \psi_2)$ is a subformula of $\psi$ and $y'$ be a new variable not occurring in $\psi, \psi_1$ or $\psi_2$. Let 
   \[A_{\psi_1} = \Set{x \in \uvars{\psi} \setminus D_y | x \in \vars{\psi_1} \text{ or } x \in D_{y_1} \text{ for some } y_1 \in \vars{\psi_1} \cap \evars{\psi}}\]
   and 
@@ -594,9 +606,11 @@ which becomes satisfiable. The problem here is that $x_1$ and $x_2$ are in $(\ne
 %\end{remark}
 
 \subsection{Quantifier Elimination}
+\label{sec:quantElimination}
 In this section we show haw we can eliminate both universal and existential quantifiers. Firstly, we show that for a simple case where the quantified variable is not in the formula, we can just remove it.
 
 \begin{lemma}
+\label{lemma:elimination}
 Let $\psi_1 \in \DQBF{V}$. Then
 \begin{align}
     \forall x \itholds \psi_1 &\approx \psi_1^{-x} \text{, if } x \not\in \vars{\psi_1}\tag{i}\label{elim:univ}\\
@@ -638,7 +652,7 @@ which (like $\psi$) is satisfiable.
 
 The conditions when existential elimination is possible are more strict:
 
-\begin{theorem}[{\cite[Theorem 5]{HQSquantifierLocalization}}]
+\begin{theorem}[{\cite[Theorem 5]{HQSquantifierLocalisation}}]
 \label{thrm:exElim}
   Let $\psi, \psi_1 \in \DQBF{V}$ such that $\exists y(D_y)\itholds\psi_1$ is a subformula of $\psi$ where $\psi_1$ does not include any quantification and includes only variables from $D_y \cup \fvars{\psi} \cup \set{y' \in \evars{\psi} | D_y' \subseteq D_y}$. Then $\psi \approx \psi'$ where $\psi'$ results from $\psi$ by replacing the subformula $\exists y(D_y)\itholds\psi_1$ by \[(\psi_1\substitute{y}{0} \lor \psi_1\substitute{y}{1})\].
 \end{theorem}
@@ -739,34 +753,20 @@ For each operation on BFs (${\land}$, ${\lor}$, ${\neg}$), there is an algorithm
 
 
 \section{Quantifier Trees}
-
-
-% TODO, define l(n) which assign either operation or literal
-\newcommand{\qtlabel}[1]{l({#1})}
-% TODO, define \evars{n},\uvars{n} where n is a node as the set of all existential variables such that it is an existential variable of DQBF formula that is represented by tree rooted in n (we assume this tree is proper tree that can represent some formula) ---- problem: nebude fungovat v algoritme, lebo subtree nevie o prefixoch v ancestors... mozno zadefinovat len V_{n} ako mnozinu variables nachadzaujich sa v tom tree???? a zadefinovat si mnoziny existential a universal variables v prefixoch???? aaalebo zadefinuj to ako pre cely strom, teda budeme to brat ako subformulu ale bereme exist/univ variables z \evars{\psi}/\uvars{\psi} kde \psi je formula ktoru reprezentuje root r
-% TODO, define Q(n) as the quantifier prefix assignment and say that we abuse notation and use it also as the set of variables in the quantifier prefix 
-\newcommand{\prefix}[1]{Q({#1})}
-\newcommand{\eprefix}[1]{Q_{\exists}(#1)}
-\newcommand{\uprefix}[1]{Q_{\forall}(#1)}
-% TODO, define children(n) as the set of children of node n
-\newcommand{\children}[1]{children({#1})}
-
+\label{sec:QT}
 While BDDs are a good represantion of BFs, we also need a represenation for DQBFs. For this we define \emph{quantifier trees} which can represent DQBFs in NNF.
 
 \begin{definition}
   Let $V$ be a set of variables. A \emph{quantifier tree} \emph{over $V$} is a rooted directed tree with labelling $l$ which assigns to each non-terminal node an operation ${\diamond} \in \set{{\land},{\lor}}$ and to each terminal node a literal from $V$ (a variable $v \in V$ or its negation), and a prefix mapping $Q$ which maps to each node some DQBF prefix.
 \end{definition}
 
-A quantifier tree with root $r$ represents a DQBF formula where children of the node $r$ are subformulas connected with the operation $\qtlabel{r}$ (or if $\qtlabel{r}$ is a literal it represents this literal) with quantifier prefix $\prefix{r}$. However, not each quantifier tree represents a proper DQBF formula, we restrict ourselves only to the set of quantifier trees which represent some formula.
+A quantifier tree with root $r$ represents a DQBF where terminal node $r$ represents the literal $\qtlabel{r}$ while children of non-terminal node $r$ are subformulas connected with the operation $\qtlabel{r}$. The formula has the quantifier prefix $\prefix{r}$. For each DQBF there exists a quantifier tree representing it. However, not each quantifier tree represents a proper DQBF, we restrict ourselves only to the set of quantifier trees which represent some formula.
 
-%TODO change in algorithm to \vars{n} everywhere because \evars{n}/\uvars{n} have differnet meaning
-We denote the set of children of node $n$ as $\children{n}$. We also abuse notation and use $\prefix{n}$ as a set of variables which are in this quantifier prefix. somethingsomething $\eprefix{n}$ is set of existential variable in $\prefix{n}$someting soemign We use $\vars{n}, \evars{n}$ and $\uvars{n}$  TODO
-
-Each DQBF in NNF can be represented by a quantifier tree by starting from literals and recursively creating subtrees for each operation. 
+We denote the set of children of node $n$ as $\children{n}$. We also abuse notation and use set notation for $\prefix{n}$ to denote adding or removing variables from it. The quantifier for added variables will always be obvious from the context. We use $\eprefix{n}$ and $\uprefix{n}$ to denote the set of existentially and universally quantified variables in $\prefix{n}$. The sets $\vars{n}, \evars{n}$ and $\uvars{n}$ denote $\vars{\psi}, \evars{\psi}$ and $\uvars{\psi}$ respectively, where $\psi$ is DQBF represented by $n$.
 
 In figures, the assigned DQBF prefix to non-terminal node $n$ is always shown on the edge coming to the node $n$, while the nodes are labelled either by the assigned operation or literal (see Figure~\ref{fig:QTex}). For the root, we add an extra ``edge'', just to show the quantifier prefix before the whole formula.
 
-\begin{figure}[ht]
+\begin{figure}
     \centering
     \begin{tikzpicture}[->,>={Stealth[scale=1.3,angle'=90]},node distance=2cm,initial distance=1.3cm,initial text=$\forall x_1 \exists y_1(x_1) $,every state/.style={minimum size=0pt}]
     \node[state,initial above] (1) {${\land}$};
@@ -795,13 +795,8 @@ In figures, the assigned DQBF prefix to non-terminal node $n$ is always shown on
   Figure~\ref{fig:QTex} shows an example of quantifier tree representing DQBF \[\forall x_1 \exists y_1(x_1) (\exists y_2(\emptyset) \itholds (y_2 \lor \neg x_1) \land x_1 \land \forall x_2 \itholds (x_2 \lor \neg y_1)).\]
 \end{example}
 
-%TODO povedat ze operacie sa striedaju, nemoze nastat ze child ma rovnaku operaciu ako parent a vysvetlit ze je to len cisto aby boli algoritmy efektivnejsie??
-
 \chapter{State of the Art}
 In this chapter we give an overview of existing solutions and solvers which tackle the satisfiability problem of DQBF. Because there are already multiple surveys about DQBF~\cite{DQBFStateOfArtTalk,DQBFStateOfArt,DQBFStateOfArtNew}, we give only a short overview of most solvers and techniques. However, we go into more details for solver HQS, because it is currently the best performing solver (winner of the DQBF track of QBF Evaluation 2018~\cite{QBFeval18} and 2019~\cite{QBFeval19}) and the methods we use for developing our solver are based on the workings of this solver.
-
-%\section{The Problem of Satisfiability}
-%Let $\psi$ be DQBF. The problem we are trying to solve is to tell whether this formula is satisfiable, that is if there exists model in which it is true. For BF, this problem belongs to NP-complete class of problems cite. If we move to QBF, the problem gets harder and belongs to PSPACE-complete class. As was shown in CITE, this problem for DQBF belongs in NEXPTIME-complete class of problems, that is it is even harder.
 
 \section{First Solution -- DQDPLL}
 The first solver that tackled the satisfiability problem for DQBF was based on DPLL~\cite{DPLL} algorithm which is successfully used for BF and QBF solvers. This algorithm works on formulas in CNF by searching for a satisfying assignment based on the clauses in CNF. By recursively choosing an assignment for literals and checking whether the remaining formula in CNF contains an empty clause (which implies unsatisfiability), DPLL searches trough all assignments until a satisfying one is found or all of them are decided to be unsatisfying. An adaptation called DQDPLL~\cite{DPLLalgorithm} was introduced for DQBF (in PCNF) which extended existing solutions for QBF by adding so-called Skolem clauses which encode the dependencies between existential and universal variables. However, by doing so the algorithm becomes too slow and results in an uncompetitive solver.
@@ -809,12 +804,10 @@ The first solver that tackled the satisfiability problem for DQBF was based on D
 \section{Instantiation -- iDQ and iProver}
 The first efficient DQBF solver, called iDQ~\cite{iDQandDQDIMACS}, is based on an instantiation technique used for solving Effectively Propositional Logic (EPR)~\cite{iProver}. This solver also works only on formulas in PCNF where in each step of the algorithm it tries to create a BF $\phi$ that is an overapproximation of an input DQBF. This is done by instantiating some set of clauses, that is it applies universal expansion locally to them. This BF $\phi$ is then checked for satisfiability, where if $\phi$ is unsatisfiable then the input DQBF is also not satisfiable, while if it is satisfiable, it must be checked if the resulting valuation is valid for the input DQBF. If it is not, then it is used to create more clause instances which are then used to refine this overapproximation.
 
-Furthermore, a solver for EPR can also be used directly for DQBF. Because EPR belongs to the same complexity class as DQBF, there exists a polynomial-time reduction from DQBF to EPR~\cite{iDQandDQDIMACS}. This is used by EPR solver iProver~\cite{iProver} which transforms a DQBF in PCNF to an EPR instance and then solves this. %The results from QBF Evaluation 2018~\cite{QBFeval18} shows that iProver is more efficient than iDQ.  %In the SAT competition??? it turned out that iProver is more powerful compared to iDQ??
+Furthermore, a solver for EPR can also be used directly for DQBF. Because EPR belongs to the same complexity class as DQBF, there exists a polynomial-time reduction from DQBF to EPR~\cite{iDQandDQDIMACS}. This is used by EPR solver iProver~\cite{iProver} which transforms a DQBF in PCNF to an EPR instance and then solves this.
 
 \section{Clausal Abstraction -- dCAQE}
 Another DQBF solver called dCAQE~\cite{dCAQE} is based on clausal abstraction~\cite{ClausalAbstr}. This solver --- working again on DQBF in PCNF --- first puts universally and existentially quantified variables to some sets (called nodes) which are then divided into levels based on the ordering of dependencies of existential variables. The algorithm then constructs for each node on each level a BF that represents which clauses in CNF it can satisfy (for existential node) or falsify (for universal node). The algorithm then builds a candidate valuation by processing each level. For each level either this valuation is extended, or there is some conflict which means that the algorithm has to backtrack to some lower level and refine the abstraction, or the candidate valuation is a satisfying one which ends the algorithm.
-
-%mozno spomenut fork splitting or something like that, v arXiv rozsirenej verzii maju nieco o tom v appendixe
 
 \section{Quantifier Elimination -- HQS}
 The next solver is based on quantifier elimination. This solver's basic premise is simple --- it iteratively chooses some universal variable for universal expansion (Theorem~\ref{thrm:unExpan}) thus eliminating it and then eliminates all existential quantifiers that are dependent on all leftover universal quantifiers using Theroem~\ref{thrm:exElim}.
@@ -837,8 +830,7 @@ The next solver is based on quantifier elimination. This solver's basic premise 
 \end{algorithmic}
 \end{algorithm}
 
-Gitina et al.~\cite{HQSsimpleAlg} introduced the basic algorithm for solving DQBF in PCNF in this way. %(mozno spomenut ze to vlastne vymysleli aj v iDQ clanku, ako nejaky base solver ktory pouziva BDDcka) 
-Algorithm~\ref{alg:QE} shows simple pseudocode of this. In every step, this algorithm chooses (using some heuristic) an universal variable to eliminate. The authors used a heuristic where the universal variable is chosen based on the number of existential ones that depend on it --- they choose the one that has minimal number of dependencies. After that, all the existential variables that depend on everything are also eliminated. To use this algorithm it is important to choose a good representation of the matrix of the DQBF. For this the authors chose and-inverter graphs~\cite{FRAIGs}. % (AIG) which are tree-like structures where non-terminal nodes represent conjunction, terminal nodes are variables and these are connected with two types of nodes: normal ones and those that represent negation. With a proper implementation of operations they can be optimised in such a way that they reuse parts of the graphs resulting in functionally reduced AIGs~\cite{FRAIGs}.
+Gitina et al.~\cite{HQSsimpleAlg} introduced the basic algorithm for solving DQBF in PCNF in this way. Algorithm~\ref{alg:QE} shows simple pseudocode of this. In every step, this algorithm chooses (using some heuristic) an universal variable to eliminate. The authors used a heuristic where the universal variable is chosen based on the number of existential ones that depend on it --- they choose the one that has minimal number of dependencies. After that, all the existential variables that depend on everything are also eliminated. To use this algorithm it is important to choose a good representation of the matrix of the DQBF. For this the authors chose and-inverter graphs~\cite{FRAIGs}. % (AIG) which are tree-like structures where non-terminal nodes represent conjunction, terminal nodes are variables and these are connected with two types of nodes: normal ones and those that represent negation. With a proper implementation of operations they can be optimised in such a way that they reuse parts of the graphs resulting in functionally reduced AIGs~\cite{FRAIGs}.
 
 Following this technique, solver HQS was introduced~\cite{HQSquantifierElimination} which was enhanced by using QBF solver as a subprocedure. They still eliminate quantifiers in similar fashion but now they do it until the formula can be transformed to QBF (that is the dependency sets are linearly ordered). On this QBF they then run already existing solver for QBF called AIGSolve~\cite{AIGSolve} which can use more effective techniques developed for QBFs. Universal quantifiers to eliminate are chosen in the beginning in such a way that the number of universal eliminations is as small as possible while still the resulting formula is QBF. For this they build a dependency graph in which nodes are existential variables where $y_i$ is connected to $y_j$ if for their dependency sets it hold that $D_{y_i} \not\subseteq D_{y_j}$. They noticed that if this graph is acyclic, the formula can be seen as QBF. Furthermore, there is a cycle in this graph iff there is a simple cycle (between two nodes) in the graph. They use this to create an instance of MaxSAT problem which is a problem of finding a valuation of one BF while maximizing another formula. This instance then encodes which universal variables have to be eliminated so the dependency graph becomes acyclic while minimising the number of universal variables to eliminate. After finding the set of variables to eliminate, they follow with an improved quantifier elimination algorithm. They also improved it by adding a preprocessing step (see Section~\ref{sec:preprocessing}) and elimination of special types of variables called unit and pure. 
 
@@ -851,7 +843,7 @@ be a prenex DQBF where $\phi$ is a BF and $x_1 \in D_{y_1}$. We can now remove $
 \end{multline*}
 Using this the authors do not look for a set of universal variables to eliminate, but for partial dependencies whose removal will result in a DQBF which can be transformed into QBF. Again, they create a dependency graph which is acyclic iff DQBF can be seen as QBF. But now they create a bipartite graph whose two sets of nodes are the set of universal variables and the set of existential variables which are connected based on whether universal variable is in the dependency set of existential one. Similarly to previous, they use this graph to solve an optimization problem that encodes which dependencies to remove to get QBF which can then be solved with AIGSolve.
 
-Last but not least, Ge-Ernst et al.~\cite{HQSquantifierLocalization} have given a theoretical foundations for non-prenex DQBFs and the possibility to push and eliminate quantifiers inside formulas as explained in Section~\ref{sec:quantLocalization}. Using this they improve HQS by adding another step in the algorithm, where they first push quantifiers as much as possible into the formula, eliminate the existential variables using Theorem~\ref{thrm:exElim} and then return the formula back to the prenex form. After this they start with the elimination of universal quantifiers as was explained in previous paragraphs.
+Last but not least, Ge-Ernst et al.~\cite{HQSquantifierLocalisation} have given a theoretical foundations for non-prenex DQBFs and the possibility to push and eliminate quantifiers inside formulas as explained in Sections~\ref{sec:quantLocalisation} and~\ref{sec:quantElimination}. Using this they improve HQS by adding another step in the algorithm, where they first push quantifiers as much as possible into the formula, eliminate the existential variables using Theorem~\ref{thrm:exElim} and then return the formula back to the prenex form. After this they start with the elimination of universal quantifiers as was explained in previous paragraphs.
 
 \section{Preprocessing}
 \label{sec:preprocessing}
@@ -867,42 +859,31 @@ Another technique which is used in some solvers as preprocessing step is to find
 \subsection{\texorpdfstring{$\PSPACE$}{PSPACE} subclass}
 The last preprocessing technique is simply put just a check whether DQBF does not belong to a subclass of problems which are in $\PSPACE$ and if it does, it is transformed to QBF (which is $\PSPACE$-complete) on which existing QBF solver is run. The simplest such subclass would be those DQBFs whose dependencies are linearly ordered. Then it can be easily transformed into QBF by reordering the quantifiers. Scholl et al.~\cite{PSPACEsubclass} investigated whether there is some another DQBF subclass which is in $\PSPACE$. They show that DQBFs where the dependency sets are either equal or pairwise disjoint can be transformed into QBFs with just linear increase in size. Thus having a check on whether an input DQBF belongs to this class before running a DQBF solver and if it does transforming it into QBF and running a QBF solver can improve the efficiency. They show this by adding this preprocessing step to HQS which results in increase of solved instances.
 
-%As a note toto vzislo z toho, ze clanok zrobil dajaky system ktory je rozsirenie QBF systemu kde pridali fork extension pravidlo. They showed that this system is complete and sound for DQBF, however, in dCAQEclanok (ale v appendixe extended version) and PSPACEclanok ukazali ze to tak nie je (nie je complete ci co). Obe tieto clanky ukazali ze tento system je complete pre tuto PSPACE classu. Zaroven dCAQE vyuziva tento fork extension ???a zle si myslia ze tato classa je NEXPTIME??? vo svojom algoritme, takze je moznost ze ich algoritmus nefunguje pre celu classu DQBF
-
 \chapter{Suggested Algorithm}
 \label{chap:algorithm}
 %TODO: decide the name, our/suggested/new/... algorithm
 
-In this chaoter we introdice the ??suggested?? algorithm for solving satisfiability of DQBF using BDDs. First we give a high level eplanation of the algorithm and then we explain each part of it showing different heuristics for solving it???
+In this chapter we describe the suggested algorithm for solving satisfiability of DQBF using BDDs. This algorithm is based on localisation algorithm for HQS~\cite{HQSquantifierLocalisation} which follows in the similar vein. However, we update it with the corrected procedure for localisation of quantifiers as explained in Section~\ref{sec:quantLocalisation} and we add thorougher elimination of quantifiers using theorems from Section~\ref{sec:quantElimination}.
 
-\section{High level defintion???}
+\section{High level definition}
 \begin{algorithm}
-  \caption{???}
+  \caption{DQBF solver}
   \label{alg:general}
   \begin{algorithmic}[1]
-    \Function{SolveDQBF}{DQBF formula $\psi$ represented as quantifier tree with root $r$}
+    \Function{Solve}{DQBF $\psi$ in NNF as quantifier tree rooted in $r$}
     \State \Call{Localise}{$r$}
     \State $\phi$ = \Call{TurnToBDD}{$r$}
     \State \Call{EliminateAllQuantifiers}{$r$, $\phi$} \label{alg:general:elimination}
-    \If{$\phi = 0$}
-      \State \Return UNSAT
-    \Else
-      \State \Return SAT
-     \EndIf
+    \State return \Call{SAT}{$\phi$}
     \EndFunction
   \end{algorithmic}
 \end{algorithm}
 
-The algorithm is shown in .... is a high level definition of out algorithm. In the next sections we explain more thoroughly each part of the algorithm. It takes as an input a DQBF $\psi$ in NNF represented using quantifier tree. First, using some heuristic function localise(????) recursively pushes the quantifiers inside the formula, usually by using rules from Theorem~\ref{thrm:quantLocalEq}. Next, we transform this quantifier tree into a tuple of quantifier prefix and a BF represented by BDD by recursively turning children of each node into this tuple of prefix and BDD and combining them together. something about pulling the quantifiers back??? the quantifiers are pulled back, however, we remove some of them??? During this some quantifiers can be eliminated by using theorems for quantifier eliminations (Theorem~\ref{thrm:unExpan} and \ref{thrm:exElim}), Section??? shows different heuristics how to decide which quantifiers are eliminated. Finally, the leftover quantifiers in the prefix are eliminated resulting in BDD which represents either $0$ or $1$ which tells us whether the formula is satisfiable or not.
-
-%vysvetlit co je to quantifier tree (proste reprezentacia DQBF, kde kazdy non terminal node reprezentuje operaciu and alebo or na children (co su subformule) a pri kazdom tomto node su ulozene kvantifikatory; terminal nodes su literals) -- hodit mozno do kapitoly 1, plus obrazok
-
-%algoritmus zacina s tymto stromom kde vsetky kvantifikatory su v root, pomocou theoremu o lokalizacii ich strcime dnu (popisat heuristiku ze ako ich strkame), potom rekurzivne prechadza tento strom, kde ziska s children formule, z ktorych vytiahne kvantifikatory a maticu prevedie do BDD a potom nejakou heuristikou sa rozhodne ktore kvantifikatory sa odstrania, tie sa odstrania (pouzitim theorems o odstranovani - pridat mazanie ak nie je v support set, nejakou heuristikou sa rozhodne v akom poradi) a return zvysny prefix s maticou v BDD
-
+Algorithm~\ref{alg:general} gives a high level definition of out algorithm. In the next sections we explain more thoroughly each part of the algorithm. It takes as an input a DQBF $\psi$ in NNF represented using quantifier tree. We assume that it does not contain free variables and all variables are quantified in $\prefix{r}$. Firstly, function \textproc{Localise} recursively pushes the quantifiers inside the formula by using rules from Theorem~\ref{thrm:quantLocalEq}. Next, we transform this quantifier tree into a BF represented by BDD by recursively turning children of each node into BDDs and combining them together. While doing this, quantifiers are pulled from formula and potentially eliminated using theorems for quantifier eliminations (Section~\ref{sec:quantElimination}). After that we end up with a DQBF with updated prefix $\prefix{r}$ with all the quantifiers (which were not eliminated) pulled back and BDD $\phi$ representing the matrix of the formula. Finally, the leftover quantifiers in the prefix are eliminated resulting in simple BDD which represents either $0$ or $1$ which indicates formula satisfiability.
 
 \section{Localising quantifiers}
-% TODO we assume that \fvars{n} is empty and all \qvars{n} are in \prefix{n}
-In this section we give a ... of the function \textproc{Localise} from Algorithm~\ref{alg:general} which uses rules from Theorem~\ref{thrm:quantLocalEq} to push quantifiers as deep inside a formula as it is possible. %We use two ...implementations... of this algorithm: one that basically does nothing, which means that after doing \textproc{TurnToPrefixAndBDD}, the resulting quantifier prefix will be the same as the quantifier prefix of the input formula $\psi$ and another that actually pushes quantifier inside. This second ???implementation??? is based on the algorithm which is used for localising quantifiers in the solver HQS~\cite{HQSquantifierLocalization}. However, we update it with the fix for disjunction????
+\label{sec:alglocalise}
+In this section we give a ... of the function \textproc{Localise} from Algorithm~\ref{alg:general} which uses rules from Theorem~\ref{thrm:quantLocalEq} to push quantifiers as deep inside a formula as it is possible. %We use two ...implementations... of this algorithm: one that basically does nothing, which means that after doing \textproc{TurnToPrefixAndBDD}, the resulting quantifier prefix will be the same as the quantifier prefix of the input formula $\psi$ and another that actually pushes quantifier inside. This second ???implementation??? is based on the algorithm which is used for localising quantifiers in the solver HQS~\cite{HQSquantifierLocalisation}. However, we update it with the fix for disjunction????
 %TODO cely tento algoritmus je based na tom co robia v HQS
 %\begin{itemize}
 %    \item we do not localise - for simple solver
@@ -915,20 +896,22 @@ In this section we give a ... of the function \textproc{Localise} from Algorithm
   \begin{algorithmic}[1]
     \Function{Localise}{node $n$}
       \If{$\qtlabel{n} = {\land}$}
-        \State \Call{LocaliseAND}{n}
+        \State \Call{LocaliseAND}{n}\label{localise:calland}
       \ElsIf{$\qtlabel{n} = {\lor}$}
-        \State \Call{LocaliseOR}{n}
+        \State \Call{LocaliseOR}{n}\label{localise:callor}
+      \ElsIf{$\qtlabel{n} = x$ or $\qtlabel{n} = \neg x$}
+        \State $\prefix{n} = \prefix{n} \cap \set{x}$\label{localise:eliminate}
       \EndIf
       \ForAll{$n' \in \children{n}$}
-        \State \Call{Localise}{$n'$}
+        \State \Call{Localise}{$n'$}\label{localise:callchildren}
       \EndFor
     \EndFunction
   \end{algorithmic}
 \end{algorithm}
 
-Algirithm~\ref{alg:localise} shows this implementation of localising. Function \textproc{Localise} first, based on the assigned operation to node $n$ either calls \textproc{LocaliseOR} or \textproc{LocaliseAND}. These functions push variables from $\prefix{n}$ to the children of $n$ based on the rules from Theorem~\ref{thrm:quantLocalEq}. After that, the algorithm recursively runs \textproc{Localise} on the children of $n$. Notice, that this algorithm does not do anything for terminal nodes, because for them we cannot push quantifiers anymore.
+Algirithm~\ref{alg:localise} shows this implementation of localising. Function \textproc{Localise} first calls for nonterminal nodes based on the assigned operation either \textproc{LocaliseAND} (line~\ref{localise:calland}) or \textproc{LocaliseOR} (line~\ref{localise:callor}). These functions push variables from $\prefix{n}$ to the children of $n$ based on the rules from Theorem~\ref{thrm:quantLocalEq}. For terminal nodes with literal from variable $x$, it uses rules \eqref{elim:univ} and \eqref{elim:exist} from Lemma~\ref{lemma:elimination} to remove all quantifiers which are not quantifying $x$. After that, the algorithm recursively runs \textproc{Localise} on the children of $n$.
 
-\begin{algorithm}
+\begin{algorithm}[t!]
   \caption{Quantifier localisation for conjuction}
   \label{alg:localiseand}
   \begin{algorithmic}[1]
@@ -964,48 +947,55 @@ Algirithm~\ref{alg:localise} shows this implementation of localising. Function \
 
 The implementation of \textproc{LocaliseAND} is shown in Algorithm~\ref{alg:localiseand}. We first push existential variables on lines~\ref{localiseand:existbegin}-\ref{localiseand:existend} and then universal on lines~\ref{localiseand:univbegin}-\ref{localiseand:univend}. We do it in this order because according to rule \eqref{loc:bothswap} from Theorem~\ref{thrm:quantLocalEq} we can only push universal variables if there are no existential variables in the prefix that depend on them. By pushing existential quantifiers first, the number of universal variables that we are able to push might increase. Also, according to~\eqref{loc:exswap} and~\eqref{loc:unswap} it does not matter in what order we push variables.
 
-In the part that pushes existential variables, we want to apply the rule~\eqref{loc:exboth} for as many existential variables from $\prefix{n}$ as possible. On line~\ref{localiseand:getevar} we first get the existential variable $y$ to apply the rule on. We choose the one that is in fewest children of $n$ as possible, that is the size of the set $yChildren$ on line~\ref{localiseand:egetchildren} is minimal from all the existential variables from $\prefix{n}$. This is because to apply the rule~\eqref{loc:exboth} we need to combine the children from the set $yChildren$ to create a new child $n_y$ (line~\ref{localiseand:ecombine}) into which it can be pushed (line~\ref{localiseand:epush}). This new child $n_y$ is then a quantifier tree with $l(n_y) = {\land}$, $\prefix{n_y} = \emptyset$ and $children(n_y) = yChildren$. Obviously, the sets of children containing each existential variables are actually computed before the while loop so we can easily find the variable with the minimal set. Also, during the combining of children to a new child, these sets are only updated, not recomputed. The while loop finishes after either all existential variables were pushed inside or we got to a variable that is in every child (line~\ref{localiseand:echildtest}) and therefore it is not possible to push it inside. Also, when we find such a variable, because all other variables have to have the sets $yChildren$ at least as large as the found variable, this means that all remaining variables are also in all children.
+In the part that pushes existential variables, we want to apply the rule~\eqref{loc:exboth} for as many existential variables from $\prefix{n}$ as possible. On line~\ref{localiseand:getevar} we first get the existential variable $y$ to apply the rule on. We choose the one that is in fewest children of $n$ as possible, that is the size of the set $yChildren$ on line~\ref{localiseand:egetchildren} is minimal from all the existential variables from $\prefix{n}$. This is because to apply the rule~\eqref{loc:exboth} we need to combine the children from the set $yChildren$ to create a new child $n_y$ (line~\ref{localiseand:ecombine}) into which it can be pushed (line~\ref{localiseand:epush}). This new child $n_y$ is then a quantifier tree with $l(n_y) = {\land}$, $\prefix{n_y} = \emptyset$ and $children(n_y) = yChildren$ (if $yChildren$ contain only one child, we do not create a new child and immerdiately push into the child from $yChildren$). Obviously, the sets of children containing each existential variables are actually computed before the while loop so we can easily find the variable with the minimal set. Also, during the combining of children to a new child, these sets are only updated, not recomputed. The while loop finishes after either all existential variables were pushed inside or we got to a variable that is in every child (line~\ref{localiseand:echildtest}) and therefore it is not possible to push it inside. Also, when we find such a variable, because all other variables have to have the sets $yChildren$ at least as large as the found variable, this means that all remaining variables are also in all children.
 
-After pushing all possible existential variables we can start pushing universal ones using rules \eqref{loc:unconj1} and \eqref{loc:unconj2}. First we find the set $U$ of all universal variables in $\prefix{n}$ such that no leftover existential variable in $\prefix{n}$ depends on them. For all these variables we can then either push them into every child (line~\ref{localiseand:upush}) using rules \eqref{loc:unconj1} or \eqref{loc:unconj2}, or if a child does not contain one of the variables $x$, we can by using rule \eqref{loc:unconj2} delete all dependencies on $x$ from the child (line~\ref{localiseand:uremovedep}). Here, we should sometime create a new variables (from rule \eqref{loc:unconj1}). However, this is not needed%TODO as we will explain in next section???
+After pushing all possible existential variables we can start pushing universal ones using rules \eqref{loc:unconj1} and \eqref{loc:unconj2}. First we find the set $U$ of all universal variables in $\prefix{n}$ such that no leftover existential variable in $\prefix{n}$ depends on them. For all these variables we can then either push them into every child (line~\ref{localiseand:upush}) using rules \eqref{loc:unconj1} or \eqref{loc:unconj2}, or if a child does not contain one of the variables $x$, we can by using rule \eqref{loc:unconj2} delete all dependencies on $x$ from the child (line~\ref{localiseand:uremovedep}). Here, we should sometimes create a new variables coming from rule~\eqref{loc:unconj1}. However, this is not needed as we explain at the end of this section.
 
-% TODO add theorem about elimination of variables not in support set
-% TODO fix quantifier tree section
-% TODO fix theorem about diajunction
-
-%TODO example
-
-\begin{algorithm}
+\begin{algorithm}[t]
   \caption{Quantifier localisation for disjunction}
   \label{alg:localiseor}
   \begin{algorithmic}[1]
     \Function{LocaliseOR}{n}
-      \ForAll{$y \in \prefix{n} \cap \evars{n}$}
-        \ForAll{$n' \in \children{n}$}
-          \State \Call{PushVar}{$y$, $n'$}
-        \EndFor
-        \State remove $y$ from $\prefix{n}$
-      \EndFor
-      \While{$\prefix{n} \cap \uvars{n} \not= \emptyset$}
-        \State $x \gets \Call{GetNextUnivVarToPush}{\null}$
-        \State $xChildren \gets \set{n' \in \children{n} | x \in \uvars{n'} \text{ or } x \in D_y \text{ where } y \in \evars{n'}}$
-        \If{$xChildren = \children{n}$}%\Comment{$x$ or its dependency is in every child}
+      \ForAll{$y \in \eprefix{n}$}\label{localiseor:estart}
+        \State $yChildren \gets \set{n' \in \children{n} | y \in \vars{n'}}$\label{localiseor:egetchildren}
+        \If{$yChildren$ fulfill the conditions from Theorem~\ref{thrm:localisedijunction}}
+          \ForAll{$n' \in yChildren$}
+            \State \Call{PushVar}{$y$, $n'$}\label{localiseor:epush}
+          \EndFor
+          \State remove $y$ from $\prefix{n}$
+        \EndIf
+      \EndFor\label{localiseor:eend}
+      \While{$\prefix{n} \not= \emptyset$}\label{localiseor:bstart}
+        \State $v \gets \Call{GetNextVarToPush}{\null}$\label{localiseor:getnextvar}
+        \State $vChildren \gets \{\,n' \in \children{n} \mid v \in \vars{n'}$  or  $v \in D_y$ for\label{localiseor:bgetchildren}
+        \Statex \hspace{9cm} some $y \in \vars{n'}\,\}$
+        \If{$vChildren = \children{n}$}\label{localiseor:bcompare}
           \State break
         \Else
-          \State $n_x \gets \Call{CombineChildren}{xChildren, {\lor}}$
-          \State $\children{n} \gets (\children{n} \setminus xChildren) \cup n_x$
-          \State \Call{PushVar}{$x$, $n_x$}
-          \State remove $x$ from $\prefix{n}$
+          \State $n_v \gets \Call{CombineChildren}{vChildren, {\lor}}$\label{localiseor:bcombine}
+          \State $\children{n} \gets (\children{n} \setminus vChildren) \cup n_v$\label{localiseor:bupdatechildren}
+          \State \Call{PushVar}{$v$, $n_v$}\label{localiseor:bpush}
+          \State remove $v$ from $\prefix{n}$\label{localiseor:bremove}
         \EndIf
-      \EndWhile
+      \EndWhile\label{localiseor:bend}
     \EndFunction
   \end{algorithmic}
 \end{algorithm}
 
+Algorithm~\ref{alg:localiseor} shows the function \textproc{LocaliseOR}. This function first tries pushing existential quantifiers with rule \eqref{loc:exdisj} according to Theorem~\ref{thrm:localisedijunction} (lines~\ref{localiseor:estart}-\ref{localiseor:eend}). Then, for leftover existential quantifiers and universal quantifiers we try to do what was done for existential variables in \textproc{LocaliseAND}: we take the variable occuring in the smallest number of children, create new child from these children and push this variable inside (lines~\ref{localiseor:bstart}-\ref{localiseor:bend}). However, here we have added complexity where by pushing both universal and existential variables, the set of universal variables which are possible to push (rule~\eqref{loc:bothswap}) changes.
 
+In the part where we try to apply Theorem~\ref{thrm:localisedijunction} we go trough all existential variables and check if it is possible to apply them. Because we can apply rule~\eqref{loc:exboth} we only need to look at children containing the existential variables. On line~\ref{localiseor:egetchildren} we find this set of children for existential variable $y$ and then check if they fulfill the conditions from Theorem~\ref{thrm:localisedijunction}. To fulfill these conditions, it has to hold that other than the variables from $D_y$, the sets of universal variables occurring in children or dependency sets of existential variables occurring in children are pairwise disjoint. Also, anything from these sets (except for one set) cannot occur anywhere else in the tree other than in the subtree rooted in $n$. If they fulfill these conditions, we can push the variable into every children. Again, according to~\eqref{loc:exdisj} we should create a copy of the variable, but as we explain at the end of this section, this is not needed.
 
-say about pushing here, that we delete immediately if it is not in support set
+After doing this, we start applying rules~\eqref{loc:undisj} for universal and~\ref{loc:exboth} for existential variables. Because during this children can be combined to create a new child, we do it at the same time, so we always push the variable with fewest number of children to combine. This means that function \textproc{GetNextVarToPush} on line~\ref{localiseor:getnextvar} returns the variable for which the set $vChildren$ on line~\ref{localiseor:bgetchildren} is minimal. The set $vChildren$ is for existential variable $y$ by rule~\eqref{loc:exboth} the set of all children containing $y$ while for universal variable $x$ by rule~\ref{loc:undisj} a set of all children containing $x$ or containing some existential variable dependent on $x$. Again, we can end if we get to a variable whose $vChildren$ is the set of all children (line~\ref{localiseor:bcompare}), otherwise we create a new child combining the children from $vChildren$ (except in case that $vChildren$ contains only one child) and push $v$ into it (lines~\ref{localiseor:bcombine}-\ref{localiseor:bremove}).  
 
-\section{Turning to BDD}
+As we already mentioned, we do not need to create copies of variables on line~\ref{localiseand:upush} of Algorithm~\ref{alg:localiseand} or on line~\ref{localiseor:epush} of Algorithm~\ref{alg:localiseor}. This is partially because the next part of Algorithm~\ref{alg:general} we extract these variables back anyway so at the end we do not end up with multiple copies of same variables. The only problem could be that we could possibly have two distinct subformulas with universally quantified $x$ and existentially quantified $y$ depending on it. This could cause problem during elimination of $x$, where if we eliminate it only in one subformula using Theorem~\ref{thrm:unExpan} we would create a copy of $y$ which would cause problems during quantifier extraction. However, this cannot happen, from the way variables are pushed inside. When we push universal variable $x$ on line~\ref{localiseand:upush} of Algorithm~\ref{alg:localiseand} to child $n'$, all quantified existential variables in $n'$ are not in other children. This stems from the fact, that on line~\ref{localiseand:epush} we push existential variables into one child that contain its occurrences. Similarly, when we push universal variable $v$ on line~\ref{localiseor:bpush} of Algorithm~\ref{alg:localiseor}, we are pushing into $vChildren$ which must contain all existential variables dependent on $v$. Another problem with not creating copies could be on line~\ref{localiseand:uremove} of Algorithm~\ref{alg:localiseand} where we remove $x$ from its dependencies. This could be a problem if we removed from one of the dependency in this subformula, but in another the dependency stayed. However, this cannot happen for exactly the same reason as in a previous problem.
+
+\begin{example}
+  TODO - add also figures
+\end{example}
+
+\section{Transformation to BDD}
+\label{sec:algturntobdd}
 In this section we give an overview of the function \textproc{TurnToBDD} which as the name suggests turns the matrix of the formula to BDD. During this, local elimination of quantifiers in subformulas can occur, which might result in simpler final result. 
 
 \begin{algorithm}
@@ -1039,23 +1029,23 @@ In this section we give an overview of the function \textproc{TurnToBDD} which a
   \end{algorithmic}
 \end{algorithm}
 
-Algorithm~\ref{alg:turntobdd} shows how this function can be implemented. Based on the type of the node $n$ it decides what to do. For terminal nodes, it just return the BDD representing the literal $\qtlabel{n}$ (line~\ref{turntobdd:returnterminal}). For non-terminal nodes, it calls itself recursively for all children of $n$ (line~\ref{turntobdd:callforchild}), eliminates some variables in it (line~\ref{turntobdd:eliminate}), and finally pulls quantifiers from them (line~\ref{turntobdd:pullquantifiers}). The quantifiers can be pulled from the children based on the rules \eqref{loc:unconj1}, \eqref{loc:undisj}, and \eqref{loc:exboth} of Theorem~\ref{thrm:quantLocalEq}. Also (\ref{loc:unconj1}) is used to rename all the copies which were created by using the same rule during localisation back to the original variable. 
-% TODO povedat v implementacii ze duplikaciu nerobim
-On line~\ref{turntobdd:returnnonterminal} the algorithm returns the resulting BDD which is the application of the operation $\qtlabel{n}$ on the children BDDs.
+Algorithm~\ref{alg:turntobdd} shows how this function can be implemented. Based on the type of the node $n$ it decides what to do. For terminal nodes, it just return the BDD representing the literal $\qtlabel{n}$ (line~\ref{turntobdd:returnterminal}). For non-terminal nodes, it calls itself recursively for all children of $n$ (line~\ref{turntobdd:callforchild}), eliminates some variables in it (line~\ref{turntobdd:eliminate}), and finally pulls quantifiers from them (line~\ref{turntobdd:pullquantifiers}). The quantifiers can be pulled from the children based on the rules \eqref{loc:unconj1}, \eqref{loc:undisj}, and \eqref{loc:exboth} of Theorem~\ref{thrm:quantLocalEq}. Also, (\ref{loc:unconj1}) should rename all the copies which were created by using the same rule during localisation back to the original variable, but this is not needed to do because localisation do not create new copies as we explained in Section~\ref{sec:alglocalise}. On line~\ref{turntobdd:returnnonterminal} the algorithm returns the resulting BDD which is the application of the operation $\qtlabel{n}$ on the children BDDs.
 
 For the elimination of the quantifiers on line~\ref{turntobdd:eliminate} we can do these three things:
 \begin{itemize}
     \item nothing -- we do not eliminate any variables from the BDD,
     %\item eliminate only those that are not in support set -- useless, it will basically do what nothing does, because we assume that input formula has already only those variables in quantifier prefix which are in support set, just pushing it inside and then taking them out will not delete anyone --- it might delete some dependencies though (but nothing should do same, if we assume that nothing is doing localising)
-    \item eliminate only ``simple'' quantifiers -- we eliminate the universal variables using Theorem~\ref{thrm:unExpan} only if they do not create new variables (that is no existential variable depend on them) and all possible existential variables using Theorem~\ref{thrm:exElim} (this elimination technique is used in HQS~\cite{HQSquantifierLocalization}), %we eliminate exist vars (or maybe just some univ. vars - those that only few exist vars depend on (probably 0, maybe 1 or 2) or those that will allow me to remove some exist vars)??? - basically eliminate only when no (a few) new variables are created
+    \item eliminate only ``simple'' quantifiers -- we eliminate the universal variables using Theorem~\ref{thrm:unExpan} only if they do not create new variables (that is no existential variable depend on them) and all possible existential variables using Theorem~\ref{thrm:exElim} (this elimination technique is used in HQS~\cite{HQSquantifierLocalisation}), %we eliminate exist vars (or maybe just some univ. vars - those that only few exist vars depend on (probably 0, maybe 1 or 2) or those that will allow me to remove some exist vars)??? - basically eliminate only when no (a few) new variables are created
     \item eliminate all possible quantifiers -- we iteratively eliminate universal variables using Theorem~\ref{thrm:unExpan} and again all possible existential variables using Theorem~\ref{thrm:exElim}. This is the same elimination as in function \textproc{EliminateAllQuantifiers} on line~\ref{alg:general:elimination} of Algorithm~\ref{alg:general}, see the next section for more details. %remove everything possible (all universal vars and possible exist. vars, in iteration -> one universal var, all possible existential vars (based on theorem~\ref{thrm:exElim}) and so on) - tree solver
     %\item remove some dependencies to be able to remove exist vars???? - not possible??
 \end{itemize}
 
-% TODO add example
+\begin{example}
+  TODO!!!!
+\end{example}
 
 \section{Quantifier Elimination}
-% TODO say in implementation that we do not eliminate last existential variables, we also delete variables not in support set
+\label{sec:algelimination}
 In this section we explain how the algorithm for eliminating all quantifiers looks like. This algorihtm is implemented as function \textproc{EliminateAllQuantifiers}, which is used in Algorithm~\ref{alg:general} for eliminating all quantifiers in the final formula (line~\ref{alg:general:elimination}) and can also be used while eliminating quantifiers during transformation to BDDs (line~\ref{turntobdd:eliminate} of Algorithm~\ref{alg:turntobdd}).
 
 \begin{algorithm}
@@ -1091,14 +1081,50 @@ The heuristics we use for choosing the next universal variable to eliminate on l
     \[\forall x_2 \forall x_3 \exists y_1(x_2) \exists y_2(x_2) \exists y_1'(x_2) \exists y_2'(x_2) \exists y_3(x_3) \exists y_4(x_3) \exists y_5 (x_3)\]
     where $y_1'$ and $y_2'$ were created as copies of $y_1$ and $y_2$ during universal expansion. Now, in the previous heuristic $x_2$ would be chosen. However, here $x_3$ is chosen because it still depends only on three variables, while $x_2$ now depends on four. This heuristic was introduced by Gitina et al.~\cite{HQSsimpleAlg}.
     \item Another heuristic we use is based on the number of variables in the BDDs representing the two conjuncts used for universal expansion in Theorem~\ref{thrm:unExpan}. That is, let $x \in \uprefix{n}$ and $\psi_1^{-x}\substitute{x}{0}$, $\psi_2^{-x}\substitute{x}{1}$
-    be the two conjuncts from Theorem~\ref{thrm:unExpan} as if we were doing universal expansion. Because the operation of replacing variables with constants is fast for BDDs, we can create BDDs for these two formulas and check for the amount of variables in both of them, that is the number of variables in the set $\vars{\psi_1^{-x}\substitute{x}{0}} \cup \psi_2^{-x}\substitute{x}{1}$. We can do this for all universal variables and choose the one with the lowest number of variables in this set. If there are multiple such variables, we can also use one of the previous heuristics to choose from them.
+    be the two conjuncts from Theorem~\ref{thrm:unExpan} as if we were doing universal expansion. Because the operation of replacing variables with constants is fast for BDDs, we can create BDDs for these two formulas and check for the amount of variables in both of them, that is the number of variables in the set $\vars{\psi_1^{-x}\substitute{x}{0}} \cup \psi_2^{-x}\substitute{x}{1}$. Because BDDs remove the variables which are not needed, the number of variables in this union can be smaller than expected. We can do this for all universal variables and choose the one with the lowest number of variables in this set. If there are multiple such variables, we can also use one of the previous heuristics to choose from them.
     %\item something with creating depency tree, to find existential variables to remove as fast as possible (not sure if possible) --- maybe possible, basically remove those universal vars that will make it possible to remove as much existential vars as possible on the level??? 
 \end{itemize}
 
-\chapter{Implementation}
-We implemented the algorithm from Chapter~\ref{chap:algorithm} in C\texttt{++} using version 3.0.0 of the CUDD\footnote{\url{https://github.com/ivmai/cudd}} package~\cite{CUDD} for BDD manipulation, version 2.2.0 of the cxxopts\footnote{\url{https://github.com/jarro2783/cxxopts}} library for parsing command-line arguments and preprocessor HQSpre~\cite{HQSpre2}, more specifically the version that was used with HQS with quantifier localisation~\cite{HQSquantifierLocalization}. As was explained in Section~\ref{sec:preprocessing}, HQSpre can extract logical gates from variables in the formula that can be then replaced by them resulting in formula with fewer variables. This results in a formula that does not need to be in PCNF, which most solvers cannot handle. However, as HQS, our solver can work with non-PCNF formulas, stemming from the fact that we represent matrices as either BDDs or quantifier trees. This means that we can use this feature of HQSpre, similarly as it is used for HQS. First we check how many gates can be extracted. If this number is low (we use less than 5), then we run preprocessor normally, without caring whether these gates will get destroyed or not. If there is enough gates, then we run preprocessor normally on a copy of the formula to check if it can solve it. It it cannot, we run the preprocessor with gate preservation setting on. This will ensure that during preprocessing no clause from which these gates are extracted is touched and at the end of preprocessing we can extract these creates while creating BDD or quantifier tree.
+\section{OLD!!! OR Localisation}
+This is how or localisation was implemented before I noticed the mistake.
+\begin{algorithm}
+  \caption{OLD!! Quantifier localisation for disjunction}
+  \begin{algorithmic}[1]
+    \Function{LocaliseOR}{n}
+      \ForAll{$y \in \eprefix{n}$}
+        \ForAll{$n' \in \children{n}$}
+          \State \Call{PushVar}{$y$, $n'$}
+        \EndFor
+        \State remove $y$ from $\prefix{n}$
+      \EndFor
+      \While{$\uprefix{n} \not= \emptyset$}
+        \State $x \gets \Call{GetNextUnivVarToPush}{\null}$
+        \State $xChildren \gets \{\,n' \in \children{n} | x \in \vars{n'}$  or  $x \in D_y$ for some $y \in \vars{n'}\,\}$
+        \If{$xChildren = \children{n}$}%\Comment{$x$ or its dependency is in every child}
+          \State break
+        \Else
+          \State $n_x \gets \Call{CombineChildren}{xChildren, {\lor}}$
+          \State $\children{n} \gets (\children{n} \setminus xChildren) \cup n_x$
+          \State \Call{PushVar}{$x$, $n_x$}
+          \State remove $x$ from $\prefix{n}$
+        \EndIf
+      \EndWhile
+    \EndFunction
+  \end{algorithmic}
+\end{algorithm}
 
-%TODO ak nemam odstranovat nic pocas odlokalizovania, tak odlokalizovanie ani nerob
+\chapter{Implementation}
+We implemented the algorithm as a tool DQBDD (see Appendix~\ref{appendix:DQBDD} for a documentation) from Chapter~\ref{chap:algorithm} in C\texttt{++} using version 3.0.0 of the CUDD\footnote{\url{https://github.com/ivmai/cudd}} package~\cite{CUDD} for BDD manipulation, version 2.2.0 of the cxxopts\footnote{\url{https://github.com/jarro2783/cxxopts}} library for parsing command-line arguments and preprocessor HQSpre~\cite{HQSpre2}, more specifically the version that was used with HQS with quantifier localisation~\cite{HQSquantifierLocalisation}.
+
+The tool takes as an input \DQDIMACS{}~\cite{iDQandDQDIMACS} file on which we can run the preprocessor HQSpre. As was explained in Section~\ref{sec:preprocessing}, HQSpre can extract logical gates from variables in the formula that can be then replaced by them resulting in formula with fewer variables. This results in a formula that does not need to be in PCNF, which most solvers cannot handle. However, as HQS, our solver can work with non-PCNF formulas, stemming from the fact that we represent matrices as either BDDs or quantifier trees. This means that we can use this feature of HQSpre, similarly as it is used for HQS.
+
+First we check how many gates can be extracted. If this number is low (we use less than 5), then we run preprocessor normally, without caring whether these gates will get destroyed or not. If there is enough gates, then we run preprocessor normally on a copy of the formula to check if it can solve it. It it cannot, we run the preprocessor with gate preservation setting on. This will ensure that during preprocessing no clause from which these gates are extracted is touched and at the end of preprocessing we can extract these gates while creating BDD or quantifier tree.
+
+On the result we run Algorithm~\ref{alg:general} with chosen heuristics for elimination of quantifiers. If we choose that nothing is eliminated during the transformation of quantifier tree to BDD as explained in Section~\ref{sec:algturntobdd}, we skip localisation and this transformation and create BDD directly from the output of preprocessor. Also, during the final elimination of quantifiers (line~\ref{alg:general:elimination}), we can stop after the final universal variable is eliminated and we can keep all the existential variables. Then if the resulting BDD is $0$, the formula is unsatisfiable. Otherwise it is satisfiable. This stems from the fact that we work with ROBDDs and for unsatisfiable formula all paths over the leftover existential variables in the resulting BDD go to $0$ while for satisfiable one, there is at least one path going to $1$.
+
+Finally, while applying any operation on BDDs, some variables can disappear from it, because the formula does not depend on their value. We can use this and apply the rules~\eqref{elim:univ} and \eqref{elim:exist} to remove unneeded quantifiers whenever we change the formula. This can result in better elimination algorithm, because we might sever unneeded dependencies.
+
+% TODO popisat triedy???
 
 \chapter{Experimental results}
 popisat na com testujeme a ze sme pouzili benchexec
@@ -1111,7 +1137,7 @@ cas HQSpre bez gate detection zaratavame do vsetkych solvrov, tym silmulujeme to
 
 benchmarks:
 \begin{itemize}
-    \item PEC - vid \cite{HQSquantifierLocalization} ze co vsetko citovat, su to asi folders Finkbenier, Scholl a Biere v z tej stranky stiahnute co je tam odkaz v tom istom clanku
+    \item PEC - vid \cite{HQSquantifierLocalisation} ze co vsetko citovat, su to asi folders Finkbenier, Scholl a Biere v z tej stranky stiahnute co je tam odkaz v tom istom clanku
     \item controller synthesis problems - to iste, folder je ale iba Bloem
     \item ziskane zo SAT - to iste, folder je ale iba Balabanov
     \item BoSy - vid \cite{dCAQE}, nie su ale zverejnene, skusit asi popytat
@@ -1148,7 +1174,8 @@ Este mozno budem porovnavat navzajom rozne heuristiky pouzite v mojom a potom bu
 %  \printindex
 
 \appendix %% Start the appendices.
-\chapter{An appendix}
-Here you can insert the appendices of your thesis.
+\chapter{DQBDD}
+\label{appendix:DQBDD}
+TODO documentation for the tool 
 
 \end{document}
