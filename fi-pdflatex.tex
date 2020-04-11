@@ -57,8 +57,8 @@
     advisor       = {Jan Strej\v{c}ek},%\\ \textbf{Co-advisor:} Martin Jon\'{a}\v{s}},
     title         = {Satisfiability of DQBF Using Binary Decision Diagrams},
     TeXtitle      = {Satisfiability of DQBF Using Binary Decision Diagrams},
-    keywords      = {dependency quantified Boolean formula, DQBF, binary decision diagram, BDD, satisfiability, solver},
-    TeXkeywords   = {dependency quantified Boolean formula, DQBF, binary decision diagram, BDD, satisfiability, solver},
+    keywords      = {dependency quantified Boolean formula, DQBF, binary decision diagram, BDD, satisfiability},
+    TeXkeywords   = {dependency quantified Boolean formula, DQBF, binary decision diagram, BDD, satisfiability},
     abstract      = {%
       This is the abstract of my thesis, which can
 
@@ -143,7 +143,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % for subfigures
-\usepackage{subcaption}
+\usepackage[font=normalsize]{subcaption}
 
 % for writing nice pseudocode...
 \usepackage{algpseudocode}
@@ -174,8 +174,12 @@
 % for writing out rules of DQBF in NNF
 \usepackage{ebproof}
 
-\usepackage{tikz}
-\usetikzlibrary{arrows.meta,automata,positioning}
+% for creating quantifier trees
+%\usepackage{tikz}
+%\usetikzlibrary{arrows.meta,automata,positioning}
+
+% for creating quantifier trees
+\usepackage{forest}
 
 % for generating some text
 \usepackage{blindtext}
@@ -757,7 +761,7 @@ For each operation on BFs (${\land}$, ${\lor}$, ${\neg}$), there is an algorithm
 While BDDs are a good represantion of BFs, we also need a represenation for DQBFs. For this we define \emph{quantifier trees} which can represent DQBFs in NNF.
 
 \begin{definition}
-  Let $V$ be a set of variables. A \emph{quantifier tree} \emph{over $V$} is a rooted directed tree with labelling $l$ which assigns to each non-terminal node an operation ${\diamond} \in \set{{\land},{\lor}}$ and to each terminal node a literal from $V$ (a variable $v \in V$ or its negation), and a prefix mapping $Q$ which maps to each node some DQBF prefix.
+  Let $V$ be a set of variables. A \emph{quantifier tree} \emph{over $V$} is a rooted tree with labelling $l$ which assigns to each non-terminal node an operation ${\diamond} \in \set{{\land},{\lor}}$ and to each terminal node a literal from $V$ (a variable $v \in V$ or its negation), and a prefix mapping $Q$ which maps to each node some DQBF prefix.
 \end{definition}
 
 A quantifier tree with root $r$ represents a DQBF where terminal node $r$ represents the literal $\qtlabel{r}$ while children of non-terminal node $r$ are subformulas connected with the operation $\qtlabel{r}$. The formula has the quantifier prefix $\prefix{r}$. For each DQBF there exists a quantifier tree representing it. However, not each quantifier tree represents a proper DQBF, we restrict ourselves only to the set of quantifier trees which represent some formula.
@@ -767,28 +771,44 @@ We denote the set of children of node $n$ as $\children{n}$. We also abuse notat
 In figures, the assigned DQBF prefix to non-terminal node $n$ is always shown on the edge coming to the node $n$, while the nodes are labelled either by the assigned operation or literal (see Figure~\ref{fig:QTex}). For the root, we add an extra ``edge'', just to show the quantifier prefix before the whole formula.
 
 \begin{figure}
-    \centering
-    \begin{tikzpicture}[->,>={Stealth[scale=1.3,angle'=90]},node distance=2cm,initial distance=1.3cm,initial text=$\forall x_1 \exists y_1(x_1) $,every state/.style={minimum size=0pt}]
-    \node[state,initial above] (1) {${\land}$};
-    \node[state, below of=1] (2) {$x_1$};
-    \node[state, left of=2] (3) {${\lor}$};
-    \node[state, right of=2] (4) {${\lor}$};
-    \node[state, below right = 1.3cm and 0.4 cm of 4,inner sep=1pt] (5) {$\neg y_1$};
-    \node[state, below left = 1.3cm and 0.4 cm of 4] (6) {$x_2$};
-    \node[state, below right = 1.3cm and 0.4cm of 3,inner sep=1pt] (7) {$\neg x_1$};
-    \node[state, below left = 1.3cm and 0.4cm of 3] (8) {$y_2$};
+  \centering
+  %\begin{tikzpicture}[->,>={Stealth[scale=1.3,angle'=90]},node distance=2cm,initial distance=1.3cm,initial text=$\forall x_1 \exists y_1(x_1) $,every state/.style={minimum size=2em, inner sep=1pt}]
+  %  \node[state,initial above] (1) {${\land}$};
+  %  \node[state, below of=1] (2) {$x_1$};
+  %  \node[state, left of=2] (3) {${\lor}$};
+  %  \node[state, right of=2] (4) {${\lor}$};
+  %  \node[state, below right = 1.3cm and 0.4 cm of 4] (5) {$\neg y_1$};
+  %  \node[state, below left = 1.3cm and 0.4 cm of 4] (6) {$x_2$};
+  %  \node[state, below right = 1.3cm and 0.4cm of 3] (7) {$\neg x_1$};
+  %  \node[state, below left = 1.3cm and 0.4cm of 3] (8) {$y_2$};
+  %  
+  %  \draw (1) edge[right] node{$\forall x_2$} (4)
+  %        (1) edge[left] node{$\exists y_2(\emptyset)$} (3)
+  %        (1) edge (2)
+  %        (3) edge (7)
+  %        (3) edge (8)
+  %        (4) edge (5)
+  %        (4) edge (6)
+  %        ;
+  %\end{tikzpicture}
     
-    \draw (1) edge[right] node{$\forall x_2$} (4)
-          (1) edge[left] node{$\exists y_2(\emptyset)$} (3)
-          (1) edge (2)
-          (3) edge (7)
-          (3) edge (8)
-          (4) edge (5)
-          (4) edge (6)
-          ;
-    \end{tikzpicture}
-    \caption{An example of quantifier tree}
-    \label{fig:QTex}
+  \begin{forest}
+    [$\forall x_1 \exists y_1(x_1)$, for descendants={circle, draw, minimum size=2em, inner sep=1pt}
+      [${\land}$
+        [${\lor}$, edge label={node[midway,above left]{$\exists y_2(\emptyset)$}}
+          [$y_2$]
+          [$\neg x_1$]
+        ]
+        [$x_1$]
+        [${\lor}$, edge label={node[midway,above right]{$\exists y_2(\emptyset)$}}
+          [$x_2$]
+          [$\neg y_1$]
+        ]
+      ]
+    ]
+  \end{forest}
+  \caption{An example of quantifier tree}
+  \label{fig:QTex}
 \end{figure}
 
 \begin{example}
@@ -854,7 +874,7 @@ In previous sections, we give an overview of techniques used for implementations
 The first and only preprocessing engine for DQBF called HQSpre~\cite{HQSpre1,HQSpre2,HQSpreJournal} took many techniques used for QBF preprocessing and lifted them to the DQBF case. We explain only one technique here, called \emph{gate extraction}. As was mentioned in Section~\ref{sec:BF:CNF}, transforming BF to an equisatisfiable formula in CNF can result in polynomial increase of the size of the formula by adding new variables. Gate extraction works in opposite direction --- it tries to extract this newly introduced variables and turn the formula back into one that is not in CNF. This does not mean that gate extraction works only on formulas in CNF, it can be used generally by finding connections between variables which make it possible to replace a variable by some Boolean function of existing variables. However, this technique can only be used by solvers which can work on DQBFs which are not in PCNF. Currently, that is only HQS. For a thorough explanation of other techniques used by HQSpre we refer the reader to the work by Wimmer et al.~\cite{HQSpreJournal}. 
 
 \subsection{Approximations}
-Another technique which is used in some solvers as preprocessing step is to find some BF or QBF approximations which can be used with existing solvers for BFs/QBFs to potentially give us faster result about the input DQBF (satisfiability for underapproximations, unsatisfiability for overapproximations). Gitina et al.~\cite{HQSsimpleAlg} introduced QBF approximations which are created by changing the dependencies of existential variables that result in QBF with the same matrix. However, these approximations can be precise only up to some level. By adding some information to these QBF overapproximation (thus changing the matrix), Finkenbeiner et al.~\cite{FastDQBFRefutation} were able to create more and more precise QBF overapproximations. For more thorough explanation of these approximations see again the work by Wimmer et al.~\cite[Section~3]{HQSpreJournal}.
+Another technique which is used in some solvers as preprocessing step is to find some BF or QBF approximations which can be used with existing solvers for BFs/QBFs to potentially give us faster result about the input DQBF (satisfiability for underapproximations, unsatisfiability for overapproximations). First QBF approximations used for DQBF~\cite{HQSsimpleAlg} were created by changing the dependencies of existential variables that result in QBF with the same matrix. However, these approximations can be precise only up to some level. By adding some information to these QBF overapproximation (thus changing the matrix), it is possible to create more and more precise QBF overapproximations~\cite{FastDQBFRefutation}. For more thorough explanation of these approximations see again the work by Wimmer et al.~\cite[Section~3]{HQSpreJournal}.
 
 \subsection{\texorpdfstring{$\PSPACE$}{PSPACE} subclass}
 The last preprocessing technique is simply put just a check whether DQBF does not belong to a subclass of problems which are in $\PSPACE$ and if it does, it is transformed to QBF (which is $\PSPACE$-complete) on which existing QBF solver is run. The simplest such subclass would be those DQBFs whose dependencies are linearly ordered. Then it can be easily transformed into QBF by reordering the quantifiers. Scholl et al.~\cite{PSPACEsubclass} investigated whether there is some another DQBF subclass which is in $\PSPACE$. They show that DQBFs where the dependency sets are either equal or pairwise disjoint can be transformed into QBFs with just linear increase in size. Thus having a check on whether an input DQBF belongs to this class before running a DQBF solver and if it does transforming it into QBF and running a QBF solver can improve the efficiency. They show this by adding this preprocessing step to HQS which results in increase of solved instances.
@@ -863,7 +883,7 @@ The last preprocessing technique is simply put just a check whether DQBF does no
 \label{chap:algorithm}
 %TODO: decide the name, our/suggested/new/... algorithm
 
-In this chapter we describe the suggested algorithm for solving satisfiability of DQBF using BDDs. This algorithm is based on localisation algorithm for HQS~\cite{HQSquantifierLocalisation} which follows in the similar vein. However, we update it with the corrected procedure for localisation of quantifiers as explained in Section~\ref{sec:quantLocalisation} and we add thorougher elimination of quantifiers using theorems from Section~\ref{sec:quantElimination}.
+In this chapter we describe the algorithm for solving satisfiability of DQBF using BDDs. This algorithm is based on localisation algorithm for HQS~\cite{HQSquantifierLocalisation} which follows in the similar vein. However, we update it with the corrected procedure for localisation of quantifiers as explained in Section~\ref{sec:quantLocalisation} and we add more thorough elimination of quantifiers using theorems from Section~\ref{sec:quantElimination}.
 
 \section{High level definition}
 \begin{algorithm}
@@ -883,12 +903,7 @@ Algorithm~\ref{alg:general} gives a high level definition of out algorithm. In t
 
 \section{Localising quantifiers}
 \label{sec:alglocalise}
-In this section we give a ... of the function \textproc{Localise} from Algorithm~\ref{alg:general} which uses rules from Theorem~\ref{thrm:quantLocalEq} to push quantifiers as deep inside a formula as it is possible. %We use two ...implementations... of this algorithm: one that basically does nothing, which means that after doing \textproc{TurnToPrefixAndBDD}, the resulting quantifier prefix will be the same as the quantifier prefix of the input formula $\psi$ and another that actually pushes quantifier inside. This second ???implementation??? is based on the algorithm which is used for localising quantifiers in the solver HQS~\cite{HQSquantifierLocalisation}. However, we update it with the fix for disjunction????
-%TODO cely tento algoritmus je based na tom co robia v HQS
-%\begin{itemize}
-%    \item we do not localise - for simple solver
-%    \item when we localise for conjuction and univ/exist quantifier we choose this and this children to put it in etc. for disjunction and univ/exist this and this etc.
-%\end{itemize}
+In this section we give an explanation of function \textproc{Localise} from Algorithm~\ref{alg:general} which uses rules from Theorem~\ref{thrm:quantLocalEq} to push quantifiers as deep inside a formula as it is possible.
 
 \begin{algorithm}
   \caption{Quantifier localisation}
@@ -990,8 +1005,136 @@ After doing this, we start applying rules~\eqref{loc:undisj} for universal and~\
 
 As we already mentioned, we do not need to create copies of variables on line~\ref{localiseand:upush} of Algorithm~\ref{alg:localiseand} or on line~\ref{localiseor:epush} of Algorithm~\ref{alg:localiseor}. This is partially because the next part of Algorithm~\ref{alg:general} we extract these variables back anyway so at the end we do not end up with multiple copies of same variables. The only problem could be that we could possibly have two distinct subformulas with universally quantified $x$ and existentially quantified $y$ depending on it. This could cause problem during elimination of $x$, where if we eliminate it only in one subformula using Theorem~\ref{thrm:unExpan} we would create a copy of $y$ which would cause problems during quantifier extraction. However, this cannot happen, from the way variables are pushed inside. When we push universal variable $x$ on line~\ref{localiseand:upush} of Algorithm~\ref{alg:localiseand} to child $n'$, all quantified existential variables in $n'$ are not in other children. This stems from the fact, that on line~\ref{localiseand:epush} we push existential variables into one child that contain its occurrences. Similarly, when we push universal variable $v$ on line~\ref{localiseor:bpush} of Algorithm~\ref{alg:localiseor}, we are pushing into $vChildren$ which must contain all existential variables dependent on $v$. Another problem with not creating copies could be on line~\ref{localiseand:uremove} of Algorithm~\ref{alg:localiseand} where we remove $x$ from its dependencies. This could be a problem if we removed from one of the dependency in this subformula, but in another the dependency stayed. However, this cannot happen for exactly the same reason as in a previous problem.
 
+\begin{figure}
+  \centering
+  \begin{subfigure}{0.48\textwidth}
+  \centering
+  \scalebox{0.6}{\begin{forest}
+    [$\forall x_1 \forall x_2 \forall x_3 \exists y_1(x_1) \exists y_2(\emptyset)$, for descendants={circle, draw, minimum size=2em, inner sep=1pt}
+      [${\lor}$
+        [${\land}$
+          [$x_1$]
+          [$y_1$]
+        ]
+        [${\land}$
+          [$x_2$]
+          [$y_1$]
+        ]
+        [${\land}$
+          [$x_2$]
+          [$y_2$]
+        ]
+        [${\land}$
+          [$\neg x_2$]
+          [$\neg y_2$]
+          [$x_3$]
+        ]
+      ]
+    ]
+  \end{forest}}
+  \caption{Starting tree}
+  \label{fig:localise:start}
+  \end{subfigure}
+  \begin{subfigure}{0.48\textwidth}
+  \centering
+  \scalebox{0.6}{\begin{forest}
+    [$\forall x_1 \forall x_2 \exists y_2(\emptyset)$, for descendants={circle, draw, minimum size=2em, inner sep=1pt}%, s sep=22pt}
+      [${\lor}$
+        [${\land}$, edge=red, edge label={node[color=red,midway,above left]{$\exists y_1(x_1)$}}
+          [$x_1$]
+          [$y_1$]
+        ]
+        [${\land}$, edge=red, edge label={node[color=red,midway,below=10pt,right=-6pt]{$\exists y_1(x_1)$}}
+          [$x_2$]
+          [$y_1$]
+        ]
+        [,phantom, inner sep=16pt]
+        [${\land}$
+          [$x_2$]
+          [$y_2$]
+        ]
+        [${\land}$, edge=blue, edge label={node[color=blue,midway,above right]{$\forall x_3$}}
+          [$\neg x_2$]
+          [$\neg y_2$]
+          [$x_3$]
+        ]
+      ]
+    ]
+  \end{forest}}
+  \caption{After pushing $y_1$ and $x_3$}
+  \label{fig:localise:disj1push}
+  \end{subfigure}
+  \begin{subfigure}{0.48\textwidth}
+  \centering
+  \scalebox{0.6}{\begin{forest}
+    [$\forall x_2$, for descendants={circle, draw, minimum size=2em, inner sep=1pt}
+      [${\lor}$
+        [${\lor}$,color=red,edge=red, edge label={node[color=red,midway,above left]{$\forall x_1$}}
+          [${\land}$, edge label={node[midway,above left]{$\exists y_1(x_1)$}}
+            [$x_1$]
+            [$y_1$]
+          ]
+          [${\land}$, edge label={node[midway,above right]{$\exists y_1(x_1)$}}
+            [$x_2$]
+            [$y_1$]
+          ]
+        ]
+        [${\lor}$,color=blue,edge=blue, edge label={node[midway,above right]{$\exists y_2(\emptyset)$}}
+          [${\land}$
+            [$x_2$]
+            [$y_2$]
+          ]
+          [${\land}$, edge label={node[midway,above right]{$\forall x_3$}}
+            [$\neg x_2$]
+            [$\neg y_2$]
+            [$x_3$]
+          ]
+        ]
+      ]
+    ]
+  \end{forest}}
+  \caption{After localising the root}
+  \label{fig:localise:disj2push}
+  \end{subfigure}
+  \begin{subfigure}{0.48\textwidth}
+  \centering
+  \scalebox{0.6}{\begin{forest}
+    [$\forall x_2$, for descendants={circle, draw, minimum size=2em, inner sep=1pt}
+      [${\lor}$
+        [${\lor}$, edge label={node[midway,above left]{$\forall x_1$}}
+          [${\land}$
+            [$x_1$]
+            [$y_1$,edge=red, edge label={node[color=red,midway,above right]{$\exists y_1(x_1)$}}]
+          ]
+          [${\land}$
+            [$x_2$]
+            [$y_1$, edge=red, edge label={node[color=red,midway,above right]{$\exists y_1(x_1)$}}]
+          ]
+        ]
+        [${\lor}$, edge label={node[midway,above right]{$\exists y_2(\emptyset)$}}
+          [${\land}$
+            [$x_2$]
+            [$y_2$]
+          ]
+          [${\land}$
+            [$\neg x_2$]
+            [$\neg y_2$]
+            [$x_3$, edge=blue,edge label={node[color=blue,midway,above right]{$\forall x_3$}}]
+          ]
+        ]
+      ]
+    ]
+  \end{forest}}
+  \caption{Final tree}
+  \label{fig:localise:end}
+  \end{subfigure}
+  \caption{Example of localisation}
+  \label{fig:localise}
+\end{figure}
+
 \begin{example}
-  TODO - add also figures
+  \label{ex:QTlocalising}
+  Figure~\ref{fig:localise} shows an example of localisation. We start by calling \textproc{LocaliseOR} on the root of the tree in Figure~\ref{fig:localise:start}. This first tries to push existential quantifiers $y_1$ and $y_2$ using Theorem~\ref{thrm:localisedijunction}. This is only possible for $y_1$, because for $y_2$, both children nodes of root, which contain $y_2$, contain also universal variable $x_2$ which is not in its dependency set. For $y_1$ even though one child containing $y_1$ contains also universal variable $x_2$ not in its dependency set that is outside this child, this is still allowed for the push to happen. On Figure~\ref{fig:localise:disj1push} the aftermath of this action is shown in red. In blue we show where $x_3$ was pushed after finishing the processing of existential variables and starting the second part of the algorithm. Here, we first push $x_3$, because only one child contains it. Also, for the same reason we do not create a new child for it. This is not true for $y_2$ and $x_1$ which are both in two children, therefore we have to create a new children for them combining the children that contain them. On Figure~\ref{fig:localise:disj2push} we can see the result of localising for the root. Variable $x_2$ was not pushed, because both resulting children contain it. After this, we start localising for children and their children which results in the tree on Figure~\ref{fig:localise:end} which shows how function \textproc{LocaliseAND} pushed variables for each ${\land}$ node.
 \end{example}
 
 \section{Transformation to BDD}
@@ -1040,13 +1183,100 @@ For the elimination of the quantifiers on line~\ref{turntobdd:eliminate} we can 
     %\item remove some dependencies to be able to remove exist vars???? - not possible??
 \end{itemize}
 
+
+\begin{figure}[ht]
+  \begin{subfigure}{0.48\textwidth}
+  \centering
+  \scalebox{0.7}{\begin{forest}
+    [$\forall x_2$, for descendants={circle, draw, minimum size=2em, inner sep=1pt}
+      [${\lor}$
+        [${\lor}$, edge label={node[midway,above left]{$\forall x_1$}}
+          [${\land}$
+            [$x_1$]
+            [$y_1$,edge label={node[midway,above right]{$\exists y_1(x_1)$}}]
+          ]
+          [${\land}$
+            [$x_2$]
+            [$y_1$, edge label={node[midway,above right]{$\exists y_1(x_1)$}}]
+          ]
+        ]
+        [${\lor}$, edge label={node[midway,above right]{$\exists y_2(\emptyset)$}}
+          [${\land}$
+            [$x_2$]
+            [$y_2$]
+          ]
+          [${\land}$
+            [$\neg x_2$]
+            [$\neg y_2$]
+            [$x_3$,edge label={node[midway,above right]{$\forall x_3$}}]
+          ]
+        ]
+      ]
+    ]
+  \end{forest}}
+  \caption{Starting tree}
+  \label{fig:eliminate:start}
+  \end{subfigure}
+  \begin{subfigure}{0.48\textwidth}
+  \centering
+  \par\vspace{0.4cm}
+  \scalebox{0.7}{\begin{forest}
+    [$\forall x_2$
+      [${\lor}$, circle, draw, minimum size=2em, inner sep=1pt, for children={circle, draw, minimum size=2em, inner sep=1pt}
+        [${\lor}$, edge label={node[midway,above left]{$\forall x_1$}}
+          [$x_1$]
+          [$x_2$]
+        ]
+        [${\lor}$, edge label={node[midway,above right]{$\exists y_2(\emptyset)$}}
+          [$x_2 \land y_2$]
+          [$0$]
+        ]
+      ]
+    ]
+  \end{forest}}
+  \par\vspace{0.4cm}
+  \caption{After transforming ${\land}$ nodes}
+  \label{fig:eliminate:terminals}
+  \end{subfigure}
+  \par\bigskip
+  \begin{subfigure}{0.48\textwidth}
+  \centering
+  \scalebox{0.7}{\begin{forest}
+    [$\forall x_2$
+      [${\lor}$, circle, draw, minimum size=2em, inner sep=1pt
+        [$x_1 \lor x_2$, edge label={node[midway,above left]{$\forall x_1$}}]
+        [$x_2 \land y_2$, edge label={node[midway,above right]{$\exists y_2(\emptyset)$}}]
+      ]
+    ]
+  \end{forest}}
+  \caption{Before transforming the root}
+  \label{fig:eliminate:secondtolast}
+  \end{subfigure}
+  \begin{subfigure}{0.48\textwidth}
+  \centering
+  \scalebox{0.7}{\begin{forest}
+    [$\forall x_2 \exists y_2(\emptyset)$
+      [${\lor}$, circle, draw, minimum size=2em, inner sep=1pt
+        [$x_2$]
+        [$x_2 \land y_2$]
+      ]
+    ]
+  \end{forest}}
+  \caption{The final tree}
+  \label{fig:eliminate:end}
+  \end{subfigure}
+  \caption{Example of transformation of quantifier tree to BDD}
+  \label{fig:eliminate}
+\end{figure}
+
 \begin{example}
-  TODO!!!!
+  \label{ex:QTeliminating}
+  Figure~\ref{fig:eliminate} shows the transformation to BDD for the quantifier tree from Example~\ref{ex:QTlocalising} which uses elimination of ``simple'' quantifiers. We can transform the terminal nodes which represent $\exists y_1(x_1) \itholds y_1$ by eliminating $y_1$ using Theorem~\ref{thrm:exElim} to $0 \lor 1 \approx 1$. For $\forall x_3 \itholds x_3$, using universal expansion, we get $0 \land 1 \approx 0$. Using these, Figure~\ref{fig:eliminate:terminals} shows the tree after turning the ${\land}$ nodes to BDDs. After that, we transform the children of the root node resulting in Figure~\ref{fig:eliminate:secondtolast}. Here, we can eliminate $x_1$ in the first child resulting in $(0 \lor x_2) \land (1 \lor x_2) \approx x_2$. We cannot eliminate $y_2$ in the second child, because it contains $x_2$ which is not in the dependecy set of $y_2$. That is why we extract it back to root resulting in the tree in Figure~\ref{fig:eliminate:end}. The resulting formula is then $\forall x_2 \exists y_2(\emptyset) \itholds (x_2 \land y_2)$.
 \end{example}
 
 \section{Quantifier Elimination}
 \label{sec:algelimination}
-In this section we explain how the algorithm for eliminating all quantifiers looks like. This algorihtm is implemented as function \textproc{EliminateAllQuantifiers}, which is used in Algorithm~\ref{alg:general} for eliminating all quantifiers in the final formula (line~\ref{alg:general:elimination}) and can also be used while eliminating quantifiers during transformation to BDDs (line~\ref{turntobdd:eliminate} of Algorithm~\ref{alg:turntobdd}).
+In this section we explain how the algorithm for eliminating all quantifiers looks like. This algorithm is implemented as function \textproc{EliminateAllQuantifiers}, which is used in Algorithm~\ref{alg:general} for eliminating all quantifiers in the final formula (line~\ref{alg:general:elimination}) and can also be used while eliminating quantifiers during transformation to BDDs (line~\ref{turntobdd:eliminate} of Algorithm~\ref{alg:turntobdd}).
 
 \begin{algorithm}
   \caption{Quantifier elimination algorithm}
@@ -1086,9 +1316,10 @@ The heuristics we use for choosing the next universal variable to eliminate on l
 \end{itemize}
 
 \section{OLD!!! OR Localisation}
-This is how or localisation was implemented before I noticed the mistake.
+Algorithm~\ref{alg:oldlocaliseor} is how or localisation was implemented before I noticed the mistake.
 \begin{algorithm}
   \caption{OLD!! Quantifier localisation for disjunction}
+  \label{alg:oldlocaliseor}
   \begin{algorithmic}[1]
     \Function{LocaliseOR}{n}
       \ForAll{$y \in \eprefix{n}$}
@@ -1113,16 +1344,17 @@ This is how or localisation was implemented before I noticed the mistake.
   \end{algorithmic}
 \end{algorithm}
 
+
 \chapter{Implementation}
 We implemented the algorithm as a tool DQBDD (see Appendix~\ref{appendix:DQBDD} for a documentation) from Chapter~\ref{chap:algorithm} in C\texttt{++} using version 3.0.0 of the CUDD\footnote{\url{https://github.com/ivmai/cudd}} package~\cite{CUDD} for BDD manipulation, version 2.2.0 of the cxxopts\footnote{\url{https://github.com/jarro2783/cxxopts}} library for parsing command-line arguments and preprocessor HQSpre~\cite{HQSpre2}, more specifically the version that was used with HQS with quantifier localisation~\cite{HQSquantifierLocalisation}.
 
-The tool takes as an input \DQDIMACS{}~\cite{iDQandDQDIMACS} file on which we can run the preprocessor HQSpre. As was explained in Section~\ref{sec:preprocessing}, HQSpre can extract logical gates from variables in the formula that can be then replaced by them resulting in formula with fewer variables. This results in a formula that does not need to be in PCNF, which most solvers cannot handle. However, as HQS, our solver can work with non-PCNF formulas, stemming from the fact that we represent matrices as either BDDs or quantifier trees. This means that we can use this feature of HQSpre, similarly as it is used for HQS.
+The tool takes as an input \DQDIMACS{}~\cite{iDQandDQDIMACS} file on which we can run the preprocessor HQSpre. As was explained in Section~\ref{sec:preprocessing}, HQSpre can extract logical gates from variables in the formula that can be then replaced by them resulting in formula with fewer variables. This results in a formula that does not need to be in PCNF, which most solvers cannot handle. However, as HQS, our solver can work with non-PCNF formulas, stemming from the fact that we represent matrices as either BDDs or quantifier trees. This means that we can use this feature of HQSpre similarly as it is used for HQS.
 
 First we check how many gates can be extracted. If this number is low (we use less than 5), then we run preprocessor normally, without caring whether these gates will get destroyed or not. If there is enough gates, then we run preprocessor normally on a copy of the formula to check if it can solve it. It it cannot, we run the preprocessor with gate preservation setting on. This will ensure that during preprocessing no clause from which these gates are extracted is touched and at the end of preprocessing we can extract these gates while creating BDD or quantifier tree.
 
 On the result we run Algorithm~\ref{alg:general} with chosen heuristics for elimination of quantifiers. If we choose that nothing is eliminated during the transformation of quantifier tree to BDD as explained in Section~\ref{sec:algturntobdd}, we skip localisation and this transformation and create BDD directly from the output of preprocessor. Also, during the final elimination of quantifiers (line~\ref{alg:general:elimination}), we can stop after the final universal variable is eliminated and we can keep all the existential variables. Then if the resulting BDD is $0$, the formula is unsatisfiable. Otherwise it is satisfiable. This stems from the fact that we work with ROBDDs and for unsatisfiable formula all paths over the leftover existential variables in the resulting BDD go to $0$ while for satisfiable one, there is at least one path going to $1$.
 
-Finally, while applying any operation on BDDs, some variables can disappear from it, because the formula does not depend on their value. We can use this and apply the rules~\eqref{elim:univ} and \eqref{elim:exist} to remove unneeded quantifiers whenever we change the formula. This can result in better elimination algorithm, because we might sever unneeded dependencies.
+Finally, while applying any operation on BDDs, some variables can disappear from it, because the formula does not depend on their value. We can use this and apply the rules~\eqref{elim:univ} and \eqref{elim:exist} to remove unneeded quantifiers whenever we change the formula. This can result in better elimination algorithm because we might sever unneeded dependencies.
 
 % TODO popisat triedy???
 
