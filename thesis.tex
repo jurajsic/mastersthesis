@@ -11,6 +11,7 @@
            %% digital version of a document. Replace with `printed`
            %% to enable the default options for the printed version
            %% of a document.
+  color,
   twoside, %% This option enables double-sided typesetting. Use at
            %% least 120 g/m² paper to prevent show-through. Replace
            %% with `oneside` to use one-sided typesetting; use only
@@ -69,11 +70,11 @@
 
       span multiple paragraphs.
     },
-    bib           = bibliography.bib
+    bib           = bibliography.bib,
     %% Uncomment the following line (by removing the % symbol at
     %% the beginning) and replace `assignment.pdf` with the
     %% filename of your scanned thesis assignment.
-    % assignment    = assignment.pdf,
+    assignment    = assignment.pdf,
 }
 \usepackage{makeidx}      %% The `makeidx` package contains
 \makeindex                %% helper commands for index typesetting.
@@ -266,6 +267,11 @@
 \begin{document}
 
 \chapter{Introduction}
+nieco o sat ze je dolezity problem ktory je v NP, potom presunut ku QBF, ze ak pridam kvantifikatory stane sa PSPACE a tiez je to velmi dolezite a zacalo sa to velmi vyuzivat a vzniklo uz kopa solvrov pre to. No a potom ze to mozem este rozsirit pridanim henkin quantifiers (tu nejak zacitovat asi~\cite{NegationOfDQBFs}) sa stane este viac succint ale posunie sa trieda do NEXPTIME. To sa zacina nejak vyuzivat (asi spomenut PEC problem) a teda zacina stupat zaujem o to.  Preto zacali vznikat solutions for satisfiability starting with extension of DPLL algorithm~\cite{DPLLalgorithm} a postupne tak vzniklo viacero solvrov ktore to riesia (iDQ~\cite{iDQandDQDIMACS}, iProver~\cite{iProver}, HQS~\cite{HQSquantifierElimination,HQSdependencyElimination,HQSquantifierLocalisation} and dCAQE~\cite{dCAQE}). Zacala byt aj DQBF track posledne dva rocniky v sutazi QBFeval~\cite{QBFeval18,QBFeval19} a tak je toto zaujimava tema???
+
+Tu dalej popisat ze BDDs are cool a sa pouzivaju na vsetko mozne a teda nas zaujem je zistit ze ci pouzitim BDDs nevznikne nejaky zaujimavy solver pre DQBF. Vytvorili sme teda solver s BDD, pouziva principy pouzite pri tvorbe HQS. Tieto principy rozsirime a opravime, dalej dokazeme nieco chybajuce atd atd.
+
+Diplomka zacina popisom teorie kde vybudujeme DQBF theory od BF cez QBF, dalej spomenieme BDDs a quantifier trees? V kapitole bla popisem existujuce solvre. V dalsej kapitole vysvetlime nas algorithm spolecne s kapitolou o implementacii kde popiseme detaily implementacie. Nakoniec ukazeme experimental results ze ako sa ma oproti ostatnym.
 
 \chapter{Theory}
 In this chapter we give the definitions and some theoretical results of dependency quantified Boolean formulas (DQBFs) and binary decision diagrams (BDDs). For DQBFs we build up from Boolean formulas (BFs) to which we add quantifiers resulting in quantified Boolean formulas (QBFs). After this, we add explicit dependencies to the definition of QBFs which results in DQBFs. For these we give two forms, one that can only have quantifiers at the beginning of the formula and one that allows them deeper in the formula. For the latter we give some rules for transformation of DQBFs which we use for developing our solver in Chapter~\ref{chap:algorithm}. 
@@ -1367,7 +1373,8 @@ pre HQS a moj pouzivame -> ak gate detection zisti ze mame viac ako n gates (v H
 
 cas HQSpre bez gate detection zaratavame do vsetkych solvrov, tym silmulujeme to co robi HQSnp???
 
-benchmarks:
+
+\section{Benchmarks}
 \begin{itemize}
     \item PEC - vid \cite{HQSquantifierLocalisation} ze co vsetko citovat, su to asi folders Finkbenier, Scholl a Biere v z tej stranky stiahnute co je tam odkaz v tom istom clanku
     \item controller synthesis problems - to iste, folder je ale iba Bloem
@@ -1378,8 +1385,33 @@ Zrobit asi pre kazdy tento benchmark sekciu a porovnat - grafy, tabulky atd, nev
 
 Este mozno budem porovnavat navzajom rozne heuristiky pouzite v mojom a potom budem porovnavat najlepsiu???? s ostatnymi????
 
-\chapter{Conclusion}
+\section{Preprocessing}
+povedat ze sme pustili HQSpre s default konfiguraciou na vsetky benchmarks, dat tabulku ze z kazdeho benchmarku kolko je SAT, UNSAT a UNKNOWN. A ze iba na tie ktore su unknown, tak na HQSpre results pustame dalsie solvre. Cas tohto sa zaratava, ale nie pre HQS a nas, pretoze pouzivaju gate extraction s tym ze tieto pustaju HQSpre priamo (tak ako vysvetlene v implementation), takze ich pustame na originaloch. 
 
+\section{Heuristics comparison}
+dat porovnanie roznych heurisitk pre nas, ze ukazeme ktora je najlepsia a tu budeme pouzivat dalej, asi to zrobim len na DQBF19 benchmarku
+
+\section{SAT}
+porovnat runs zo sat benchmarku (alebo mozno dam vsetky benchmarks dohromady, jednu velku tabulku kde dam vsetky solvre a benchmarks a nejake grafy)
+
+\section{PEC}
+porovnat runs zo pec benchmarku
+
+\section{CSP}
+porovnat runs zo csp benchmarku
+
+\section{BOSY}
+porovnat runs zo BOSY benchmarku
+
+\section{DQBF19}
+porovnat runs zo DQBF19 benchmarku
+
+\chapter{Conclusion}
+Work to do:
+\begin{itemize}
+    \item add BDDs to HQS as BDDs are used in AIGsolve
+    \item 
+\end{itemize}
 
 \begingroup
 \setlength{\emergencystretch}{8em}
