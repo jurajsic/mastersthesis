@@ -905,7 +905,7 @@ In this chapter we describe the algorithm for solving satisfiability of DQBF usi
   \end{algorithmic}
 \end{algorithm}
 
-Algorithm~\ref{alg:general} gives a high level definition of out algorithm. In the next sections we explain more thoroughly each part of the algorithm. It takes as an input a DQBF $\psi$ in NNF represented using quantifier tree. We assume that it does not contain free variables and all variables are quantified in $\prefix{r}$. Firstly, function \textproc{Localise} recursively pushes the quantifiers inside the formula by using rules from Theorem~\ref{thrm:quantLocalEq}. Next, we transform this quantifier tree into a BF represented by BDD by recursively turning children of each node into BDDs and combining them together. While doing this, quantifiers are pulled from formula and potentially eliminated using theorems for quantifier eliminations (Section~\ref{sec:quantElimination}). After that we end up with a DQBF with updated prefix $\prefix{r}$ with all the quantifiers (which were not eliminated) pulled back and BDD $\phi$ representing the matrix of the formula. Finally, the leftover quantifiers in the prefix are eliminated resulting in simple BDD which represents either $0$ or $1$ which indicates formula satisfiability.
+Algorithm~\ref{alg:general} gives a high level definition of our algorithm. In the next sections we explain more thoroughly each part of the algorithm. It takes as an input a DQBF $\psi$ in NNF represented using quantifier tree. We assume that it does not contain free variables and all variables are quantified in $\prefix{r}$. Firstly, function \textproc{Localise} recursively pushes the quantifiers inside the formula by using rules from Theorem~\ref{thrm:quantLocalEq}. Next, we transform this quantifier tree into a BF represented by BDD by recursively turning children of each node into BDDs and combining them together. While doing this, quantifiers are pulled from formula and potentially eliminated using theorems for quantifier eliminations (Section~\ref{sec:quantElimination}). After that we end up with a DQBF with updated prefix $\prefix{r}$ with all the quantifiers (which were not eliminated) pulled back and BDD $\phi$ representing the matrix of the formula. Finally, the leftover quantifiers in the prefix are eliminated resulting in simple BDD which represents either $0$ or $1$ which indicates formula satisfiability.
 
 \section{Localising quantifiers}
 \label{sec:alglocalise}
@@ -1317,7 +1317,7 @@ The heuristics we use for choosing the next universal variable to eliminate on l
     \[\forall x_2 \forall x_3 \exists y_1(x_2) \exists y_2(x_2) \exists y_1'(x_2) \exists y_2'(x_2) \exists y_3(x_3) \exists y_4(x_3) \exists y_5 (x_3)\]
     where $y_1'$ and $y_2'$ were created as copies of $y_1$ and $y_2$ during universal expansion. Now, in the previous heuristic $x_2$ would be chosen. However, here $x_3$ is chosen because it still depends only on three variables, while $x_2$ now depends on four. This heuristic was introduced by Gitina et al.~\cite{HQSsimpleAlg}.
     \item Another heuristic we use is based on the number of variables in the BDDs representing the two conjuncts used for universal expansion in Theorem~\ref{thrm:unExpan}. That is, let $x \in \uprefix{n}$ and $\psi_1^{-x}\substitute{x}{0}$, $\psi_2^{-x}\substitute{x}{1}$
-    be the two conjuncts from Theorem~\ref{thrm:unExpan} as if we were doing universal expansion. Because the operation of replacing variables with constants is fast for BDDs, we can create BDDs for these two formulas and check for the amount of variables in both of them, that is the number of variables in the set $\vars{\psi_1^{-x}\substitute{x}{0}} \cup \psi_2^{-x}\substitute{x}{1}$. Because BDDs remove the variables which are not needed, the number of variables in this union can be smaller than expected. We can do this for all universal variables and choose the one with the lowest number of variables in this set. If there are multiple such variables, we can also use one of the previous heuristics to choose from them.
+    be the two conjuncts from Theorem~\ref{thrm:unExpan} as if we were doing universal expansion. Because the operation of replacing variables with constants is fast for BDDs, we can create BDDs for these two formulas and check for the amount of variables in both of them, that is the number of variables in the set $\vars{\psi_1^{-x}\substitute{x}{0}} \cup \vars{\psi_2^{-x}\substitute{x}{1}}$. Because BDDs remove the variables which are not needed, the number of variables in this union can be smaller than expected. We can do this for all universal variables and choose the one with the lowest number of variables in this set. If there are multiple such variables, we can also use one of the previous heuristics to choose from them.
     %\item something with creating depency tree, to find existential variables to remove as fast as possible (not sure if possible) --- maybe possible, basically remove those universal vars that will make it possible to remove as much existential vars as possible on the level??? 
 \end{itemize}
 
@@ -1365,7 +1365,7 @@ Finally, while applying any operation on BDDs, some variables can disappear from
 % TODO popisat triedy???
 
 \chapter{Experimental results}
-popisat na com testujeme a ze sme pouzili benchexec
+popisat na com testujeme a ze sme pouzili benchexec 2.2~\cite{benchexec}
 
 povedat ze sme najprv pustili HQSpre (odkaz na sekciu a asi aj znova citovat) bez gate detection, odfiltrovali sme results ktore boli vyriesene HQSpre alebo uz HQSpre prekrocil limity... vysledok tohto sme hodili do iDQ, iProver, dCAQE
 
@@ -1373,17 +1373,28 @@ pre HQS a moj pouzivame -> ak gate detection zisti ze mame viac ako n gates (v H
 
 cas HQSpre bez gate detection zaratavame do vsetkych solvrov, tym silmulujeme to co robi HQSnp???
 
+All used benchmarks with the results??? and BenchExec definitions??? can be found on github\footnote{\url{https://github.com/jurajsic/DQBFbenchmarks}}.
 
-\section{Benchmarks}
-\begin{itemize}
-    \item PEC - vid \cite{HQSquantifierLocalisation} ze co vsetko citovat, su to asi folders Finkbenier, Scholl a Biere v z tej stranky stiahnute co je tam odkaz v tom istom clanku
-    \item controller synthesis problems - to iste, folder je ale iba Bloem
-    \item ziskane zo SAT - to iste, folder je ale iba Balabanov
-    \item BoSy - vid \cite{dCAQE}, nie su ale zverejnene, skusit asi popytat
-\end{itemize}
-Zrobit asi pre kazdy tento benchmark sekciu a porovnat - grafy, tabulky atd, neviem este. Potom zrobit velky graf kde dam vsetko dohromady mozno, nech vidno spolu ze ake to je. A mozno dat z QBFeval'19, ze povedat ze je to suhrn vybratych benchmarks z tychto (okrem asi BoSy), tak aby nijaky nedominoval a nejak su pekne rozdelene ci co a ukazat na tom ????
+\section{Benchmark sets}
+We use four different benchmark sets:
 
-Este mozno budem porovnavat navzajom rozne heuristiky pouzite v mojom a potom budem porovnavat najlepsiu???? s ostatnymi????
+\paragraph{PEC}
+The first set consists of 4316 DQBF encodings of partial equivalence checking problem for incomplete circuits from various sources~\cite{iDQandDQDIMACS,FastDQBFRefutation,HQSsimpleAlg,PECScholl}. Incomplete circuits are combinational circuits containing missing parts, so called Black-Boxes. For these we only know their input and output signals, the functionality is unknown. The partial equivalence checking problem answers the question whether the given complete and incomplete circuit are equivalent.
+
+\paragraph{CSP}
+This set consists of 461 instances encoding controller synthesis problem~\cite{CSPbenchmarks} in which we try to find safe controller for controllable transition system. Controllable transition system is composed of state and two types of inputs -- uncontrollable and controllable -- which decide to which state the system moves. Controller decides the controllable inputs and a safe controller is such a controller that the transition system always stays in some set of safe states.
+
+\paragraph{SAT}
+The next set is created from 34 SAT instances which are transformed into equisatisfiable DQBF with exponentially smaller number of variables~\cite{SATbenchmarks}.
+
+\paragraph{QBFEVAL'19}
+The last benchmark set consists of 334 instances used for evaluation of DQBF solvers at QBF Evaluation 2019~\cite{QBFeval19} which is a selected combination of previous benchmarks with some extra instances not occurring in any of the previous sets.
+
+
+
+%Zrobit asi pre kazdy tento benchmark sekciu a porovnat - grafy, tabulky atd, neviem este. Potom zrobit velky graf kde dam vsetko dohromady mozno, nech vidno spolu ze ake to je. A mozno dat z QBFeval'19, ze povedat ze je to suhrn vybratych benchmarks z tychto (okrem asi BoSy), tak aby nijaky nedominoval a nejak su pekne rozdelene ci co a ukazat na tom ????
+
+%Este mozno budem porovnavat navzajom rozne heuristiky pouzite v mojom a potom budem porovnavat najlepsiu???? s ostatnymi????
 
 \section{Preprocessing}
 povedat ze sme pustili HQSpre s default konfiguraciou na vsetky benchmarks, dat tabulku ze z kazdeho benchmarku kolko je SAT, UNSAT a UNKNOWN. A ze iba na tie ktore su unknown, tak na HQSpre results pustame dalsie solvre. Cas tohto sa zaratava, ale nie pre HQS a nas, pretoze pouzivaju gate extraction s tym ze tieto pustaju HQSpre priamo (tak ako vysvetlene v implementation), takze ich pustame na originaloch. 
@@ -1410,7 +1421,8 @@ porovnat runs zo DQBF19 benchmarku
 Work to do:
 \begin{itemize}
     \item add BDDs to HQS as BDDs are used in AIGsolve
-    \item 
+    \item add more preprocessing?
+    \item try dqbf to qbf 
 \end{itemize}
 
 \begingroup
