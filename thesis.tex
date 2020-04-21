@@ -98,8 +98,8 @@
   commentstyle    = \itshape\color{magenta},
   breaklines      = true,
 }
-\usepackage{floatrow} %% Putting captions above tables
-\floatsetup[table]{capposition=top}
+%\usepackage{floatrow} %% Putting captions above tables
+%\floatsetup[table]{capposition=top}
 %% The following code fixes the rendering of BibLaTeX ISO 690
 %% references in old TeX Live (such as the one at Overleaf).
 \thesisload
@@ -1355,6 +1355,7 @@ Algorithm~\ref{alg:oldlocaliseor} is how or localisation was implemented before 
 
 
 \chapter{Implementation}
+\label{chap:implementation}
 We implemented the algorithm as a tool DQBDD (see Appendix~\ref{appendix:DQBDD} for a documentation) from Chapter~\ref{chap:algorithm} in C\texttt{++} using version 3.0.0 of the CUDD\footnote{\url{https://github.com/ivmai/cudd}} package~\cite{CUDD} for BDD manipulation, version 2.2.0 of the cxxopts\footnote{\url{https://github.com/jarro2783/cxxopts}} library for parsing command-line arguments and preprocessor HQSpre~\cite{HQSpre2}, more specifically the version that was used with HQS with quantifier localisation~\cite{HQSquantifierLocalisation}.
 
 The tool takes as an input \DQDIMACS{}~\cite{iDQandDQDIMACS} file on which we can run the preprocessor HQSpre. As was explained in Section~\ref{sec:preprocessing}, HQSpre can extract logical gates from variables in the formula that can be then replaced by them resulting in formula with fewer variables. This results in a formula that does not need to be in PCNF, which most solvers cannot handle. However, as HQS, our solver can work with non-PCNF formulas, stemming from the fact that we represent matrices as either BDDs or quantifier trees. This means that we can use this feature of HQSpre similarly as it is used for HQS.
@@ -1368,6 +1369,7 @@ Finally, while applying any operation on BDDs, some variables can disappear from
 % TODO popisat triedy???
 
 \chapter{Experimental results}
+\label{chap:experiments}
 This chapter shows the experimental results of different versions of DQBDDs and its comparison with different DQBF solvers (iDQ, iProver, dCAQE and HQS). All our benchmarks were run on a computer with ...?????????..... using benchexec 2.2~\cite{benchexec} where we set the time limit at \SI{15}{min} and the memory limit at \SI{4}{GB}. We also run all benchmarks in parallel on 6 cores???
 
 %povedat ze sme najprv pustili HQSpre (odkaz na sekciu a asi aj znova citovat) bez gate detection, odfiltrovali sme results ktore boli vyriesene HQSpre alebo uz HQSpre prekrocil limity... vysledok tohto sme hodili do iDQ, iProver, dCAQE
@@ -1400,20 +1402,25 @@ The last benchmark set consists of 334 instances used for evaluation of DQBF sol
 %Este mozno budem porovnavat navzajom rozne heuristiky pouzite v mojom a potom budem porovnavat najlepsiu???? s ostatnymi????
 
 \section{Preprocessing}
-First, we run preprocessor HQSpre on all benchmarks. Some of the benchmarks were solved immediately by this, therefore we removed these from  From this run, we saved all the resulting 
+First, we run preprocessor HQSpre on all benchmarks. Table~\ref{tab:HQSpre} shows the results with the number of solved (both \textbf{S}atisfiable and \textbf{U}n\-sa\-ti\-sfi\-able) and unsolved (\textbf{?}) instanced by HQSpre.
 
-\begin{table}
+\begin{table}[ht]
+\centering
 \catcode`\-=12
-\begin{tabular}{l|l|l|l|l|}
+\begin{tabular}{c|l|l|l|l|}
 \cline{2-5}
-                                  & \textbf{PEC} & \textbf{CSP} & \textbf{SAT} & \textbf{E19} \\ \hline
+\cellcolor{white}                 & \textbf{PEC} & \textbf{CSP} & \textbf{SAT} & \textbf{E19} \\ \hline
 \multicolumn{1}{|l|}{\textbf{S}}  & 111          & 33           & 4            & 33           \\ \hline
 \multicolumn{1}{|l|}{\textbf{U}}  & 879          & 6            & 8            & 55           \\ \hline
-\multicolumn{1}{|l|}{\textbf{\#}} & 3326         & 422          & 22           & 246          \\ \hline
+\multicolumn{1}{|l|}{\textbf{?}} & 3326         & 422          & 22           & 246          \\ \hline
 \end{tabular}
+\caption{Results of HQSpre where \textbf{S} is the number of solved satisfiable instances, \textbf{U} number of solved unsatisfiable instances and \textbf{?} number of unsolved instances}
+\label{tab:HQSpre}
 \end{table}
 
-povedat ze sme pustili HQSpre s default konfiguraciou na vsetky benchmarks, dat tabulku ze z kazdeho benchmarku kolko je SAT, UNSAT a UNKNOWN. A ze iba na tie ktore su unknown, tak na HQSpre results pustame dalsie solvre. Cas tohto sa zaratava, ale nie pre HQS a nas, pretoze pouzivaju gate extraction s tym ze tieto pustaju HQSpre priamo (tak ako vysvetlene v implementation), takze ich pustame na originaloch. 
+We removed the solved instances from the benchmarks sets and we run the solvers only on the results of unsolved instances (as the preprocessor simplified these). The resulting times of these runs are then combination of HQSpre and solver runtime. However, we do not run HQS and DQBDD on these simplified instances, as both of these solvers incorporate HQSpre in their solving routine (as explained in Chapter~\ref{chap:implementation}), therefore we run them on the original instances. We still run them only on the instances which were not solved by HQSpre because the incorporated HQSpre in these solvers would have solved other instances anyway. The time of HQSpre is then not added to these solvers, because the runtime of preprocessing is included in the runtime of those two solvers.
+
+%povedat ze sme pustili HQSpre s default konfiguraciou na vsetky benchmarks, dat tabulku ze z kazdeho benchmarku kolko je SAT, UNSAT a UNKNOWN. A ze iba na tie ktore su unknown, tak na HQSpre results pustame dalsie solvre. Cas tohto sa zaratava, ale nie pre HQS a nas, pretoze pouzivaju gate extraction s tym ze tieto pustaju HQSpre priamo (tak ako vysvetlene v implementation), takze ich pustame na originaloch. 
 
 \section{Heuristics comparison}
 dat porovnanie roznych heurisitk pre nas, ze ukazeme ktora je najlepsia a tu budeme pouzivat dalej, asi to zrobim len na DQBF19 benchmarku
