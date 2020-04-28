@@ -34,7 +34,7 @@
   main=english, %% By using `czech` or `slovak` as the main locale
                 %% instead of `english`, you can typeset the thesis
                 %% in either Czech or Slovak, respectively.
-  english, slovak, czech%german, russian, czech, slovak %% The additional keys allow
+  %english, slovak, czech%german, russian, czech, slovak %% The additional keys allow
 ]{babel}        %% foreign texts to be typeset as follows:
 %%
 %%   \begin{otherlanguage}{german}  ... \end{otherlanguage}
@@ -44,8 +44,8 @@
 %%
 %% For non-Latin scripts, it may be necessary to load additional
 %% fonts:
-\usepackage{paratype}
-\def\textrussian#1{{\usefont{T2A}{PTSerif-TLF}{m}{rm}#1}}
+%\usepackage{paratype}
+%\def\textrussian#1{{\usefont{T2A}{PTSerif-TLF}{m}{rm}#1}}
 %%
 %% The following section sets up the metadata of the thesis.
 \thesissetup{
@@ -143,6 +143,12 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% Stuff for tables
+% for combining rows
+\usepackage{multirow}
+% for better lines
+\usepackage{hhline}
+
 % for subfigures
 \usepackage[font=normalsize]{subcaption}
 
@@ -175,9 +181,14 @@
 % for writing out rules of DQBF in NNF
 \usepackage{ebproof}
 
-% for creating quantifier trees
-%\usepackage{tikz}
+
+\usepackage{tikz}
 %\usetikzlibrary{arrows.meta,automata,positioning}
+% so tikzpictures are not recomputed each compulation
+\usetikzlibrary{external}
+\tikzexternalize[prefix=tikz/]
+
+\usepackage{pgfplots}
 
 % for creating quantifier trees
 \usepackage{forest}
@@ -270,16 +281,21 @@
 \begin{document}
 
 \chapter{Introduction}
-nieco o sat ze je dolezity problem ktory je v NP, potom presunut ku QBF, ze ak pridam kvantifikatory stane sa PSPACE a tiez je to velmi dolezite a zacalo sa to velmi vyuzivat a vzniklo uz kopa solvrov pre to. No a potom ze to mozem este rozsirit pridanim henkin quantifiers (tu nejak zacitovat asi~\cite{NegationOfDQBFs}) sa stane este viac succint ale posunie sa trieda do NEXPTIME. To sa zacina nejak vyuzivat (asi spomenut PEC problem) a teda zacina stupat zaujem o to.  Preto zacali vznikat solutions for satisfiability starting with extension of DPLL algorithm~\cite{DPLLalgorithm} a postupne tak vzniklo viacero solvrov ktore to riesia (iDQ~\cite{iDQandDQDIMACS}, iProver~\cite{iProver}, HQS~\cite{HQSquantifierElimination,HQSdependencyElimination,HQSquantifierLocalisation} and dCAQE~\cite{dCAQE}). Zacala byt aj DQBF track posledne dva rocniky v sutazi QBFeval~\cite{QBFeval18,QBFeval19} a tak je toto zaujimava tema???
+The well known canonical $\NP$-complete SAT problem that determines whether a Boolean formula is satisfiable or not is one of the most fundamental problems of computer science. In addition to its theoretical importance, it has many practical applications. However, sometimes SAT is not enough which led to the generalisation of SAT problem -- the quantified Boolean formula (QBF) problem. %there are many practical applications of SAT which resulted in multitude of SAT solvers.
 
-Tu dalej popisat ze BDDs are cool a sa pouzivaju na vsetko mozne a teda nas zaujem je zistit ze ci pouzitim BDDs nevznikne nejaky zaujimavy solver pre DQBF. Vytvorili sme teda solver s BDD, pouziva principy pouzite pri tvorbe HQS. Tieto principy rozsirime a opravime, dalej dokazeme nieco chybajuce atd atd.
+The QBF problem is a canonical $\PSPACE$-complete problem of determining whether a Boolean formula with universal and existential quantifiers is satisfiable. This allows for a more succinct representation of problem descriptions and wider possibilities of applications that resulted in number of different QBF solvers. However, for some applications, for example partial equivalence checking (PEC)~\cite{HQSsimpleAlg}, this is still not enough. We can extend QBF by Henkin quantifiers which allow to explicitly give the dependencies between quantified variables, resulting in dependency quantified Boolean formula (DQBF)~\cite{NegationOfDQBFs}. The problem of deciding satisfiability of DQBF is $\NEXPTIME$-complete~\cite{DQBFisNEXPTIME} which means that it allows even more succinct problem descriptions.
 
-Diplomka zacina popisom teorie kde vybudujeme DQBF theory od BF cez QBF, dalej spomenieme BDDs a quantifier trees? V kapitole bla popisem existujuce solvre. V dalsej kapitole vysvetlime nas algorithm spolecne s kapitolou o implementacii kde popiseme detaily implementacie. Nakoniec ukazeme experimental results ze ako sa ma oproti ostatnym.
+In recent years, DQBF solving is on a rise (driven mostly by PEC) which resulted in the first known solution for DQBF problem that used DPLL algorithm~\cite{DPLLalgorithm} followed by multiple DQBF solvers (iDQ~\cite{iDQandDQDIMACS}, iProver~\cite{iProver}, HQS~\cite{HQSquantifierElimination,HQSdependencyElimination,HQSquantifierLocalisation} and dCAQE~\cite{dCAQE}). HQS, the most successful of these (winner of both 2018 and 2019 DQBF track of QBF Evaluation competition~\cite{QBFeval18,QBFeval19}) uses quantifier elimination~\cite{HQSquantifierElimination} -- the quantifiers are eliminated one by one using universal expansion (which increases the size of the formula) until we end up with a Boolean formula (actually QBF on which an existing QBF solver is run). It also uses a succinct representation of Boolean formulas called and-inverter graphs (AIG)~\cite{FRAIGs} that makes this solving method possible.
+
+Binary decision diagrams (BDD)~\cite{BDD} are another data structure that can represent Boolean formulas. Since its introduction, BDDs have been used in many different applications. Compared to AIGs they are better representation in the way that, for a given variable ordering, there is only one BDD for each Boolean formula. However, AIGs can sometimes be much smaller for the same Boolean formula.
+
+In this work we are interested in a DQBF that uses BDD as an underlying representation of formulas combined with quantifier elimination. We use quantifier localisation~\cite{HQSquantifierLocalisation} (also used in HQS) which allows us to push quantifiers inside the formula and eliminate them only ``locally`` in subformulas. We show that the localisation used in HQS is erroneous and we give a corrected version of the localisation algorithm. We also give an important missing proof that shows the localisation can also be used in subformulas and enhance it with ``local`` universal expansion. We do this in Chapter~\ref{chap:theory} where we also give all the needed theory. Chapter~\ref{chap:SoA} gives an overview of existing DQBF solving techniques. In Chapter~\ref{chap:algorithm} we show the fixed algorithm with enhancement. We also implement this algorithm with the details in Chapter~\ref{chap:implementation} and finally, we do an extensive experimental evaluation where we compare it with other solvers in Chapter~\ref{chap:experiments}.
 
 \chapter{Theory}
+\label{chap:theory}
 In this chapter we give the definitions and some theoretical results of dependency quantified Boolean formulas (DQBFs) and binary decision diagrams (BDDs). For DQBFs we build up from Boolean formulas (BFs) to which we add quantifiers resulting in quantified Boolean formulas (QBFs). After this, we add explicit dependencies to the definition of QBFs which results in DQBFs. For these we give two forms, one that can only have quantifiers at the beginning of the formula and one that allows them deeper in the formula. For the latter we give some rules for transformation of DQBFs which we use for developing our solver in Chapter~\ref{chap:algorithm}. 
 
-In the last section of this chapter we define BDDs and recall some of their properties.
+After this, we define BDDs and recall some of their properties. Finally, we describe quantifier trees which can represent DQBFs.
 
 \section{Boolean Formulas}
 We first start with defining Boolean formulas. For these we need a set of variables $V = \set{x_1, \dots, x_n}$ for which we can define a valuation function $v\colon V \to \{0,1\}$ that says whether each variable is true or false. We then define Boolean formulas as variables connected by logical operatives \emph{and} (${\land}$), \emph{or} (${\lor}$) and \emph{negation} (${\neg}$).
@@ -496,7 +512,7 @@ We first give the definition of the set $\DQBF{V}$ of DQBFs in \emph{negation no
         \label{existrule}
         D_v \subseteq V \setminus (\qvars{\psi} \cup \set{v})
     \end{equation}
-    \caption{Rules defining the syntax of DQBFs in NNF (based on Ge-Ernst et al.~\cite{HQSquantifierLocalisation}).}
+    \caption{The rules defining the syntax of DQBFs in NNF (based on Ge-Ernst et al.~\cite{HQSquantifierLocalisation}).}
     \label{fig:DQBFrules}
 \end{figure}
 
@@ -542,11 +558,11 @@ The meaning behind this formula is that either $x_1$ and $x_2$ are the same or t
 \label{sec:quantLocalisation}
 Now that we have defined DQBFs we give some theoretical results which show the equisatisfiability of different DQBFs which can result in their simplification. These results can be then used for developing a DQBF solver which checks whether an input DQBF is satisfiable or not.
 
-We start with a theorem that show some rules by which we can push (extract) quantifiers in (from) the formula. 
+We start with a theorem that shows some rules by which we can push (extract) quantifiers in (from) the formula. 
 
 \begin{theorem}[{\cite[Theorems 3,4]{HQSquantifierLocalisation}}]
 \label{thrm:quantLocalEq}
-  Let ${\diamond} \in \set{{\land},{\lor}}$ and $\psi,\psi_1,\psi_2 \in \DQBF{V}$. We assume that $x'$ and $y'$ are fresh variables, which do not occur in $\psi,\psi_1$ and $\psi_2$. Then we have
+  Let ${\diamond} \in \set{{\land},{\lor}}$ and $\psi,\psi_1,\psi_2 \in \DQBF{V}$. We assume that $x'$ and $y'$ are fresh variables, which do not occur in $\psi,\psi_1$ and $\psi_2$. The following equisatifiabilities hold for all DQBFs in NNF.
   \begin{align}
       %\forall x : \psi &\approx \psi \text{, if } x \not\in V_{\psi} \\
       \forall x \itholds (\psi_1 \land \psi_2) &\approx \left(\forall x \itholds \psi_1 \land \forall x' \itholds \psi_2\substitute{x}{x'}\right) \tag{a} \label{loc:unconj1} \\
@@ -587,7 +603,7 @@ which is satisfiable for $s$ where $s(y) = 1$ and $s(y') = 0$. To fix this, we n
 \[\forall x_1 \forall x_2 \itholds (\exists y(\emptyset) \itholds ((x_1 \land y) \lor (x_2 \land \neg y)) \lor (\neg x_1 \land \neg x_2)),\]
 which is not satisfiable, we have that $(x_1 \land y)$ contains $x_1$ which is not in $(x_2 \land \neg y)$ and $x_2$ is only in the second disjunct. However, after applying the rule~\eqref{loc:exdisj} we get
 \[\forall x_1 \forall x_2 \itholds ((\exists y(\emptyset) \itholds (x_1 \land y) \lor \exists y'(\emptyset) \itholds (x_2 \land \neg y')) \lor (\neg x_1 \land \neg x_2)),\]
-which becomes satisfiable. The problem here is that $x_1$ and $x_2$ are in $(\neg x_1 \land \neg x_2)$ which is outside the subformula on which we are applying the rule $\eqref{loc:exdisj}$. Therefore, we can put in a condition, that the sets of universal variables (except the ones from $D_y$) from the disjuncts are disjoint and as the next theorem shows, it is enough that universal variables from one of these disjuncts are not ouside this subformula. We also need to not only look at the universal variables occurring in the disjuncts, but also at the ones from the dependency sets of existential variables occurring in the disjuncts.
+which becomes satisfiable. The problem here is that $x_1$ and $x_2$ are in $(\neg x_1 \land \neg x_2)$ which is outside the subformula on which we are applying the rule $\eqref{loc:exdisj}$. Therefore, we can put in a condition that the sets of universal variables (except the ones from $D_y$) from the disjuncts are disjoint and as the next theorem shows, it is enough that universal variables from one of these disjuncts are not ouside this subformula. We also need to not only look at the universal variables occurring in the disjuncts, but also at the ones from the dependency sets of existential variables occurring in the disjuncts.
 
 \begin{theorem}
   \label{thrm:localisedijunction}
@@ -613,10 +629,6 @@ which becomes satisfiable. The problem here is that $x_1$ and $x_2$ are in $(\ne
   %First, the assumption $A_{\psi_1} \cap A_{\psi_2} \subseteq D_y$ tells us that for any two $s,s' \in \Scands{\psi}$ it holds that the variables occurring both in $s(\psi_1)$ and $s'(\psi_2)$ are from $D_y$. 
   %We will prove that for some $s$, where $s(y)$ is a combination of  $s'(y)$ and $s'(y')$, and $s(v) = s'(v)$ for other variables, is a satisfying Skolem functions mapping of $\psi'$. Let $v \in \valtns{\psi'}$ be a valuation and $v_{D_y}$ its restriction to $D_y$. With similar reasoning as in the proof of case~(\ref{loc:unconj1}) of Theorem~\ref{thrm:quantLocalSubformulas} we only need to show that $v(s(\phi)) = 1$ assuming that $v(s'(\phi')) = 1$. From this assumption we can infer that $v(s'(\psi_1)) = 1$ or $v(s'(\psi_2\substitute{y}{y'})) = 1$. Without loss of generality assume that $v(s'(\psi_1)) = 1$. Then we set $s(y)(v_{D_y})$ to $s'(y)(v_{D_y})$ which means that $v(s(\psi_1)) = 1$, therefore $v(s(\phi)) = 1$. However, we need to show that for different valuation $v' \in \valtns{\psi'}$ such that $v'(x) = v(x)$ for $x \in D_y$ (therefore $v_{D_y}' = v_{D_y}$) it also holds that $v'(s'(\psi_1)) = 1$ (and so $v'(s(\phi)) = 1$). Assume now it does not hold. For $v'(s'(\phi'))$ to be equal to $1$ it would have to hold then that $v'(s'(\psi_2\substitute{y}{y'})) = 1$. There needs to be a valuation with restriction to $D_y$ equal to $v_{D_y}$ such that it evaluates $s'(\psi_2\substitute{y}{y'})$ to $0$, otherwise we could set $s(y)(v_{D_y})$ to $s'(y')(v_{D_y})$. For simplicity, assume that $v$ is such a valuation, therefore $v(s'(\psi_2\substitute{y}{y'})) = 0$. This means that we can create valuation $v''$ where we set variables from $s'(\psi_1)$ to the same value as $v$ and variables from $s'(\psi_2\substitute{y}{y'})$ to the same value as $v'$ (others do not matter). This is possible because variables occurring both in $s'(\psi_1)$ and $s'(\psi_2\substitute{y}{y'})$ are only those that are in $D_y$ (see the beginning of the proof) and $v_{D_y} = v_{D_y}'$. However, in this valuation it holds that $v''(s'(\psi_1)) = v''(s'(\psi_2\substitute{y}{y'})) = 0$ which means that $v''(s'(\phi')) = 0$ which is contradiction .... with what... this is not true, it does not have to be equal to 1, it is only subformula......
 \end{proof}
-
-%\begin{remark}
-%  The condition .... basically means that the set of universal variables occurring both in $\psi_1$ and $\psi_2$ are those from $D_y$ and for existential variable $y''$ to occur in both of them it needs to hold that $D_{y''} \subseteq D_{y}$.
-%\end{remark}
 
 \subsection{Quantifier Elimination}
 \label{sec:quantElimination}
@@ -687,20 +699,18 @@ which is still satisfiable.
 
 
 \section{Binary Decision Diagrams}
-%Having defined DQBFs we can now turn our attention to their representation. We have already defined some normal forms in section blabla, but algorithmically, working with them in this form would not be very effective (why?). For this reason binary decision diagrams (BDDs) were introduced~\cite{BDD}. These structures allow for a succinct representation of BFs with an efficient polynomial time implementation of logical operations.
+\label{sec:BDD}
 In this section we recall a definition of \emph{binary decision diagrams}~\cite{BDD} which is a succinct representation of BFs with an efficient polynomial time implementation of logical operations.
 
 \begin{definition}
   Let $V$ be a set of variables. A \emph{binary decision diagram} (BDD) \emph{over $V$} is a rooted directed acyclic graph with two terminal nodes 0 and 1 and a set $N$ of non-terminal nodes, each representing a variable from $V$. Each $n \in N$ has two child nodes, low child and high child. For each $x \in V$ and every path $\sigma$ from root to a terminal node there is at most one $n \in N$ on $\sigma$ representing $x$.
 \end{definition}
 
-%We will give a definition of reduced ordered binary decision diagram, however we do not use that name and whenever we say BDD we mean ROBDD.
-
 Let $v\colon V \to \{0,1\}$ be a valuation over $V$. BDD $\beta$ in this valuation is evaluated to 0 or 1 by starting in the root and for every $n \in N$, representing some $x \in V$, either moving to low child if $v(x) = 0$ or to high child if $v(x) = 1$. The resulting terminal node is then the evaluation $v(\beta)$ of $\beta$ in $v$. BDD $\beta$ then represents a Boolean formula $\phi \in \BF{V}$ if for each valuation $v$ it holds that $v(\beta) = v(\phi)$.
 
 In figures, non-terminal nodes are denoted by the variable they represent, terminal nodes are shown as boxes with the constant they represent, edges to low children are dashed and edges to high children are full.
 
-\begin{figure}[ht]
+\begin{figure}[t]
     \centering
     \begin{subfigure}[b]{.5\linewidth}
         \centering
@@ -714,11 +724,7 @@ In figures, non-terminal nodes are denoted by the variable they represent, termi
         \caption{ROBDD}
         \label{fig:ROBDD}
     \end{subfigure}
-    %\subcaptionbox{\label{fig:BDD}BDD}
-    %    {\includegraphics{figures/bdd1.pdf}}
-    %\subcaptionbox{\label{fig:ROBDD}ROBDD}
-    %    {\includegraphics{figures/bdd2.pdf}}
-    \caption{An example of BDD and ROBDD that represent the same BF $(\neg x_1 \land x_2 \land x_3) \lor (x_1 \land \neg (x_1 \lequal x_2))$}
+    \caption{An example of BDD and ROBDD representing the same BF} %$((\neg x_1 \land x_2 \land x_3) \lor (x_1 \land \neg (x_1 \lequal x_2))$}
     \label{fig:BDDandROBDD}
 \end{figure}
 
@@ -733,36 +739,16 @@ To have simpler algorithms for BDDs, we actually use \emph{reduced ordered BDDs}
     \item the isomorphic (''the same looking'') subtrees are merged and
     \item nodes whose both edges go to the same subtree are deleted.
 \end{enumerate}
-They have the nice property that for a given variable order, each BF is represented by exactly one ROBDD. In the following chapters, when we use BDD we mean ROBDD.
+They have the nice property that for a given variable order, each BF is represented by exactly one ROBDD. However, the size of two ROBDDs for the same formula can be very different. We can find a formula which in one ordering has a ROBDD representation whose number of nodes is linear to the size of the formula and in a different one it is exponential. The problem of finding the optimal variable ordering is $\NP$-hard, therefore we usually use some heuristics to reduce the size of BDDs and we do not look for the perfect ordering.
 
 \begin{example}
 \label{ex:ROBDD}
 Figure~\ref{fig:ROBDD} shows a ROBDD which represents the same BF as the BDD from Example~\ref{ex:BDD}. While the BDD from Figure~\ref{fig:BDD} does not have ordered variables the ROBDD always goes from root to terminal node with $x_1$ followed by $x_2$ and $x_3$. Also, one $x_3$ node was deleted because both edges coming from it ended in $0$. Furthermore, both $x_2$ nodes share an isomorphic subtree.
 \end{example}
 
-%To have simpler algorithms for BDDs, we usually want to have some ordering on the set of variables $V$ such that for each path from the root of BDD to the terminal of the BDD has nodes in this order. These BDDs are called ordered BDDs (OBDDs). The ordering of BDDs is important, because two BDD representations of the same BF in different orderings can have very different sizes. odkazat sa na obrazok ze tam je ordered 
+For each operation on BFs (${\land}$, ${\lor}$, ${\neg}$), there is an algorithm on ROBDDs which can get the resulting ROBDD representing the application of the operation. For example, if we have a ROBDD representing BF $\psi_1$, we can get a ROBDD representing $\neg \psi_1$ by swapping terminal nodes $0$ and $1$. See for example Andersen~\cite{BDDdetails} for more details.
 
-%Two OBDDs with the same ordering representing the same BF can still be different, that is why we will actually work with reduced OBDDs (ROBDDs) which is an OBDD that merges isomorphic (''the same looking'') subtrees and deletes nodes whose both edges go to the same subtree. 
-
-%As a final step 
-
-% chceme mat linearne operacie ---> treba aby boli usporiadane ---> shannon expansion ---> ukazat operacie???
-%When we have two BDDs, we want to have an effective way to compute their conjunction/disjunction. Such an algorithm should just traverse the BDDs in the same way while comparing the variables in the nodes. However, variables in the nodes on the paths from the root in general BDDs can occur in any order, which would cause problems with simple traversal of BDDs. To solve this we add an ordering on the set of variables $V$. The nodes in the BDD are then sorted based on this ordering. The resulting BDD is called an ordered binary decision diagram (OBDD).
-
-%\begin{example}
-%ukazat asi z previous example 2 orderings a povedat daco o tom ze operacie sa daju teraz implementovat jednoducho len prechadzanim stromom
-%\end{example}
-
-%nieco o ROBDD, ze pre kazde BF existuje prave jedno unikatne pre kazde zoradenie + ze vyber zoradenia je dolezity + ze da sa dynamicky preukladat???
-%OBDDs still suffer from one problem -- for each BF we would like to have for given order on $V$ only one OBDD representing it. This is not the case, notice OBDDs on fig. ????? and ???. Both represents BF ??? but they are different. That is why we introduce reduced OBDDs (ROBDD) (vysvetlit lepsie ze to neni moj prinos). ROBDD is an OBDD such that all isomorphic sub-BDDs are merged and the nodes that have the same BDD as children are removed.
-
-%\begin{example}
-%porovnat nejake OBDD s jeho ROBDD, detailne (kde sa ukaze )
-%\end{example}
-
-For each operation on BFs (${\land}$, ${\lor}$, ${\neg}$), there is an algorithm on BDDs which can get the resulting BDD representing the application of the operation. For example, if we have a BDD representing BF $\psi_1$, we can get a BDD representing $\neg \psi_1$ by swapping terminal nodes $0$ and $1$. See for example Andersen~\cite{BDDdetails} for more details. %If we have another BDD representing BF $\phi_2$, we can get $\psi_1 \land \psi_2$ by using this algorithm.  Similarly an algorithm for ${\lor}$ can be defined.
-
-%In the following we will use the term BDD instead of ROBDD.
+In the following chapters, when we use BDD we mean ROBDD.
 
 
 \section{Quantifier Trees}
@@ -825,6 +811,7 @@ In figures, the assigned DQBF prefix to non-terminal node $n$ is always shown on
 \end{example}
 
 \chapter{State of the Art}
+\label{chap:SoA}
 In this chapter we give an overview of existing solutions and solvers which tackle the satisfiability problem of DQBF. Because there are already multiple surveys about DQBF~\cite{DQBFStateOfArtTalk,DQBFStateOfArt,DQBFStateOfArtNew}, we give only a short overview of most solvers and techniques. However, we go into more details for solver HQS, because it is currently the best performing solver (winner of the DQBF track of QBF Evaluation 2018~\cite{QBFeval18} and 2019~\cite{QBFeval19}) and the methods we use for developing our solver are based on the workings of this solver.
 
 \section{First Solution -- DQDPLL}
@@ -948,7 +935,6 @@ Algirithm~\ref{alg:localise} shows this implementation of localising. Function \
         \Else
           \State $n_y \gets \Call{CombineChildren}{yChildren, {\land}}$\label{localiseand:ecombine}
           \State $\children{n} \gets (\children{n} \setminus yChildren) \cup n_y$\label{localiseand:echildrenupdate}
-          % TODO, explain that even though we do not rename, the algorithm still work, also explain what pushing means
           \State \Call{PushVar}{$y$, $n_y$}\label{localiseand:epush}
           \State remove $y$ from $\prefix{n}$\label{localiseand:eremove}
         \EndIf
@@ -1041,7 +1027,7 @@ As we already mentioned, we do not need to create copies of variables on line~\r
       ]
     ]
   \end{forest}}
-  \caption{Starting tree}
+  \caption{The starting tree}
   \label{fig:localise:start}
   \end{subfigure}
   \begin{subfigure}{0.48\textwidth}
@@ -1134,10 +1120,10 @@ As we already mentioned, we do not need to create copies of variables on line~\r
       ]
     ]
   \end{forest}}
-  \caption{Final tree}
+  \caption{The final tree}
   \label{fig:localise:end}
   \end{subfigure}
-  \caption{Example of localisation}
+  \caption{An example of localisation}
   \label{fig:localise}
 \end{figure}
 
@@ -1223,7 +1209,7 @@ For the elimination of the quantifiers on line~\ref{turntobdd:eliminate} we can 
       ]
     ]
   \end{forest}}
-  \caption{Starting tree}
+  \caption{The starting tree}
   \label{fig:eliminate:start}
   \end{subfigure}
   \begin{subfigure}{0.48\textwidth}
@@ -1274,7 +1260,7 @@ For the elimination of the quantifiers on line~\ref{turntobdd:eliminate} we can 
   \caption{The final tree}
   \label{fig:eliminate:end}
   \end{subfigure}
-  \caption{Example of transformation of quantifier tree to BDD}
+  \caption{An example of transformation of quantifier tree to BDD}
   \label{fig:eliminate}
 \end{figure}
 
@@ -1324,39 +1310,39 @@ The heuristics we use for choosing the next universal variable to eliminate on l
     %\item something with creating depency tree, to find existential variables to remove as fast as possible (not sure if possible) --- maybe possible, basically remove those universal vars that will make it possible to remove as much existential vars as possible on the level??? 
 \end{itemize}
 
-\section{OLD!!! OR Localisation}
-Algorithm~\ref{alg:oldlocaliseor} is how or localisation was implemented before I noticed the mistake.
-\begin{algorithm}
-  \caption{OLD!! Quantifier localisation for disjunction}
-  \label{alg:oldlocaliseor}
-  \begin{algorithmic}[1]
-    \Function{LocaliseOR}{n}
-      \ForAll{$y \in \eprefix{n}$}
-        \ForAll{$n' \in \children{n}$}
-          \State \Call{PushVar}{$y$, $n'$}
-        \EndFor
-        \State remove $y$ from $\prefix{n}$
-      \EndFor
-      \While{$\uprefix{n} \not= \emptyset$}
-        \State $x \gets \Call{GetNextUnivVarToPush}{\null}$
-        \State $xChildren \gets \{\,n' \in \children{n} | x \in \vars{n'}$  or  $x \in D_y$ for some $y \in \vars{n'}\,\}$
-        \If{$xChildren = \children{n}$}%\Comment{$x$ or its dependency is in every child}
-          \State break
-        \Else
-          \State $n_x \gets \Call{CombineChildren}{xChildren, {\lor}}$
-          \State $\children{n} \gets (\children{n} \setminus xChildren) \cup n_x$
-          \State \Call{PushVar}{$x$, $n_x$}
-          \State remove $x$ from $\prefix{n}$
-        \EndIf
-      \EndWhile
-    \EndFunction
-  \end{algorithmic}
-\end{algorithm}
+%\section{OLD!!! OR Localisation}
+%Algorithm~\ref{alg:oldlocaliseor} is how or localisation was implemented before I noticed the mistake.
+%\begin{algorithm}
+%  \caption{OLD!! Quantifier localisation for disjunction}
+%  \label{alg:oldlocaliseor}
+%  \begin{algorithmic}[1]
+%    \Function{LocaliseOR}{n}
+%      \ForAll{$y \in \eprefix{n}$}
+%        \ForAll{$n' \in \children{n}$}
+%          \State \Call{PushVar}{$y$, $n'$}
+%        \EndFor
+%        \State remove $y$ from $\prefix{n}$
+%      \EndFor
+%      \While{$\uprefix{n} \not= \emptyset$}
+%        \State $x \gets \Call{GetNextUnivVarToPush}{\null}$
+%        \State $xChildren \gets \{\,n' \in \children{n} | x \in \vars{n'}$  or  $x \in D_y$ for some $y \in \vars{n'}\,\}$
+%        \If{$xChildren = \children{n}$}%\Comment{$x$ or its dependency is in every child}
+%          \State break
+%        \Else
+%          \State $n_x \gets \Call{CombineChildren}{xChildren, {\lor}}$
+%          \State $\children{n} \gets (\children{n} \setminus xChildren) \cup n_x$
+%          \State \Call{PushVar}{$x$, $n_x$}
+%          \State remove $x$ from $\prefix{n}$
+%        \EndIf
+%      \EndWhile
+%    \EndFunction
+%  \end{algorithmic}
+%\end{algorithm}
 
 
 \chapter{Implementation}
 \label{chap:implementation}
-We implemented the algorithm as a tool DQBDD (see Appendix~\ref{appendix:DQBDD} for a documentation) from Chapter~\ref{chap:algorithm} in C\texttt{++} using version 3.0.0 of the CUDD\footnote{\url{https://github.com/ivmai/cudd}} package~\cite{CUDD} for BDD manipulation, version 2.2.0 of the cxxopts\footnote{\url{https://github.com/jarro2783/cxxopts}} library for parsing command-line arguments and preprocessor HQSpre~\cite{HQSpre2}, more specifically the version that was used with HQS with quantifier localisation~\cite{HQSquantifierLocalisation}.
+We implemented the algorithm as a tool DQBDD~\footnote{the source code can be found \url{https://github.com/jurajsic/DQBDD}} (see Appendix~\ref{appendix:DQBDD} for a documentation) from Chapter~\ref{chap:algorithm} in C\texttt{++} using version 3.0.0 of the CUDD\footnote{\url{https://github.com/ivmai/cudd}} package~\cite{CUDD} for BDD manipulation, version 2.2.0 of the cxxopts\footnote{\url{https://github.com/jarro2783/cxxopts}} library for parsing command-line arguments and preprocessor HQSpre~\cite{HQSpre2}, more specifically the version that was used with HQS with quantifier localisation~\cite{HQSquantifierLocalisation}.
 
 The tool takes as an input \DQDIMACS{}~\cite{iDQandDQDIMACS} file on which we can run the preprocessor HQSpre. As was explained in Section~\ref{sec:preprocessing}, HQSpre can extract logical gates from variables in the formula that can be then replaced by them resulting in formula with fewer variables. This results in a formula that does not need to be in PCNF, which most solvers cannot handle. However, as HQS, our solver can work with non-PCNF formulas, stemming from the fact that we represent matrices as either BDDs or quantifier trees. This means that we can use this feature of HQSpre similarly as it is used for HQS.
 
@@ -1364,13 +1350,15 @@ First we check how many gates can be extracted. If this number is low (we use le
 
 On the result we run Algorithm~\ref{alg:general} with chosen heuristics for elimination of quantifiers. If we choose that nothing is eliminated during the transformation of quantifier tree to BDD as explained in Section~\ref{sec:algturntobdd}, we skip localisation and this transformation and create BDD directly from the output of preprocessor. Also, during the final elimination of quantifiers (line~\ref{alg:general:elimination}), we can stop after the final universal variable is eliminated and we can keep all the existential variables. Then if the resulting BDD is $0$, the formula is unsatisfiable. Otherwise it is satisfiable. This stems from the fact that we work with ROBDDs and for unsatisfiable formula all paths over the leftover existential variables in the resulting BDD go to $0$ while for satisfiable one, there is at least one path going to $1$.
 
-Finally, while applying any operation on BDDs, some variables can disappear from it, because the formula does not depend on their value. We can use this and apply the rules~\eqref{elim:univ} and \eqref{elim:exist} to remove unneeded quantifiers whenever we change the formula. This can result in better elimination algorithm because we might sever unneeded dependencies.
+While applying any operation on BDDs, some variables can disappear from it, because the formula does not depend on their value. We can use this and apply the rules~\eqref{elim:univ} and \eqref{elim:exist} to remove unneeded quantifiers whenever we change the formula. This can result in better elimination algorithm because we might sever unneeded dependencies.
+
+As explained in Section~\ref{sec:BDD}, the size of a BDD depends on the order of the variables. This is why we also use dynamic reordering provided by CUDD which reorders the variables using some heuristics whenever the BDDs grow too big. We use CUDD's implementation of Rudell's sifting algorithm~\cite{BDDsifting}.
 
 % TODO popisat triedy???
 
 \chapter{Experimental results}
 \label{chap:experiments}
-This chapter shows the experimental results of different versions of DQBDDs and its comparison with different DQBF solvers (iDQ, iProver, dCAQE and HQS). All our benchmarks were run on a computer with ...?????????..... using benchexec 2.2~\cite{benchexec} where we set the time limit at \SI{15}{min} and the memory limit at \SI{4}{GB}. We also run all benchmarks in parallel on 6 cores???
+This chapter shows the experimental results of different versions of DQBDDs and its comparison with different DQBF solvers (iDQ v1.0\footnote{\url{http://fmv.jku.at/idq/}}, iProver v3.1\footnote{\url{http://www.cs.man.ac.uk/~korovink/iprover/}}, dCAQE v4.0.1\footnote{\url{https://github.com/ltentrup/caqe/}} and HQS with quantifier localisation\footnote{\url{https://abs.informatik.uni-freiburg.de/src/projects_view.php?projectID=21}}). All our benchmarks were run on ??6 cores???  with ...?????????..... using BenchExec v2.2~\cite{benchexec}, a framework for reliable benchmarking and rescource measurement, where we set per benchmark the runtime limit at \SI{15}{min} and the memory consumption limit at \SI{4}{GB}. We also run all benchmarks in parallel on 6 cores???
 
 %povedat ze sme najprv pustili HQSpre (odkaz na sekciu a asi aj znova citovat) bez gate detection, odfiltrovali sme results ktore boli vyriesene HQSpre alebo uz HQSpre prekrocil limity... vysledok tohto sme hodili do iDQ, iProver, dCAQE
 
@@ -1406,24 +1394,61 @@ First, we run preprocessor HQSpre on all benchmarks. Table~\ref{tab:HQSpre} show
 
 \begin{table}[ht]
 \centering
-\catcode`\-=12
 \begin{tabular}{c|l|l|l|l|}
-\cline{2-5}
+\hhline{~----}
 \cellcolor{white}                 & \textbf{PEC} & \textbf{CSP} & \textbf{SAT} & \textbf{E19} \\ \hline
 \multicolumn{1}{|l|}{\textbf{S}}  & 111          & 33           & 4            & 33           \\ \hline
 \multicolumn{1}{|l|}{\textbf{U}}  & 879          & 6            & 8            & 55           \\ \hline
 \multicolumn{1}{|l|}{\textbf{?}} & 3326         & 422          & 22           & 246          \\ \hline
 \end{tabular}
-\caption{Results of HQSpre where \textbf{S} is the number of solved satisfiable instances, \textbf{U} number of solved unsatisfiable instances and \textbf{?} number of unsolved instances}
+\caption{Results of HQSpre where \textbf{S} is the number of solved satisfiable instances, \textbf{U} number of solved unsatisfiable instances and \textbf{?} number of unsolved instances.}
 \label{tab:HQSpre}
 \end{table}
 
 We removed the solved instances from the benchmarks sets and we run the solvers only on the results of unsolved instances (as the preprocessor simplified these). The resulting times of these runs are then combination of HQSpre and solver runtime. However, we do not run HQS and DQBDD on these simplified instances, as both of these solvers incorporate HQSpre in their solving routine (as explained in Chapter~\ref{chap:implementation}), therefore we run them on the original instances. We still run them only on the instances which were not solved by HQSpre because the incorporated HQSpre in these solvers would have solved other instances anyway. The time of HQSpre is then not added to these solvers, because the runtime of preprocessing is included in the runtime of those two solvers.
 
-%povedat ze sme pustili HQSpre s default konfiguraciou na vsetky benchmarks, dat tabulku ze z kazdeho benchmarku kolko je SAT, UNSAT a UNKNOWN. A ze iba na tie ktore su unknown, tak na HQSpre results pustame dalsie solvre. Cas tohto sa zaratava, ale nie pre HQS a nas, pretoze pouzivaju gate extraction s tym ze tieto pustaju HQSpre priamo (tak ako vysvetlene v implementation), takze ich pustame na originaloch. 
-
 \section{Heuristics comparison}
-dat porovnanie roznych heurisitk pre nas, ze ukazeme ktora je najlepsia a tu budeme pouzivat dalej, asi to zrobim len na DQBF19 benchmarku
+To be able to compare DQBDD to other solvers it is important to choose the right heuristics for choosing the universal variables to be eliminated and quantifiers to eliminate in quantifier tree (see Section~\ref{sec:quantLocalisation} and \ref{sec:quantElimination}). For this we compare these heuristics on E19 benchmark set as it is a selected combination of other benchmarks and it is reasonably small. 
+
+
+\begin{table}
+\centering
+\caption{Comparison of DQBDD heuristics for the choice of the next universal variable to eliminate and which quantifiers to eliminate during transformation to BDD on E19 benchmark with the total number (\textbf{\#}) of instances solved and the number of satisfiable (\textbf{S}) and unsatisfiable (\textbf{U}) from these.}
+\label{tab:heurcomp}
+\begin{tabular}{|l||l|l|l|l|l|l|l|l|l|}
+\hline
+\multicolumn{1}{|c||}{\textbf{order of the next}} & \multicolumn{9}{c|}{\textbf{what quantifiers to eliminate}} \\ \hhline{~*{9}{-}} 
+\multicolumn{1}{|c||}{\textbf{universal variable}} & \multicolumn{3}{c|}{\textbf{none}}     & \multicolumn{3}{c|}{\textbf{simple}}   & \multicolumn{3}{c|}{\textbf{all}} \\ \hhline{~*{9}{-}} 
+\multicolumn{1}{|c||}{\textbf{to eliminate}} & \multicolumn{1}{c|}{\textbf{\#}} & \multicolumn{1}{c|}{\textbf{S}} & \multicolumn{1}{c|}{\textbf{U}} & \multicolumn{1}{c|}{\textbf{\#}} & \multicolumn{1}{c|}{\textbf{S}} & \multicolumn{1}{c|}{\textbf{U}} & \multicolumn{1}{c|}{\textbf{\#}} & \multicolumn{1}{c|}{\textbf{S}} & \multicolumn{1}{c|}{\textbf{U}} \\ \hline
+\textbf{set at beginning}    & 94 & 41 & 53 & 139 & 43 & 96 & 134 & 38 & 96 \\ \hline
+\textbf{current lowest}      & 94 & 41 & 53 & 138 & 42 & 96 & 134 & 38 & 96 \\ \hline
+\textbf{vars in conjuncts}   & 94 & 41 & 53 & 139 & 43 & 96 & 135 & 40 & 95 \\ \hline
+\end{tabular}
+\end{table}
+
+Table~\ref{tab:heurcomp} shows this comparison where we run every possible combination of heuristics. 
+
+tell which is best, we use that for the next section
+
+\tikzsetnextfilename{DQBDDsimplevsall}
+\begin{figure}
+  \centering
+  \begin{tikzpicture}
+    \begin{axis}[
+      enlargelimits=false,
+    ]
+    \addplot+[
+      only marks,]
+      %mark=,
+      %mark size=2.9pt]
+      table[col sep=comma]{data/DQBDDsimpleallcomparison.csv};
+    \end{axis}
+  \end{tikzpicture}
+  \caption{Caption}
+  \label{fig:my_label}
+\end{figure}
+
+To also show that it is better to use preprocessor and dynamic reordering, we run DQBDD (with simple quantifiers elimination and the order of the next variable set at beginning) without preprocessor and without dynamic reordering. The run without preprocessor solved only .... (with ... satisfiable and ... unsatisfiable) and the one without dynamic reordering solved only 84 instances (with 37 satisfiable and 47 unsatisfiable).
 
 \section{SAT}
 porovnat runs zo sat benchmarku (alebo mozno dam vsetky benchmarks dohromady, jednu velku tabulku kde dam vsetky solvre a benchmarks a nejake grafy)
@@ -1441,11 +1466,14 @@ porovnat runs zo BOSY benchmarku
 porovnat runs zo DQBF19 benchmarku
 
 \chapter{Conclusion}
-Work to do:
+We have implemented quantifier elimination DQBF solver DQBDD that uses BDDs. We have shown missing proofs used for quantifier localisation while fixing the disjunction problem??? as well as added proof for universal expansion for subformulas. We have done an extensive evaluation of different heuristics used in DQBDD and compared the best ones with other DQBF solvers. We have shown that our solver is da best so fuck off
+
+As future work we are planning to???
 \begin{itemize}
-    \item add BDDs to HQS as BDDs are used in AIGsolve
-    \item add more preprocessing?
-    \item try dqbf to qbf 
+    \item it is a good idea to think whether HQS and DQBDD can be combined as in AIGsolve where they use AIGs but try to change them to BDDs when possible??? add BDDs to HQS similarly as BDDs are used in AIGsolve
+    \item It would be also good idea to add more preprocessing (PSPACE subset, approximations, using bloqqer with caqe) ?
+    \item Another possible direction is to implement the quantifier elimination only of those universal variables which result in qbf and possibly design and implement a QBF solver using BDDs which could solve it???
+    \item Finally, we should look into whether initializing variable order for BDDs makes sense (and what should it be) and what other reordering techniques could we use (we now use dynamic sifting, could be interesting to try others that CUDD implements, also would be interesting to use ''static'' reordering, where we would say when to reorder)
 \end{itemize}
 
 \begingroup
