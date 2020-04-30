@@ -148,6 +148,8 @@
 \usepackage{multirow}
 % for better lines
 \usepackage{hhline}
+% for thick vertical line
+\newcolumntype{?}{!{\vrule width 2pt}}
 
 % for subfigures
 \usepackage[font=normalsize]{subcaption}
@@ -182,13 +184,13 @@
 \usepackage{ebproof}
 
 
-\usepackage{tikz}
+%\usepackage{tikz}
 %\usetikzlibrary{arrows.meta,automata,positioning}
 % so tikzpictures are not recomputed each compulation
-\usetikzlibrary{external}
-\tikzexternalize[prefix=tikz/]
+%\usetikzlibrary{external}
+%\tikzexternalize[prefix=tikz/]
 
-\usepackage{pgfplots}
+%\usepackage{pgfplots}
 
 % for creating quantifier trees
 \usepackage{forest}
@@ -577,7 +579,7 @@ We start with a theorem that shows some rules by which we can push (extract) qua
   \end{align}
 \end{theorem}
 
-To make these rules more usable for DQBF in NNF we have to show that they also work while replacing subformulas. Except for~\eqref{loc:unconj2}, this was not proven by Ge-Ernst et al.~\cite{HQSquantifierLocalisation} even though they used it for replacing subformulas. As we will show, this was used erroneously because the rule~\eqref{loc:exdisj} does not generally hold. However, for other rules there is no problem as the next theorem shows.
+To make these rules more usable for DQBF in NNF we have to show that they also work while replacing subformulas. Except for~\eqref{loc:unconj2}, this was not proven by Ge-Ernst et al.~\cite{HQSquantifierLocalisation} even though they use them for replacing subformulas. As we will show, this was used erroneously because the rule~\eqref{loc:exdisj} does not generally hold. However, for other rules there is no problem as the next theorem shows.
 
 \begin{theorem}
   \label{thrm:quantLocalSubformulas}
@@ -1306,7 +1308,7 @@ The heuristics we use for choosing the next universal variable to eliminate on l
     \[\forall x_2 \forall x_3 \exists y_1(x_2) \exists y_2(x_2) \exists y_1'(x_2) \exists y_2'(x_2) \exists y_3(x_3) \exists y_4(x_3) \exists y_5 (x_3)\]
     where $y_1'$ and $y_2'$ were created as copies of $y_1$ and $y_2$ during universal expansion. Now, in the previous heuristic $x_2$ would be chosen. However, here $x_3$ is chosen because it still depends only on three variables, while $x_2$ now depends on four. This heuristic was introduced by Gitina et al.~\cite{HQSsimpleAlg}.
     \item Another heuristic we use is based on the number of variables in the BDDs representing the two conjuncts used for universal expansion in Theorem~\ref{thrm:unExpan}. That is, let $x \in \uprefix{n}$ and $\psi_1^{-x}\substitute{x}{0}$, $\psi_2^{-x}\substitute{x}{1}$
-    be the two conjuncts from Theorem~\ref{thrm:unExpan} as if we were doing universal expansion. Because the operation of replacing variables with constants is fast for BDDs, we can create BDDs for these two formulas and check for the amount of variables in both of them, that is the number of variables in the set $\vars{\psi_1^{-x}\substitute{x}{0}} \cup \vars{\psi_2^{-x}\substitute{x}{1}}$. Because BDDs remove the variables which are not needed, the number of variables in this union can be smaller than expected. We can do this for all universal variables and choose the one with the lowest number of variables in this set. If there are multiple such variables, we can also use one of the previous heuristics to choose from them.
+    be the two conjuncts from Theorem~\ref{thrm:unExpan} as if we were doing universal expansion. Because the operation of replacing variables with constants is fast for BDDs, we can create BDDs for these two formulas and check for the amount of variables in both of them, that is the number of variables in the set $\vars{\psi_1^{-x}\substitute{x}{0}} \cup \vars{\psi_2^{-x}\substitute{x}{1}}$. Because BDDs remove the variables which are not needed, the number of variables in this union can be smaller than expected. We can do this for all universal variables and choose the one with the lowest number of variables in this set. Notice, that this heuristic behaves like the previous one if no variables are removed in BDDs.
     %\item something with creating depency tree, to find existential variables to remove as fast as possible (not sure if possible) --- maybe possible, basically remove those universal vars that will make it possible to remove as much existential vars as possible on the level??? 
 \end{itemize}
 
@@ -1369,13 +1371,22 @@ This chapter shows the experimental results of different versions of DQBDDs and 
 All used benchmarks with the results??? and BenchExec definitions??? can be found in github repository\footnote{\url{https://github.com/jurajsic/DQBFbenchmarks}}.
 
 \section{Benchmark sets}
-We use four different benchmark sets:
+We use these benchmark sets for the experimental evaluation:
 
-\paragraph{PEC}
-The first set consists of 4316 DQBF encodings of partial equivalence checking problem for incomplete circuits from various sources~\cite{iDQandDQDIMACS,FastDQBFRefutation,HQSsimpleAlg,PECScholl}. Incomplete circuits are combinational circuits containing missing parts, so called Black-Boxes. For these we only know their input and output signals, the functionality is unknown. The partial equivalence checking problem answers the question whether the given complete and incomplete circuit are equivalent.
+%\paragraph{PEC}
+%The first set consists of 4316 DQBF encodings of partial equivalence checking problem for incomplete circuits from various sources~\cite{iDQandDQDIMACS,FastDQBFRefutation,HQSsimpleAlg,PECScholl}. Incomplete circuits are combinational circuits containing missing parts, so called Black-Boxes. For these we only know their input and output signals, the functionality is unknown. The partial equivalence checking problem answers the question whether the given complete and incomplete circuit are equivalent.
+
+\paragraph{PEC1}
+The first set consists of 1200 DQBF encodings of partial equivalence checking (PEC) problem for incomplete circuits used by Fr\"{o}hlich et al. for evaluating their DQBF solver iDQ~\cite{iDQandDQDIMACS}. Incomplete circuits are combinational circuits containing some missing parts, so called black-boxes. For these we only know their input and output signals, the functionality is unknown. The partial equivalence checking problem answers the question whether there exists an implementation of black-boxes in some given incomplete circuit such that a different complete circuit is equivalent to it.
+
+\paragraph{PEC2}
+This is another set of DQBF encodings for PEC, these are from Finkbeiner et al.~\cite{FastDQBFRefutation}. This set contains 2000 instances with over-proportionally many unsatisfiable ones.
+
+\paragraph{PEC3}
+One more set of 1116 PEC encodings~\cite{HQSsimpleAlg,PECScholl}.
 
 \paragraph{CSP}
-This set consists of 461 instances encoding controller synthesis problem~\cite{CSPbenchmarks} in which we try to find safe controller for controllable transition system. Controllable transition system is composed of state and two types of inputs -- uncontrollable and controllable -- which decide to which state the system moves. Controller decides the controllable inputs and a safe controller is such a controller that the transition system always stays in some set of safe states.
+This set consists of 461 instances of controller synthesis problem~\cite{CSPbenchmarks} in which we try to find safe controller for controllable transition system. Controllable transition system is composed of state and two types of inputs -- uncontrollable and controllable -- which decide to which state the system moves. Controller decides the controllable inputs and a safe controller is such a controller that the transition system always stays in some set of safe states.
 
 \paragraph{SAT}
 The next set is created from 34 SAT instances which are transformed into equisatisfiable DQBF with exponentially smaller number of variables~\cite{SATbenchmarks}.
@@ -1394,12 +1405,16 @@ First, we run preprocessor HQSpre on all benchmarks. Table~\ref{tab:HQSpre} show
 
 \begin{table}[ht]
 \centering
-\begin{tabular}{c|l|l|l|l|}
-\hhline{~----}
-\cellcolor{white}                 & \textbf{PEC} & \textbf{CSP} & \textbf{SAT} & \textbf{E19} \\ \hline
-\multicolumn{1}{|l|}{\textbf{S}}  & 111          & 33           & 4            & 33           \\ \hline
-\multicolumn{1}{|l|}{\textbf{U}}  & 879          & 6            & 8            & 55           \\ \hline
-\multicolumn{1}{|l|}{\textbf{?}} & 3326         & 422          & 22           & 246          \\ \hline
+\begin{tabular}{c|r|r|r|r|r|r|}
+\hhline{~*{6}{-}}
+\cellcolor{white}                % & \textbf{PEC} 
+& \textbf{PEC1} & \textbf{PEC2} & \textbf{PEC3} & \textbf{CSP} & \textbf{SAT} & \textbf{E19} \\ \hline
+\multicolumn{1}{|l|}{\textbf{S}} % & 111         
+& 86 & 0 & 25 & 33 & 4 & 33 \\ \hline
+\multicolumn{1}{|l|}{\textbf{U}} % & 879          
+& 681 & 0 & 198 & 6 & 8 & 55 \\ \hline
+\multicolumn{1}{|l|}{\textbf{?}} %& 3326        
+& 433 & \num{2000} & 893 & 422 & 22 & 246 \\ \hline
 \end{tabular}
 \caption{Results of HQSpre where \textbf{S} is the number of solved satisfiable instances, \textbf{U} number of solved unsatisfiable instances and \textbf{?} number of unsolved instances.}
 \label{tab:HQSpre}
@@ -1408,10 +1423,10 @@ First, we run preprocessor HQSpre on all benchmarks. Table~\ref{tab:HQSpre} show
 We removed the solved instances from the benchmarks sets and we run the solvers only on the results of unsolved instances (as the preprocessor simplified these). The resulting times of these runs are then combination of HQSpre and solver runtime. However, we do not run HQS and DQBDD on these simplified instances, as both of these solvers incorporate HQSpre in their solving routine (as explained in Chapter~\ref{chap:implementation}), therefore we run them on the original instances. We still run them only on the instances which were not solved by HQSpre because the incorporated HQSpre in these solvers would have solved other instances anyway. The time of HQSpre is then not added to these solvers, because the runtime of preprocessing is included in the runtime of those two solvers.
 
 \section{Heuristics comparison}
-To be able to compare DQBDD to other solvers it is important to choose the right heuristics for choosing the universal variables to be eliminated and quantifiers to eliminate in quantifier tree (see Section~\ref{sec:quantLocalisation} and \ref{sec:quantElimination}). For this we compare these heuristics on E19 benchmark set as it is a selected combination of other benchmarks and it is reasonably small. 
+To be able to compare DQBDD to other solvers it is important to choose the right heuristics for choosing the universal variables to be eliminated (see Section~\ref{sec:algelimination}) and quantifiers to eliminate in quantifier tree (see Section~\ref{sec:algturntobdd}). For this we compare these heuristics on E19 benchmark set as it is a selected combination of other benchmarks and it is reasonably small. 
 
 
-\begin{table}
+\begin{table}[ht]
 \centering
 \caption{Comparison of DQBDD heuristics for the choice of the next universal variable to eliminate and which quantifiers to eliminate during transformation to BDD on E19 benchmark with the total number (\textbf{\#}) of instances solved and the number of satisfiable (\textbf{S}) and unsatisfiable (\textbf{U}) from these.}
 \label{tab:heurcomp}
@@ -1426,51 +1441,154 @@ To be able to compare DQBDD to other solvers it is important to choose the right
 \end{tabular}
 \end{table}
 
-Table~\ref{tab:heurcomp} shows this comparison where we run every possible combination of heuristics. 
+Table~\ref{tab:heurcomp} shows this comparison where we run every possible combination of heuristics. It shows the number of solved instances (\textbf{\#}) and from these the number of \textbf{S}atisfiable and \textbf{U}n\-sa\-ti\-sfi\-able instances. It is obvious that it is best to eliminate only simple quantifiers (meaning all possible existential variables and only those universal variables which do not have any dependency) during the transformation to BDD. However, eliminating all universal variables during this transformation was not much worse compared to the eliminating simple ones, only a few less instances were solved. For the heuristic that chooses the next universal variable to eliminate, it is not obvious which one is the best. The number of solved instances here is pretty much the same for a chosen heuristic of which quantifiers to eliminate so the choice of which one is the best is not so clear. We can however compare the total runtimes of all solved instances. In the case of simple elimination, we get that the total runtime of solved instances by heuristic which sets the order of unviersal variables to eliminate at the beginning is \SI{3440.76}{s}, by heuristic which chooses the universal variable as the one with currently the lowest number of dependencies is \SI{3785.59}{s} and the one that chooses based on the number of variable in the two BDDs representing the conjuncts of universal expansion is \SI{4125.18}{s}. Obviously, from these we can see that it is best to eliminate simple quantifiers and set the order of universal variables at the beginning.
 
-tell which is best, we use that for the next section
+TODO: say something about vars in conjuncts is like current lowest, but not always, and then it is better (also for some cases, the number of dyn reorderings is probably so hugh -- probably caused by the constant checking of conjuncts -- that it can sometimes result in small BDD and then it solves some instances (2?) which other heuristics cannot.
 
-\tikzsetnextfilename{DQBDDsimplevsall}
-\begin{figure}
-  \centering
-  \begin{tikzpicture}
-    \begin{axis}[
-      enlargelimits=false,
-    ]
-    \addplot+[
-      only marks,]
-      %mark=,
-      %mark size=2.9pt]
-      table[col sep=comma]{data/DQBDDsimpleallcomparison.csv};
-    \end{axis}
-  \end{tikzpicture}
-  \caption{Caption}
-  \label{fig:my_label}
-\end{figure}
+To also show that it is better to use dynamic reordering, we run DQBDD (with simple quantifiers elimination and the order set at beginning) without dynamic reordering. We get that the run without dynamic reordering solved only 84 instances (with 37 satisfiable and 47 unsatisfiable), which is much less that the run with dynamic reordering. When we run other two heuristics for ordering, the number of solved instances was even less, for both of them it was 73.
 
-To also show that it is better to use preprocessor and dynamic reordering, we run DQBDD (with simple quantifiers elimination and the order of the next variable set at beginning) without preprocessor and without dynamic reordering. The run without preprocessor solved only .... (with ... satisfiable and ... unsatisfiable) and the one without dynamic reordering solved only 84 instances (with 37 satisfiable and 47 unsatisfiable).
 
-\section{SAT}
-porovnat runs zo sat benchmarku (alebo mozno dam vsetky benchmarks dohromady, jednu velku tabulku kde dam vsetky solvre a benchmarks a nejake grafy)
+%\section{PEC}
+%porovnat runs zo pec benchmarku
+%
+%\begin{table}[]
+%\centering
+%\begin{tabular}{|l|r|r|r|r|r|r|r|r|}
+%\hline
+%\multicolumn{1}{|c|}{}                                  & \multicolumn{5}{c|}{\textbf{Solved}}                                                                                                                                        & \multicolumn{3}{c|}{\textbf{Unsolved}}                                                                 \\  \hhline{~*{8}{-}}
+%\multicolumn{1}{|c|}{\multirow{-2}{*}{\textbf{Solver}}} & \multicolumn{1}{c|}{\textbf{\#}} & \multicolumn{1}{c|}{\textbf{Time (s)}} & \multicolumn{1}{c|}{\textbf{S}} & \multicolumn{1}{c|}{\textbf{U}} & \multicolumn{1}{c|}{\textbf{*}} & \multicolumn{1}{c|}{\textbf{T}} & \multicolumn{1}{c|}{\textbf{M}} & \multicolumn{1}{c|}{\textbf{O}} \\ \hline
+%\textbf{dCAQE} & \num{795} & \num{19540.74} & \num{144} & \num{651} & \num{3} & \num{2526} & \num{5} & \num{0} \\ \hline
+%\textbf{DQBDD} & \num{2995} & \num{29930.45} & \num{363} & \num{2632} & \num{447} & \num{222} & \num{109} & \num{0} \\ \hline
+%\textbf{HQS} & \num{2569} & \num{58663.80} & \num{266} & \num{2303} & \num{30} & \num{692} & \num{0} & \num{65} \\ \hline
+%\textbf{iDQ} & \num{536} & \num{22014.62} & \num{79} & \num{457} & \num{4} & \num{2790} & \num{0} & \num{0} \\ \hline
+%\textbf{iProver} & \num{638} & \num{21150.88} & \num{99} & \num{539} & \num{0} & \num{14} & \num{2658} & \num{16} \\ \hline
+%\end{tabular}
+%\caption{Solvers on PEC...}
+%\label{tab:PEC}
+%\end{table}
 
-\section{PEC}
-porovnat runs zo pec benchmarku
+\section{PEC1}
+
+\begin{table}[]
+\centering
+\begin{tabular}{|l|r|r|r|r|r|r|r|r|}
+\hline
+\multicolumn{1}{|c|}{}                                  & \multicolumn{5}{c|}{\textbf{Solved}}                                                                                                                                        & \multicolumn{3}{c|}{\textbf{Unsolved}}                                                                 \\  \hhline{~*{8}{-}}
+\multicolumn{1}{|c|}{\multirow{-2}{*}{\textbf{Solver}}} & \multicolumn{1}{c|}{\textbf{\#}} & \multicolumn{1}{c|}{\textbf{Time (s)}} & \multicolumn{1}{c|}{\textbf{S}} & \multicolumn{1}{c|}{\textbf{U}} & \multicolumn{1}{c|}{\textbf{*}} & \multicolumn{1}{c|}{\textbf{T}} & \multicolumn{1}{c|}{\textbf{M}} & \multicolumn{1}{c|}{\textbf{O}} \\ \hline
+\textbf{dCAQE} & \num{433} & \num{134.89} & \num{48} & \num{385} & \num{0} & \num{0} & \num{0} & \num{0} \\ \hline
+\textbf{DQBDD} & \num{430} & \num{18.38} & \num{47} & \num{383} & \num{0} & \num{0} & \num{3} & \num{0} \\ \hline
+\textbf{HQS} & \num{413} & \num{68.06} & \num{44} & \num{369} & \num{0} & \num{2} & \num{0} & \num{18} \\ \hline
+\textbf{iDQ} & \num{413} & \num{16943.53} & \num{40} & \num{373} & \num{0} & \num{20} & \num{0} & \num{0} \\ \hline
+\textbf{iProver} & \num{414} & \num{9265.67} & \num{43} & \num{371} & \num{0} & \num{6} & \num{0} & \num{0} \\ \hline
+\end{tabular}
+\caption{Solvers on PEC1...}
+\label{tab:???}
+\end{table}
+
+\section{PEC2}
+
+\begin{table}[]
+\centering
+\begin{tabular}{|l|r|r|r|r|r|r|r|r|}
+\hline
+\multicolumn{1}{|c|}{}                                  & \multicolumn{5}{c|}{\textbf{Solved}}                                                                                                                                        & \multicolumn{3}{c|}{\textbf{Unsolved}}                                                                 \\  \hhline{~*{8}{-}}
+\multicolumn{1}{|c|}{\multirow{-2}{*}{\textbf{Solver}}} & \multicolumn{1}{c|}{\textbf{\#}} & \multicolumn{1}{c|}{\textbf{Time (s)}} & \multicolumn{1}{c|}{\textbf{S}} & \multicolumn{1}{c|}{\textbf{U}} & \multicolumn{1}{c|}{\textbf{*}} & \multicolumn{1}{c|}{\textbf{T}} & \multicolumn{1}{c|}{\textbf{M}} & \multicolumn{1}{c|}{\textbf{O}} \\ \hline
+\textbf{dCAQE} & \num{34} & \num{134.12} & \num{0} & \num{34} & \num{0} & \num{1961} & \num{5} & \num{0} \\ \hline
+\textbf{DQBDD} & \num{1999} & \num{19618.36} & \num{123} & \num{1876} & \num{278} & \num{0} & \num{1} & \num{0} \\ \hline
+\textbf{HQS} & \num{1722} & \num{51769.75} & \num{1642} & \num{80} & \num{1} & \num{246} & \num{0} & \num{32} \\ \hline
+\textbf{iDQ} & \num{4} & \num{292.66} & \num{0} & \num{4} & \num{0} & \num{1996} & \num{0} & \num{0} \\ \hline
+\textbf{iProver} & \num{40} & \num{3200.80} & \num{1} & \num{39} & \num{0} & \num{9} & \num{1950} & \num{1} \\ \hline
+\end{tabular}
+\caption{Solvers on PEC2...}
+\label{tab:PEC2}
+\end{table}
+
+\section{PEC3}
+
+\begin{table}[]
+\centering
+\begin{tabular}{|l|r|r|r|r|r|r|r|r|}
+\hline
+\multicolumn{1}{|c|}{}                                  & \multicolumn{5}{c|}{\textbf{Solved}}                                                                                                                                        & \multicolumn{3}{c|}{\textbf{Unsolved}}                                                                 \\  \hhline{~*{8}{-}}
+\multicolumn{1}{|c|}{\multirow{-2}{*}{\textbf{Solver}}} & \multicolumn{1}{c|}{\textbf{\#}} & \multicolumn{1}{c|}{\textbf{Time (s)}} & \multicolumn{1}{c|}{\textbf{S}} & \multicolumn{1}{c|}{\textbf{U}} & \multicolumn{1}{c|}{\textbf{*}} & \multicolumn{1}{c|}{\textbf{T}} & \multicolumn{1}{c|}{\textbf{M}} & \multicolumn{1}{c|}{\textbf{O}} \\ \hline
+\textbf{dCAQE} & \num{328} & \num{19271.73} & \num{232} & \num{96} & \num{3} & \num{565} & \num{0} & \num{0} \\ \hline
+\textbf{DQBDD} & \num{566} & \num{10293.71} & \num{193} & \num{373} & \num{169} & \num{222} & \num{105} & \num{0} \\ \hline
+\textbf{HQS} & \num{434} & \num{6825.99} & \num{142} & \num{292} & \num{29} & \num{444} & \num{0} & \num{15} \\ \hline
+\textbf{iDQ} & \num{119} & \num{4778.43} & \num{39} & \num{80} & \num{4} & \num{774} & \num{0} & \num{0} \\ \hline
+\textbf{iProver} & \num{184} & \num{8684.41} & \num{55} & \num{129} & \num{0} & \num{5} & \num{702} & \num{2} \\ \hline
+\end{tabular}
+\caption{Solvers on PEC3...}
+\label{tab:PEC3}
+\end{table}
 
 \section{CSP}
 porovnat runs zo csp benchmarku
 
-\section{BOSY}
-porovnat runs zo BOSY benchmarku
+\begin{table}[]
+\centering
+\begin{tabular}{|l|r|r|r|r|r|r|r|r|}
+\hline
+\multicolumn{1}{|c|}{}                                  & \multicolumn{5}{c|}{\textbf{Solved}}                                                                                                                                        & \multicolumn{3}{c|}{\textbf{Unsolved}}                                                                 \\  \hhline{~*{8}{-}}
+\multicolumn{1}{|c|}{\multirow{-2}{*}{\textbf{Solver}}} & \multicolumn{1}{c|}{\textbf{\#}} & \multicolumn{1}{c|}{\textbf{Time (s)}} & \multicolumn{1}{c|}{\textbf{S}} & \multicolumn{1}{c|}{\textbf{U}} & \multicolumn{1}{c|}{\textbf{*}} & \multicolumn{1}{c|}{\textbf{T}} & \multicolumn{1}{c|}{\textbf{M}} & \multicolumn{1}{c|}{\textbf{O}} \\ \hline
+\textbf{dCAQE} & \num{44} & \num{1373.30} & \num{44} & \num{0} & \num{9} & \num{378} & \num{0} & \num{0} \\ \hline
+\textbf{DQBDD} & \num{40} & \num{681.86} & \num{40} & \num{0} & \num{2} & \num{334} & \num{48} & \num{0} \\ \hline
+\textbf{HQS} & \num{42} & \num{504.51} & \num{42} & \num{0} & \num{1} & \num{82} & \num{0} & \num{298} \\ \hline
+\textbf{iDQ} & \num{10} & \num{281.18} & \num{10} & \num{0} & \num{0} & \num{407} & \num{5} & \num{0} \\ \hline
+\textbf{iProver} & \num{29} & \num{928.46} & \num{29} & \num{0} & \num{0} & \num{0} & \num{393} & \num{0} \\ \hline
+\end{tabular}
+\caption{Solvers on CSP...}
+\label{tab:CSP}
+\end{table}
+
+
+\section{SAT}
+porovnat runs zo sat benchmarku (alebo mozno dam vsetky benchmarks dohromady, jednu velku tabulku kde dam vsetky solvre a benchmarks a nejake grafy)
+
+\begin{table}[]
+\centering
+\begin{tabular}{|l|r|r|r|r|r|r|r|r|}
+\hline
+\multicolumn{1}{|c|}{}                                  & \multicolumn{5}{c|}{\textbf{Solved}}                                                                                                                                        & \multicolumn{3}{c|}{\textbf{Unsolved}}                                                                 \\  \hhline{~*{8}{-}}
+\multicolumn{1}{|c|}{\multirow{-2}{*}{\textbf{Solver}}} & \multicolumn{1}{c|}{\textbf{\#}} & \multicolumn{1}{c|}{\textbf{Time (s)}} & \multicolumn{1}{c|}{\textbf{S}} & \multicolumn{1}{c|}{\textbf{U}} & \multicolumn{1}{c|}{\textbf{*}} & \multicolumn{1}{c|}{\textbf{T}} & \multicolumn{1}{c|}{\textbf{M}} & \multicolumn{1}{c|}{\textbf{O}} \\ \hline
+\textbf{dCAQE} & \num{7} & \num{2141.37} & \num{3} & \num{4} & \num{0} & \num{15} & \num{0} & \num{0} \\ \hline
+\textbf{DQBDD} & \num{0} & \num{0} & \num{0} & \num{0} & \num{0} & \num{19} & \num{3} & \num{0} \\ \hline
+\textbf{HQS} & \num{7} & \num{3030.71} & \num{5} & \num{2} & \num{2} & \num{15} & \num{0} & \num{0} \\ \hline
+\textbf{iDQ} & \num{9} & \num{2546.24} & \num{4} & \num{5} & \num{1} & \num{13} & \num{0} & \num{0} \\ \hline
+\textbf{iProver} & \num{4} & \num{1706.29} & \num{3} & \num{1} & \num{0} & \num{18} & \num{0} & \num{0} \\ \hline
+\end{tabular}
+\caption{Solvers on SAT...}
+\label{tab:SAT}
+\end{table}
+
+uplne pohorel, je to tym ze SAT problemy boli asi dostatocne tazke a nevedel vytvorit BDDcko ani v jednom pripade (alebo quantifier tree). Toto je well knows fact o BDDckach, ze they do not scale???
+
 
 \section{DQBF19}
 porovnat runs zo DQBF19 benchmarku
+
+\begin{table}[]
+\centering
+\begin{tabular}{|l|r|r|r|r|r|r|r|r|}
+\hline
+\multicolumn{1}{|c|}{}                                  & \multicolumn{5}{c|}{\textbf{Solved}}                                                                                                                                        & \multicolumn{3}{c|}{\textbf{Unsolved}}                                                                 \\  \hhline{~*{8}{-}}
+\multicolumn{1}{|c|}{\multirow{-2}{*}{\textbf{Solver}}} & \multicolumn{1}{c|}{\textbf{\#}} & \multicolumn{1}{c|}{\textbf{Time (s)}} & \multicolumn{1}{c|}{\textbf{S}} & \multicolumn{1}{c|}{\textbf{U}} & \multicolumn{1}{c|}{\textbf{*}} & \multicolumn{1}{c|}{\textbf{T}} & \multicolumn{1}{c|}{\textbf{M}} & \multicolumn{1}{c|}{\textbf{O}} \\ \hline
+\textbf{dCAQE} & \num{111} & \num{4335.81} & \num{37} & \num{74} & \num{1} & \num{135} & \num{0} & \num{0} \\ \hline
+\textbf{DQBDD} & \num{139} & \num{3440.76} & \num{43} & \num{96} & \num{14} & \num{90} & \num{17} & \num{0} \\ \hline
+\textbf{HQS} & \num{139} & \num{6796.64} & \num{51} & \num{88} & \num{5} & \num{53} & \num{0} & \num{54} \\ \hline
+\textbf{iDQ} & \num{27} & \num{3698.26} & \num{13} & \num{14} & \num{1} & \num{218} & \num{1} & \num{0} \\ \hline
+\textbf{iProver} & \num{43} & \num{4918.77} & \num{23} & \num{20} & \num{0} & \num{23} & \num{179} & \num{1} \\ \hline
+\end{tabular}
+\caption{Solvers on E19...}
+\label{tab:E19}
+\end{table}
+
 
 \chapter{Conclusion}
 We have implemented quantifier elimination DQBF solver DQBDD that uses BDDs. We have shown missing proofs used for quantifier localisation while fixing the disjunction problem??? as well as added proof for universal expansion for subformulas. We have done an extensive evaluation of different heuristics used in DQBDD and compared the best ones with other DQBF solvers. We have shown that our solver is da best so fuck off
 
 As future work we are planning to???
 \begin{itemize}
-    \item it is a good idea to think whether HQS and DQBDD can be combined as in AIGsolve where they use AIGs but try to change them to BDDs when possible??? add BDDs to HQS similarly as BDDs are used in AIGsolve
+    \item it is a good idea to think whether HQS and DQBDD can be combined as in AIGsolve where they use AIGs but try to change them to BDDs when possible??? add BDDs to HQS similarly as BDDs are used in AIGsolve, especially during the localisation phase, it seems that the case where we did not localise (and so did not create quantifier tree) it never went out of memory, however it can during locaslisation when the tree is too big. This is because when we create just BDD, no tree, we do it from the gates and so the same gate represents the same BDD so we do not create it multiple times. But for the localisation algorithm to work properly, we have to create for each gate multiple same quantifier trees, because we might push stuff inside them in one branch but not in other. However, this might be too much, maybe it is better to just have tree share subtrees and when we see we need to push something, create a copy then??? This is a bit similar to how they do it in HQS, they basically transform AIG to quantifier tree sharing subtrees or something like that, but they never create copies, they push only if all parents share the quantifiers?? We could combine this somehow and do it like that, and then when we create the BDD, we create it up to some size or something, otherwise we keep it as AIG???
     \item It would be also good idea to add more preprocessing (PSPACE subset, approximations, using bloqqer with caqe) ?
     \item Another possible direction is to implement the quantifier elimination only of those universal variables which result in qbf and possibly design and implement a QBF solver using BDDs which could solve it???
     \item Finally, we should look into whether initializing variable order for BDDs makes sense (and what should it be) and what other reordering techniques could we use (we now use dynamic sifting, could be interesting to try others that CUDD implements, also would be interesting to use ''static'' reordering, where we would say when to reorder)
