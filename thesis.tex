@@ -58,8 +58,8 @@
     advisor       = {Jan Strej\v{c}ek},%\\ \textbf{Co-advisor:} Martin Jon\'{a}\v{s}},
     title         = {Satisfiability of DQBF Using Binary Decision Diagrams},
     TeXtitle      = {Satisfiability of DQBF Using Binary Decision Diagrams},
-    keywords      = {dependency quantified Boolean formula, DQBF, binary decision diagram, BDD, satisfiability},
-    TeXkeywords   = {dependency quantified Boolean formula, DQBF, binary decision diagram, BDD, satisfiability},
+    keywords      = {dependency quantified Boolean formula, DQBF, binary decision diagram, BDD, satisfiability, quantifier elimination},
+    TeXkeywords   = {dependency quantified Boolean formula, DQBF, binary decision diagram, BDD, satisfiability, quantifier elimination},
     abstract      = {%
       This is the abstract of my thesis, which can
 
@@ -289,9 +289,9 @@ The QBF problem is a canonical $\PSPACE$-complete problem of determining whether
 
 In recent years, DQBF solving is on a rise (driven mostly by PEC) which resulted in the first known solution for DQBF problem that used DPLL algorithm~\cite{DPLLalgorithm} followed by multiple DQBF solvers (iDQ~\cite{iDQandDQDIMACS}, iProver~\cite{iProver}, HQS~\cite{HQSquantifierElimination,HQSdependencyElimination,HQSquantifierLocalisation} and dCAQE~\cite{dCAQE}). HQS, the most successful of these (winner of both 2018 and 2019 DQBF track of QBF Evaluation competition~\cite{QBFeval18,QBFeval19}) uses quantifier elimination~\cite{HQSquantifierElimination} -- the quantifiers are eliminated one by one using universal expansion (which increases the size of the formula) until we end up with a Boolean formula (actually QBF on which an existing QBF solver is run). It also uses a succinct representation of Boolean formulas called and-inverter graphs (AIG)~\cite{FRAIGs} that makes this solving method possible.
 
-Binary decision diagrams (BDD)~\cite{BDD} are another data structure that can represent Boolean formulas. Since its introduction, BDDs have been used in many different applications. Compared to AIGs they are better representation in the way that, for a given variable ordering, there is only one BDD for each Boolean formula. However, AIGs can sometimes be much smaller for the same Boolean formula.
+Binary decision diagrams (BDD)~\cite{BDD} are another data structure that can represent Boolean formulas. Since its introduction, BDDs have been used in many different applications. Compared to AIGs they are better representation in the way that, for a given variable ordering, there is only one BDD for each Boolean formula.
 
-In this work we are interested in a DQBF that uses BDD as an underlying representation of formulas combined with quantifier elimination. We use quantifier localisation~\cite{HQSquantifierLocalisation} (also used in HQS) which allows us to push quantifiers inside the formula and eliminate them only ``locally`` in subformulas. We show that the localisation used in HQS is erroneous and we give a corrected version of the localisation algorithm. We also give an important missing proof that shows the localisation can also be used in subformulas and enhance it with ``local`` universal expansion. We do this in Chapter~\ref{chap:theory} where we also give all the needed theory. Chapter~\ref{chap:SoA} gives an overview of existing DQBF solving techniques. In Chapter~\ref{chap:algorithm} we show the fixed algorithm with enhancement. We also implement this algorithm with the details in Chapter~\ref{chap:implementation} and finally, we do an extensive experimental evaluation where we compare it with other solvers in Chapter~\ref{chap:experiments}.
+In this work, we are interested in creating a DQBF solver that uses BDD as an underlying representation of formulas combined with quantifier elimination. We use quantifier localisation~\cite{HQSquantifierLocalisation} (also used in HQS) which allows us to push quantifiers inside the formula and eliminate them only ``locally`` in subformulas. We show that the localisation used in HQS is erroneous and we give a corrected version of the localisation algorithm. We also give an important missing proof that shows the localisation can also be used in subformulas and enhance it with ``local`` universal expansion. We do this in Chapter~\ref{chap:theory} where we also give all the needed theory. Chapter~\ref{chap:SoA} gives an overview of existing DQBF solving techniques. In Chapter~\ref{chap:algorithm} we show the fixed algorithm with enhancement. We also implement this algorithm with the details in Chapter~\ref{chap:implementation} and finally, we do an extensive experimental evaluation where we compare it with other solvers in Chapter~\ref{chap:experiments}.
 
 \chapter{Theory}
 \label{chap:theory}
@@ -564,7 +564,7 @@ We start with a theorem that shows some rules by which we can push (extract) qua
 
 \begin{theorem}[{\cite[Theorems 3,4]{HQSquantifierLocalisation}}]
 \label{thrm:quantLocalEq}
-  Let ${\diamond} \in \set{{\land},{\lor}}$ and $\psi,\psi_1,\psi_2 \in \DQBF{V}$. We assume that $x'$ and $y'$ are fresh variables, which do not occur in $\psi,\psi_1$ and $\psi_2$. The following equisatifiabilities hold for all DQBFs in NNF.
+  Let ${\diamond} \in \set{{\land},{\lor}}$ and $\psi,\psi_1,\psi_2 \in \DQBF{V}$. We assume that $x'$ and $y'$ are fresh variables, which do not occur in $\psi,\psi_1$ and $\psi_2$. The following equisatifiabilities hold for all DQBFs in NNF:
   \begin{align}
       %\forall x : \psi &\approx \psi \text{, if } x \not\in V_{\psi} \\
       \forall x \itholds (\psi_1 \land \psi_2) &\approx \left(\forall x \itholds \psi_1 \land \forall x' \itholds \psi_2\substitute{x}{x'}\right) \tag{a} \label{loc:unconj1} \\
@@ -599,7 +599,7 @@ To make these rules more usable for DQBF in NNF we have to show that they also w
 
 As we already mentioned, the rule~\eqref{loc:exdisj} as it stands cannot be generally used for replacing subformulas. We show it on the following formula:
 \[\forall x \exists y(\emptyset) \itholds ((x \land y) \lor (\neg x \land \neg y)).\]
-It is obviously not satisfiable because whether $s(y) = 0$ or $s(y) = 1$ we always can find valuation in which both disjuncts are not true. However if we assumed that rule~(\ref{loc:exdisj}) can be also used for subformulas we would get
+It is obviously not satisfiable because whether $s(y) = 0$ or $s(y) = 1$ we can always find valuation in which both disjuncts are not true. However if we assumed that rule~(\ref{loc:exdisj}) can be also used for subformulas we would get
 \[\forall x \itholds (\exists y(\emptyset) \itholds (x \land y) \lor \exists y'(\emptyset) \itholds (\neg x \land \neg y')),\]
 which is satisfiable for $s$ where $s(y) = 1$ and $s(y') = 0$. To fix this, we need to restrict the variables that can occur in the disjuncts. When we look at this formula, it would appear that the problem arises from having universal variable $x$ on which $y$ is not dependent in both disjuncts. However, we can find an example when even if both disjuncts contain different sets of universal variables (other than the ones from $D_y$), this rule does not work. For example for
 \[\forall x_1 \forall x_2 \itholds (\exists y(\emptyset) \itholds ((x_1 \land y) \lor (x_2 \land \neg y)) \lor (\neg x_1 \land \neg x_2)),\]
@@ -872,9 +872,11 @@ In previous sections, we give an overview of techniques used for implementations
 The first and only preprocessing engine for DQBF called HQSpre~\cite{HQSpre1,HQSpre2,HQSpreJournal} took many techniques used for QBF preprocessing and lifted them to the DQBF case. We explain only one technique here, called \emph{gate extraction}. As was mentioned in Section~\ref{sec:BF:CNF}, transforming BF to an equisatisfiable formula in CNF can result in polynomial increase of the size of the formula by adding new variables. Gate extraction works in opposite direction --- it tries to extract this newly introduced variables and turn the formula back into one that is not in CNF. This does not mean that gate extraction works only on formulas in CNF, it can be used generally by finding connections between variables which make it possible to replace a variable by some Boolean function of existing variables. However, this technique can only be used by solvers which can work on DQBFs which are not in PCNF. Currently, that is only HQS. For a thorough explanation of other techniques used by HQSpre we refer the reader to the work by Wimmer et al.~\cite{HQSpreJournal}. 
 
 \subsection{Approximations}
+\label{sec:prepro:approximations}
 Another technique which is used in some solvers as preprocessing step is to find some BF or QBF approximations which can be used with existing solvers for BFs/QBFs to potentially give us faster result about the input DQBF (satisfiability for underapproximations, unsatisfiability for overapproximations). First QBF approximations used for DQBF~\cite{HQSsimpleAlg} were created by changing the dependencies of existential variables that result in QBF with the same matrix. However, these approximations can be precise only up to some level. By adding some information to these QBF overapproximation (thus changing the matrix), it is possible to create more and more precise QBF overapproximations~\cite{FastDQBFRefutation}. For more thorough explanation of these approximations see again the work by Wimmer et al.~\cite[Section~3]{HQSpreJournal}.
 
-\subsection{\texorpdfstring{$\PSPACE$}{PSPACE} subclass}
+\subsection{\texorpdfstring{$\PSPACE$}{PSPACE} Subclass}
+\label{sec:prepro:pspacesubclass}
 The last preprocessing technique is simply put just a check whether DQBF does not belong to a subclass of problems which are in $\PSPACE$ and if it does, it is transformed to QBF (which is $\PSPACE$-complete) on which existing QBF solver is run. The simplest such subclass would be those DQBFs whose dependencies are linearly ordered. Then it can be easily transformed into QBF by reordering the quantifiers. Scholl et al.~\cite{PSPACEsubclass} investigated whether there is some another DQBF subclass which is in $\PSPACE$. They show that DQBFs where the dependency sets are either equal or pairwise disjoint can be transformed into QBFs with just linear increase in size. Thus having a check on whether an input DQBF belongs to this class before running a DQBF solver and if it does transforming it into QBF and running a QBF solver can improve the efficiency. They show this by adding this preprocessing step to HQS which results in increase of solved instances.
 
 \chapter{Suggested Algorithm}
@@ -883,7 +885,7 @@ The last preprocessing technique is simply put just a check whether DQBF does no
 
 In this chapter we describe the algorithm for solving satisfiability of DQBF using BDDs. This algorithm is based on localisation algorithm for HQS~\cite{HQSquantifierLocalisation} which follows in the similar vein. However, we update it with the corrected procedure for localisation of quantifiers as explained in Section~\ref{sec:quantLocalisation} and we add more thorough elimination of quantifiers using theorems from Section~\ref{sec:quantElimination}.
 
-\section{High level definition}
+\section{High Level Definition}
 \begin{algorithm}
   \caption{DQBF solver}
   \label{alg:general}
@@ -899,7 +901,7 @@ In this chapter we describe the algorithm for solving satisfiability of DQBF usi
 
 Algorithm~\ref{alg:general} gives a high level definition of our algorithm. In the next sections we explain more thoroughly each part of the algorithm. It takes as an input a DQBF $\psi$ in NNF represented using quantifier tree. We assume that it does not contain free variables and all variables are quantified in $\prefix{r}$. Firstly, function \textproc{Localise} recursively pushes the quantifiers inside the formula by using rules from Theorem~\ref{thrm:quantLocalEq}. Next, we transform this quantifier tree into a BF represented by BDD by recursively turning children of each node into BDDs and combining them together. While doing this, quantifiers are pulled from formula and potentially eliminated using theorems for quantifier eliminations (Section~\ref{sec:quantElimination}). After that we end up with a DQBF with updated prefix $\prefix{r}$ with all the quantifiers (which were not eliminated) pulled back and BDD $\phi$ representing the matrix of the formula. Finally, the leftover quantifiers in the prefix are eliminated resulting in simple BDD which represents either $0$ or $1$ which indicates formula satisfiability.
 
-\section{Localising quantifiers}
+\section{Localising Quantifiers}
 \label{sec:alglocalise}
 In this section we give an explanation of function \textproc{Localise} from Algorithm~\ref{alg:general} which uses rules from Theorem~\ref{thrm:quantLocalEq} to push quantifiers as deep inside a formula as it is possible.
 
@@ -1344,7 +1346,7 @@ The heuristics we use for choosing the next universal variable to eliminate on l
 
 \chapter{Implementation}
 \label{chap:implementation}
-We implemented the algorithm as a tool DQBDD~\footnote{the source code can be found \url{https://github.com/jurajsic/DQBDD}} (see Appendix~\ref{appendix:DQBDD} for a documentation) from Chapter~\ref{chap:algorithm} in C\texttt{++} using version 3.0.0 of the CUDD\footnote{\url{https://github.com/ivmai/cudd}} package~\cite{CUDD} for BDD manipulation, version 2.2.0 of the cxxopts\footnote{\url{https://github.com/jarro2783/cxxopts}} library for parsing command-line arguments and preprocessor HQSpre~\cite{HQSpre2}, more specifically the version that was used with HQS with quantifier localisation~\cite{HQSquantifierLocalisation}.
+We implemented the algorithm as a tool DQBDD~\footnote{the source code can be found at \url{https://github.com/jurajsic/DQBDD}} from Chapter~\ref{chap:algorithm} in C\texttt{++} using version 3.0.0 of the CUDD\footnote{\url{https://github.com/ivmai/cudd}} package~\cite{CUDD} for BDD manipulation, version 2.2.0 of the cxxopts\footnote{\url{https://github.com/jarro2783/cxxopts}} library for parsing command-line arguments and preprocessor HQSpre~\cite{HQSpre2}, more specifically the version that was used with HQS with quantifier localisation~\cite{HQSquantifierLocalisation}.
 
 The tool takes as an input \DQDIMACS{}~\cite{iDQandDQDIMACS} file on which we can run the preprocessor HQSpre. As was explained in Section~\ref{sec:preprocessing}, HQSpre can extract logical gates from variables in the formula that can be then replaced by them resulting in formula with fewer variables. This results in a formula that does not need to be in PCNF, which most solvers cannot handle. However, as HQS, our solver can work with non-PCNF formulas, stemming from the fact that we represent matrices as either BDDs or quantifier trees. This means that we can use this feature of HQSpre similarly as it is used for HQS.
 
@@ -1358,19 +1360,13 @@ As explained in Section~\ref{sec:BDD}, the size of a BDD depends on the order of
 
 % TODO popisat triedy???
 
-\chapter{Experimental results}
+\chapter{Experimental Results}
 \label{chap:experiments}
-This chapter shows the experimental results of different versions of DQBDDs and its comparison with different DQBF solvers (iDQ v1.0\footnote{\url{http://fmv.jku.at/idq/}}, iProver v3.1\footnote{\url{http://www.cs.man.ac.uk/~korovink/iprover/}}, dCAQE v4.0.1\footnote{\url{https://github.com/ltentrup/caqe/}} and HQS with quantifier localisation\footnote{\url{https://abs.informatik.uni-freiburg.de/src/projects_view.php?projectID=21}}). All our benchmarks were run on ??6 cores???  with ...?????????..... using BenchExec v2.2~\cite{benchexec}, a framework for reliable benchmarking and rescource measurement, where we set per benchmark the runtime limit at \SI{15}{min} and the memory consumption limit at \SI{4}{GB}. We also run all benchmarks in parallel on 6 cores???
+This chapter shows the experimental results of DQBDD heuristics comparison and its comparison with other publicly available DQBF solvers (iDQ v1.0\footnote{\url{http://fmv.jku.at/idq/}}, iProver v3.1\footnote{\url{http://www.cs.man.ac.uk/~korovink/iprover/}}, dCAQE v4.0.1\footnote{\url{https://github.com/ltentrup/caqe/}} and HQS with the erroneous quantifier localisation\footnote{\url{https://abs.informatik.uni-freiburg.de/src/projects_view.php?projectID=21}}). All our benchmarks were run on 24 core machine with \SI{2.10}{GHz} Intel Xeon CPU (with at most 6 different runs in parallel) using BenchExec v2.2~\cite{benchexec}, a framework for reliable benchmarking and rescource measurement, where we set the runtime limit at \SI{900}{s} and the memory consumption limit at \SI{4}{GB} per benchmark.
 
-%povedat ze sme najprv pustili HQSpre (odkaz na sekciu a asi aj znova citovat) bez gate detection, odfiltrovali sme results ktore boli vyriesene HQSpre alebo uz HQSpre prekrocil limity... vysledok tohto sme hodili do iDQ, iProver, dCAQE
+All used benchmarks with the results and BenchExec definitions can be found in a github repository\footnote{\url{https://github.com/jurajsic/DQBFbenchmarks}}.
 
-%pre HQS a moj pouzivame -> ak gate detection zisti ze mame viac ako n gates (v HQS maju teraz 5) tak pustime znova HQSpre ale teraz uz aj s tym ze chranime tieto gates aby sme ich potom mohli pouzit
-
-%cas HQSpre bez gate detection zaratavame do vsetkych solvrov, tym silmulujeme to co robi HQSnp???
-
-All used benchmarks with the results??? and BenchExec definitions??? can be found in github repository\footnote{\url{https://github.com/jurajsic/DQBFbenchmarks}}.
-
-\section{Benchmark sets}
+\section{Benchmark Sets}
 We use these benchmark sets for the experimental evaluation:
 
 %\paragraph{PEC}
@@ -1386,7 +1382,7 @@ This is another set of DQBF encodings for PEC, these are from Finkbeiner et al.~
 One more set of 1116 PEC encodings~\cite{HQSsimpleAlg,PECScholl}.
 
 \paragraph{CSP}
-This set consists of 461 instances of controller synthesis problem~\cite{CSPbenchmarks} in which we try to find safe controller for controllable transition system. Controllable transition system is composed of state and two types of inputs -- uncontrollable and controllable -- which decide to which state the system moves. Controller decides the controllable inputs and a safe controller is such a controller that the transition system always stays in some set of safe states.
+This set consists of 461 instances of controller synthesis problem~\cite{CSPbenchmarks} in which we try to find safe controller for controllable transition system. Controllable transition system is composed of states and two types of inputs -- uncontrollable and controllable -- which decide to which state the system moves. Controller decides the controllable inputs and a safe controller is such a controller that the transition system always stays in some set of safe states.
 
 \paragraph{SAT}
 The next set is created from 34 SAT instances which are transformed into equisatisfiable DQBF with exponentially smaller number of variables~\cite{SATbenchmarks}.
@@ -1394,11 +1390,6 @@ The next set is created from 34 SAT instances which are transformed into equisat
 \paragraph{E19}
 The last benchmark set consists of 334 instances used for evaluation of DQBF solvers at QBF Evaluation 2019~\cite{QBFeval19} which is a selected combination of previous benchmarks with some extra instances not occurring in any of the previous sets.
 
-
-
-%Zrobit asi pre kazdy tento benchmark sekciu a porovnat - grafy, tabulky atd, neviem este. Potom zrobit velky graf kde dam vsetko dohromady mozno, nech vidno spolu ze ake to je. A mozno dat z QBFeval'19, ze povedat ze je to suhrn vybratych benchmarks z tychto (okrem asi BoSy), tak aby nijaky nedominoval a nejak su pekne rozdelene ci co a ukazat na tom ????
-
-%Este mozno budem porovnavat navzajom rozne heuristiky pouzite v mojom a potom budem porovnavat najlepsiu???? s ostatnymi????
 
 \section{Preprocessing}
 First, we run preprocessor HQSpre on all benchmarks. Table~\ref{tab:HQSpre} shows the results with the number of solved (both \textbf{S}atisfiable and \textbf{U}n\-sa\-ti\-sfi\-able) and unsolved (\textbf{?}) instanced by HQSpre.
@@ -1422,33 +1413,34 @@ First, we run preprocessor HQSpre on all benchmarks. Table~\ref{tab:HQSpre} show
 
 We removed the solved instances from the benchmarks sets and we run the solvers only on the results of unsolved instances (as the preprocessor simplified these). The resulting times of these runs are then combination of HQSpre and solver runtime. However, we do not run HQS and DQBDD on these simplified instances, as both of these solvers incorporate HQSpre in their solving routine (as explained in Chapter~\ref{chap:implementation}), therefore we run them on the original instances. We still run them only on the instances which were not solved by HQSpre because the incorporated HQSpre in these solvers would have solved other instances anyway. The time of HQSpre is then not added to these solvers, because the runtime of preprocessing is included in the runtime of those two solvers.
 
-\section{Heuristics comparison}
-To be able to compare DQBDD to other solvers it is important to choose the right heuristics for choosing the universal variables to be eliminated (see Section~\ref{sec:algelimination}) and quantifiers to eliminate in quantifier tree (see Section~\ref{sec:algturntobdd}). For this we compare these heuristics on E19 benchmark set as it is a selected combination of other benchmarks and it is reasonably small. 
+\section{Heuristics Comparison}
+To be able to compare DQBDD to other solvers it is important to choose the right heuristic for choosing the universal variables to be eliminated (see Section~\ref{sec:algelimination}) and for which quantifiers to eliminate in quantifier tree during transformation to BDD (see Section~\ref{sec:algturntobdd}). For this we compare these heuristics on E19 benchmark set as it is a selected combination of other benchmarks and it is reasonably small. 
 
+Table~\ref{tab:heurcomp} shows this comparison where we run every possible combination of heuristics. It shows the number of solved instances (\textbf{\#}) and from these the number of \textbf{S}atisfiable and \textbf{U}n\-sa\-ti\-sfi\-able instances. It is obvious that it is best to eliminate only simple quantifiers (meaning all possible existential variables and only those universal variables which do not have any dependency) during the transformation to BDD. However, eliminating all universal variables during this transformation was not much worse compared to eliminating simple ones, only a few less instances were solved.
 
-\begin{table}[ht]
-\centering
-\caption{Comparison of DQBDD heuristics for the choice of the next universal variable to eliminate and which quantifiers to eliminate during transformation to BDD on E19 benchmark with the total number (\textbf{\#}) of instances solved and the number of satisfiable (\textbf{S}) and unsatisfiable (\textbf{U}) from these.}
-\label{tab:heurcomp}
-\begin{tabular}{|l||l|l|l|l|l|l|l|l|l|}
-\hline
-\multicolumn{1}{|c||}{\textbf{order of the next}} & \multicolumn{9}{c|}{\textbf{what quantifiers to eliminate}} \\ \hhline{~*{9}{-}} 
-\multicolumn{1}{|c||}{\textbf{universal variable}} & \multicolumn{3}{c|}{\textbf{none}}     & \multicolumn{3}{c|}{\textbf{simple}}   & \multicolumn{3}{c|}{\textbf{all}} \\ \hhline{~*{9}{-}} 
-\multicolumn{1}{|c||}{\textbf{to eliminate}} & \multicolumn{1}{c|}{\textbf{\#}} & \multicolumn{1}{c|}{\textbf{S}} & \multicolumn{1}{c|}{\textbf{U}} & \multicolumn{1}{c|}{\textbf{\#}} & \multicolumn{1}{c|}{\textbf{S}} & \multicolumn{1}{c|}{\textbf{U}} & \multicolumn{1}{c|}{\textbf{\#}} & \multicolumn{1}{c|}{\textbf{S}} & \multicolumn{1}{c|}{\textbf{U}} \\ \hline
-\textbf{set at beginning}    & 94 & 41 & 53 & 139 & 43 & 96 & 134 & 38 & 96 \\ \hline
-\textbf{current lowest}      & 94 & 41 & 53 & 138 & 42 & 96 & 134 & 38 & 96 \\ \hline
-\textbf{vars in conjuncts}   & 94 & 41 & 53 & 139 & 43 & 96 & 135 & 40 & 95 \\ \hline
-\end{tabular}
-\end{table}
-
-Table~\ref{tab:heurcomp} shows this comparison where we run every possible combination of heuristics. It shows the number of solved instances (\textbf{\#}) and from these the number of \textbf{S}atisfiable and \textbf{U}n\-sa\-ti\-sfi\-able instances. It is obvious that it is best to eliminate only simple quantifiers (meaning all possible existential variables and only those universal variables which do not have any dependency) during the transformation to BDD. However, eliminating all universal variables during this transformation was not much worse compared to the eliminating simple ones, only a few less instances were solved. For the heuristic that chooses the next universal variable to eliminate, it is not obvious which one is the best. The number of solved instances here is pretty much the same for a chosen heuristic of which quantifiers to eliminate so the choice of which one is the best is not so clear. We can however compare the total runtimes of all solved instances. In the case of simple elimination, we get that the total runtime of solved instances by heuristic which sets the order of unviersal variables to eliminate at the beginning is \SI{3440.76}{s}, by heuristic which chooses the universal variable as the one with currently the lowest number of dependencies is \SI{3785.59}{s} and the one that chooses based on the number of variable in the two BDDs representing the conjuncts of universal expansion is \SI{4125.18}{s}. Obviously, from these we can see that it is best to eliminate simple quantifiers and set the order of universal variables at the beginning.
-
-TODO: say something about vars in conjuncts is like current lowest, but not always, and then it is better (also for some cases, the number of dyn reorderings is probably so hugh -- probably caused by the constant checking of conjuncts -- that it can sometimes result in small BDD and then it solves some instances (2?) which other heuristics cannot.
+For the heuristic that chooses the next universal variable to eliminate, it is not obvious which one is the best. The number of solved instances is pretty much the same (for a given heuristic of which quantifiers to eliminate) across all three heuristics. We can however compare the total runtimes of all solved instances. In the case of simple elimination, we get that the total runtime of solved instances by heuristic which sets the order of universal variables to eliminate at the beginning is \SI{3440.76}{s}, by heuristic which chooses the universal variable as the one with currently the lowest number of dependencies is \SI{3785.59}{s} and the one that chooses based on the number of variables in the two BDDs representing the conjuncts of universal expansion is \SI{4125.18}{s}. Obviously, from these we can see that it is best to eliminate simple quantifiers and set the order of universal variables at the beginning.
 
 To also show that it is better to use dynamic reordering, we run DQBDD (with simple quantifiers elimination and the order set at beginning) without dynamic reordering. We get that the run without dynamic reordering solved only 84 instances (with 37 satisfiable and 47 unsatisfiable), which is much less that the run with dynamic reordering. When we run other two heuristics for ordering, the number of solved instances was even less, for both of them it was 73.
 
+\begin{table}[ht]
+\centering
+\caption{Comparison of DQBDD heuristics for the choice of the next universal variable to eliminate and which quantifiers to eliminate during transformation to BDD on E19 benchmark with the total number of solved instances (\textbf{\#}) and the number of satisfiable (\textbf{S}) and unsatisfiable (\textbf{U}) from these.}
+\label{tab:heurcomp}
+\begin{tabular}{l||l|l|l|l|l|l|l|l|l}
+%\hline
+\multicolumn{1}{c||}{\textbf{order of the next}} & \multicolumn{9}{c}{\textbf{what quantifiers to eliminate}} \\ \hhline{~*{9}{-}} 
+\multicolumn{1}{c||}{\textbf{universal variable}} & \multicolumn{3}{c|}{\textbf{none}}     & \multicolumn{3}{c|}{\textbf{simple}}   & \multicolumn{3}{c}{\textbf{all}} \\ \hhline{~*{9}{-}} 
+\multicolumn{1}{c||}{\textbf{to eliminate}} & \multicolumn{1}{c}{\textbf{\#}} & \multicolumn{1}{c|}{\textbf{S}} & \multicolumn{1}{c|}{\textbf{U}} & \multicolumn{1}{c|}{\textbf{\#}} & \multicolumn{1}{c|}{\textbf{S}} & \multicolumn{1}{c|}{\textbf{U}} & \multicolumn{1}{c|}{\textbf{\#}} & \multicolumn{1}{c|}{\textbf{S}} & \multicolumn{1}{c|}{\textbf{U}} \\ \hline
+\textbf{set at beginning}    & 94 & 41 & 53 & 139 & 43 & 96 & 134 & 38 & 96 \\ %\hline
+\textbf{current lowest}      & 94 & 41 & 53 & 138 & 42 & 96 & 134 & 38 & 96 \\ %\hline
+\textbf{vars in conjuncts}   & 94 & 41 & 53 & 139 & 43 & 96 & 135 & 40 & 95 \\ %\hline
+\end{tabular}
+\end{table}
 
-%\section{PEC}
+\section{Solvers Comparison}
+We can now compare DQBDD with the chosen heuristics (simple quantifier elimination and order set at beginning) with other solvers. We show results for each benchmark set in Tables \ref{tab:PEC1}-\ref{tab:E19} which for each solver show the number of solved instances (\textbf{\#}) and the total time of solving these. They also show the number of solved \textbf{S}atisfiable and \textbf{U}n\-sa\-ti\-sfi\-able instances with the number of uniquely (\textbf{*}) solved instances. Furthermore, they show the reasons for unsolved instances where solvers either reached their \textbf{T}ime or \textbf{M}emory limit or they did not finish for some \textbf{O}ther reason. Only HQS and iProver have other reasons, which are either an error during computation or, for HQS, a termination of computation because the set of universal variables to eliminate (to end up with QBF) could not be computed. 
+
+%\subsection{PEC}
 %porovnat runs zo pec benchmarku
 %
 %\begin{table}[]
@@ -1467,10 +1459,58 @@ To also show that it is better to use dynamic reordering, we run DQBDD (with sim
 %\label{tab:PEC}
 %\end{table}
 
-\section{PEC1}
+\begin{figure}[p]
+  \centering
+  \begin{subfigure}{0.48\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/PEC1dqbddVSdcaqe.pdf}
+    \caption{DQBDD vs dCAQE for PEC1}
+    \label{fig:PEC1dqbddVSdcaqe}
+  \end{subfigure}
+  \begin{subfigure}{0.48\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/PEC2dqbddVShqs.pdf}
+    \caption{DQBDD vs HQS for PEC2}
+    \label{fig:PEC2dqbddVShqs}
+  \end{subfigure}
+  \begin{subfigure}{0.48\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/PEC3dqbddVShqs.pdf}
+    \caption{DQBDD vs HQS for PEC3}
+    \label{fig:PEC3dqbddVShqs}
+  \end{subfigure}
+  \begin{subfigure}{0.48\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/E19dqbddVShqs.pdf}
+    \caption{DQBDD vs HQS for E19}
+    \label{fig:E19dqbddVShqs}
+  \end{subfigure}
+  \begin{subfigure}{0.48\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/CSPdqbddVSdcaqe.pdf}
+    \caption{DQBDD vs dCAQE for CSP}
+    \label{fig:CSPdqbddVSdcaqe}
+  \end{subfigure}
+  \begin{subfigure}{0.48\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/CSPdqbddVShqs.pdf}
+    \caption{DQBDD vs HQS for CSP}
+    \label{fig:CSPdqbddVShqs}
+  \end{subfigure}
+  \caption{Comparison of solving times in seconds}
+  \label{fig:runtimecomp}
+\end{figure}
 
-\begin{table}[]
+\subsection{PEC1}
+Table~\ref{tab:PEC1} shows the comparison of all solvers for PEC1 benchmarks which were not solved by HQSpre. All solvers solved most of the instances, while dCAQE solved \emph{all} 433 instances. This is followed by DQBDD which did not solve only three instances. For these, DQBDD reached the memory limit during quantifier localisation. Furthermore, the total runtime of DQBDD for solved instances is seven times less than dCAQE. On average, this means that it took DQBDD \SI{0.04}{s} to solve one instance while dCAQE took \SI{0.31}{s} per instance. The comparison of solving times for DQBDD and dCAQE is shown in Figure~\ref{fig:PEC1dqbddVSdcaqe}.
+
+The remaining three solvers -- HQS, iDQ, and iProver -- solved comparatively many instances (413 or 414) where HQS was 136 times faster than iProver which in turn was nearly twice as fast as iDQ. Also notice that even though HQS solved less instances than DQBDD, DQBDD total runtime was still faster than HQS total runtime.
+
+
+\begin{table}[ht]
 \centering
+\caption{Comparison of solvers for PEC1 benchmark set}% with the total number of solved instances (\textbf{\#}) and the time taken to solve them, the number of solved satisfiable (\textbf{S}), unsatisfiable (\textbf{U}), and unique~(\textbf{*}) instances and the number of unsolved instances broken down to those that reached the time (\textbf{T}) or memory limit (\textbf{M}), or ended prematurely for some other reason (\textbf{O}).}
+\label{tab:PEC1}
 \begin{tabular}{|l|r|r|r|r|r|r|r|r|}
 \hline
 \multicolumn{1}{|c|}{}                                  & \multicolumn{5}{c|}{\textbf{Solved}}                                                                                                                                        & \multicolumn{3}{c|}{\textbf{Unsolved}}                                                                 \\  \hhline{~*{8}{-}}
@@ -1479,53 +1519,59 @@ To also show that it is better to use dynamic reordering, we run DQBDD (with sim
 \textbf{DQBDD} & \num{430} & \num{18.38} & \num{47} & \num{383} & \num{0} & \num{0} & \num{3} & \num{0} \\ \hline
 \textbf{HQS} & \num{413} & \num{68.06} & \num{44} & \num{369} & \num{0} & \num{2} & \num{0} & \num{18} \\ \hline
 \textbf{iDQ} & \num{413} & \num{16943.53} & \num{40} & \num{373} & \num{0} & \num{20} & \num{0} & \num{0} \\ \hline
-\textbf{iProver} & \num{414} & \num{9265.67} & \num{43} & \num{371} & \num{0} & \num{6} & \num{0} & \num{0} \\ \hline
+\textbf{iProver} & \num{414} & \num{9265.67} & \num{43} & \num{371} & \num{0} & \num{6} & \num{0} & \num{13} \\ \hline
 \end{tabular}
-\caption{Solvers on PEC1...}
-\label{tab:???}
 \end{table}
 
-\section{PEC2}
+\subsection{PEC2}
+The comparison of all solvers on all 2000 benchmarks from PEC2 benchmark set (as none of them were solved by HQSpre) is shown in Table~\ref{tab:PEC2}. Here, dCAQE, iDQ and iProver solved just a few instances whereas DQBDD and HQS solved most of them. For DQBDD, there was only one unsolved instance (caused by reaching memory limit during quantifier localisation) while HQS did not solve 278. Even with this, DQBDD was still more than twice as fast compared with HQS. Figure~\ref{fig:PEC2dqbddVShqs} shows the comparison of solving times of DQBDD and HQS.
 
-\begin{table}[]
+The success of DQBDD and HQS for this benchmark set could be explained by gate extraction as explained in Section~\ref{sec:preprocessing} which simplifies input formulas. This stems from the fact that PEC problem encodes circuits, which means there are possibly many gates to extract which can result in much more simplified formula compared to the formula in PCNF.
+
+In this benchmark there were also three discrepancies: dCAQE solved three instances as satisfiable while HQS or DQBDD solved them as unsatisfiable (each solved two of them; iDQ and iProver did not solve them). This cannot be explained by the erroneous implementation of quantifier localisation in HQS because it can only turn unsatisfiable formulas to satisfiable ones. As both HQS and DQBDD use similar techniques for solving, it is hard to tell whether there is a mistake in dCAQE or HQS and DQBDD.
+
+\begin{table}[ht]
 \centering
+\caption{Comparison of solvers for PEC2 benchmark set}% with the total number of solved instances (\textbf{\#}) and the time taken to solve them, the number of solved satisfiable (\textbf{S}), unsatisfiable (\textbf{U}), and unique~(\textbf{*}) instances and the number of unsolved instances broken down to those that reached the time (\textbf{T}) or memory limit (\textbf{M}), or ended prematurely for some other reason (\textbf{O}).}
+\label{tab:PEC2}
 \begin{tabular}{|l|r|r|r|r|r|r|r|r|}
 \hline
 \multicolumn{1}{|c|}{}                                  & \multicolumn{5}{c|}{\textbf{Solved}}                                                                                                                                        & \multicolumn{3}{c|}{\textbf{Unsolved}}                                                                 \\  \hhline{~*{8}{-}}
 \multicolumn{1}{|c|}{\multirow{-2}{*}{\textbf{Solver}}} & \multicolumn{1}{c|}{\textbf{\#}} & \multicolumn{1}{c|}{\textbf{Time (s)}} & \multicolumn{1}{c|}{\textbf{S}} & \multicolumn{1}{c|}{\textbf{U}} & \multicolumn{1}{c|}{\textbf{*}} & \multicolumn{1}{c|}{\textbf{T}} & \multicolumn{1}{c|}{\textbf{M}} & \multicolumn{1}{c|}{\textbf{O}} \\ \hline
 \textbf{dCAQE} & \num{34} & \num{134.12} & \num{0} & \num{34} & \num{0} & \num{1961} & \num{5} & \num{0} \\ \hline
 \textbf{DQBDD} & \num{1999} & \num{19618.36} & \num{123} & \num{1876} & \num{278} & \num{0} & \num{1} & \num{0} \\ \hline
-\textbf{HQS} & \num{1722} & \num{51769.75} & \num{1642} & \num{80} & \num{1} & \num{246} & \num{0} & \num{32} \\ \hline
+\textbf{HQS} & \num{1722} & \num{51769.75} & \num{80} & \num{1642} & \num{1} & \num{246} & \num{0} & \num{32} \\ \hline
 \textbf{iDQ} & \num{4} & \num{292.66} & \num{0} & \num{4} & \num{0} & \num{1996} & \num{0} & \num{0} \\ \hline
 \textbf{iProver} & \num{40} & \num{3200.80} & \num{1} & \num{39} & \num{0} & \num{9} & \num{1950} & \num{1} \\ \hline
 \end{tabular}
-\caption{Solvers on PEC2...}
-\label{tab:PEC2}
 \end{table}
 
-\section{PEC3}
+\subsection{PEC3}
+The results for the last PEC benchmark set are shown in Table~\ref{tab:PEC3}. Again, DQBDD and HQS solved the most instances (possibly because of gate extraction) followed by dCAQE, iProver and finally by iDQ. Furthermore, DQBDD solved \num{132} instances more than HQS, where DQBDD took on average \SI{18.19}{s} per instance while HQS took \SI{15.73}{s}. Figure~\ref{fig:PEC3dqbddVShqs} shows the comparison of their runtimes for this benchmark set.
 
-\begin{table}[]
+\begin{table}[ht]
 \centering
+\caption{Comparison of solvers for PEC3 benchmark set}% with the total number of solved instances (\textbf{\#}) and the time taken to solve them, the number of solved satisfiable (\textbf{S}), unsatisfiable (\textbf{U}), and unique~(\textbf{*}) instances and the number of unsolved instances broken down to those that reached the time (\textbf{T}) or memory limit (\textbf{M}), or ended prematurely for some other reason (\textbf{O}).}
+\label{tab:PEC3}
 \begin{tabular}{|l|r|r|r|r|r|r|r|r|}
 \hline
 \multicolumn{1}{|c|}{}                                  & \multicolumn{5}{c|}{\textbf{Solved}}                                                                                                                                        & \multicolumn{3}{c|}{\textbf{Unsolved}}                                                                 \\  \hhline{~*{8}{-}}
 \multicolumn{1}{|c|}{\multirow{-2}{*}{\textbf{Solver}}} & \multicolumn{1}{c|}{\textbf{\#}} & \multicolumn{1}{c|}{\textbf{Time (s)}} & \multicolumn{1}{c|}{\textbf{S}} & \multicolumn{1}{c|}{\textbf{U}} & \multicolumn{1}{c|}{\textbf{*}} & \multicolumn{1}{c|}{\textbf{T}} & \multicolumn{1}{c|}{\textbf{M}} & \multicolumn{1}{c|}{\textbf{O}} \\ \hline
-\textbf{dCAQE} & \num{328} & \num{19271.73} & \num{232} & \num{96} & \num{3} & \num{565} & \num{0} & \num{0} \\ \hline
+\textbf{dCAQE} & \num{328} & \num{19271.73} & \num{96} & \num{232} & \num{3} & \num{565} & \num{0} & \num{0} \\ \hline
 \textbf{DQBDD} & \num{566} & \num{10293.71} & \num{193} & \num{373} & \num{169} & \num{222} & \num{105} & \num{0} \\ \hline
 \textbf{HQS} & \num{434} & \num{6825.99} & \num{142} & \num{292} & \num{29} & \num{444} & \num{0} & \num{15} \\ \hline
 \textbf{iDQ} & \num{119} & \num{4778.43} & \num{39} & \num{80} & \num{4} & \num{774} & \num{0} & \num{0} \\ \hline
 \textbf{iProver} & \num{184} & \num{8684.41} & \num{55} & \num{129} & \num{0} & \num{5} & \num{702} & \num{2} \\ \hline
 \end{tabular}
-\caption{Solvers on PEC3...}
-\label{tab:PEC3}
 \end{table}
 
-\section{CSP}
-porovnat runs zo csp benchmarku
+\subsection{CSP}
+Table~\ref{tab:CSP} shows the results for CSP benchmark set. For these, dCAQE, DQBDD, and HQS solved comparatively many instances (with dCAQE the most) while iProver and iDQ solved less. From those three, HQS was on average the fastest, spending \SI{12.01}{s} per instances, closely followed by DQBDD which spent \SI{17.05}{s} per instance. dCAQE was around two times slower than these two, taking on average \SI{31.21}{s} per instance. However, dCAQE runtime is dominated by one instance which took \SI{753.81}{s} to solve and was not solved by other solvers. If we remove this instance, dCAQE took on average \SI{14.41}{s}. Figures~\ref{fig:CSPdqbddVSdcaqe} and \ref{fig:CSPdqbddVShqs} show solving time comparison of DQBDD with dCAQE and HQS respectively.
 
-\begin{table}[]
+\begin{table}[ht]
 \centering
+\caption{Comparison of solvers for CSP benchmark set}% with the total number of solved instances (\textbf{\#}) and the time taken to solve them, the number of solved satisfiable (\textbf{S}), unsatisfiable (\textbf{U}), and unique~(\textbf{*}) instances and the number of unsolved instances broken down to those that reached the time (\textbf{T}) or memory limit (\textbf{M}), or ended prematurely for some other reason (\textbf{O}).}
+\label{tab:CSP}
 \begin{tabular}{|l|r|r|r|r|r|r|r|r|}
 \hline
 \multicolumn{1}{|c|}{}                                  & \multicolumn{5}{c|}{\textbf{Solved}}                                                                                                                                        & \multicolumn{3}{c|}{\textbf{Unsolved}}                                                                 \\  \hhline{~*{8}{-}}
@@ -1536,16 +1582,16 @@ porovnat runs zo csp benchmarku
 \textbf{iDQ} & \num{10} & \num{281.18} & \num{10} & \num{0} & \num{0} & \num{407} & \num{5} & \num{0} \\ \hline
 \textbf{iProver} & \num{29} & \num{928.46} & \num{29} & \num{0} & \num{0} & \num{0} & \num{393} & \num{0} \\ \hline
 \end{tabular}
-\caption{Solvers on CSP...}
-\label{tab:CSP}
 \end{table}
 
 
-\section{SAT}
-porovnat runs zo sat benchmarku (alebo mozno dam vsetky benchmarks dohromady, jednu velku tabulku kde dam vsetky solvre a benchmarks a nejake grafy)
+\subsection{SAT}
+The results for SAT benchmark set are in Table~\ref{tab:SAT}. This set consists of only few instances, therefore the comparison is not very interesting. However, we can see that DQBDD did not solve any formulas from this set. This was caused by either not even finishing creation of the quantifier tree (three cases where DQBDD reached the memory limit) or getting stuck creating the BDD (the cases where DQBDD reached the time limit). This benchmark therefore shows, that BDDs can sometime suffer from scalability problems.
 
-\begin{table}[]
+\begin{table}[ht]
 \centering
+\caption{Comparison of solvers for SAT benchmark set}% with the total number of solved instances (\textbf{\#}) and the time taken to solve them, the number of solved satisfiable (\textbf{S}), unsatisfiable (\textbf{U}), and unique~(\textbf{*}) instances and the number of unsolved instances broken down to those that reached the time (\textbf{T}) or memory limit (\textbf{M}), or ended prematurely for some other reason (\textbf{O}).}
+\label{tab:SAT}
 \begin{tabular}{|l|r|r|r|r|r|r|r|r|}
 \hline
 \multicolumn{1}{|c|}{}                                  & \multicolumn{5}{c|}{\textbf{Solved}}                                                                                                                                        & \multicolumn{3}{c|}{\textbf{Unsolved}}                                                                 \\  \hhline{~*{8}{-}}
@@ -1556,18 +1602,18 @@ porovnat runs zo sat benchmarku (alebo mozno dam vsetky benchmarks dohromady, je
 \textbf{iDQ} & \num{9} & \num{2546.24} & \num{4} & \num{5} & \num{1} & \num{13} & \num{0} & \num{0} \\ \hline
 \textbf{iProver} & \num{4} & \num{1706.29} & \num{3} & \num{1} & \num{0} & \num{18} & \num{0} & \num{0} \\ \hline
 \end{tabular}
-\caption{Solvers on SAT...}
-\label{tab:SAT}
 \end{table}
 
-uplne pohorel, je to tym ze SAT problemy boli asi dostatocne tazke a nevedel vytvorit BDDcko ani v jednom pripade (alebo quantifier tree). Toto je well knows fact o BDDckach, ze they do not scale???
 
+\subsection{E19}
+Finally, Table~\ref{tab:E19} shows the comparison of solvers for E19 benchmark set. As this set is a combination of previous sets (with also some new benchmarks), it is the most interesting for ''real'' comparison. However, this set is still dominated by PEC benchmarks, which shows up in the result: both DQBDD and HQS solved the most benchmarks, with 139 each (see Figure~\ref{fig:E19dqbddVShqs} for their runtime comparison). This is followed by dCAQE which solved 111 instance, then iProver with 43 instance and finally iDQ with only 27 instances. Even though DQBDD solved the most, it was still the fastest, taking only \SI{3440.76}{s} for all of its solved instances. On average, this is \SI{24.75}{s} per instance, where dCAQE took \SI{39.06}{s} per instance, HQS took \SI{48.9}{s}, iDQ took \SI{136.97}{s} and iProver \SI{114.39}{s}.
 
-\section{DQBF19}
-porovnat runs zo DQBF19 benchmarku
+There was also a discrepancy in this benchmark set. One instance, which is not in other benchmark sets, was deemed satisfiable by dCAQE while HQS decided its unsatisfiability. Again, we do not know what caused this discrepancy.
 
-\begin{table}[]
+\begin{table}[ht]
 \centering
+\caption{Comparison of solvers for E19 benchmark set}% with the total number of solved instances (\textbf{\#}) and the time taken to solve them, the number of solved satisfiable (\textbf{S}), unsatisfiable (\textbf{U}), and unique~(\textbf{*}) instances and the number of unsolved instances broken down to those that reached the time (\textbf{T}) or memory limit (\textbf{M}), or ended prematurely for some other reason (\textbf{O}).}
+\label{tab:E19}
 \begin{tabular}{|l|r|r|r|r|r|r|r|r|}
 \hline
 \multicolumn{1}{|c|}{}                                  & \multicolumn{5}{c|}{\textbf{Solved}}                                                                                                                                        & \multicolumn{3}{c|}{\textbf{Unsolved}}                                                                 \\  \hhline{~*{8}{-}}
@@ -1578,20 +1624,23 @@ porovnat runs zo DQBF19 benchmarku
 \textbf{iDQ} & \num{27} & \num{3698.26} & \num{13} & \num{14} & \num{1} & \num{218} & \num{1} & \num{0} \\ \hline
 \textbf{iProver} & \num{43} & \num{4918.77} & \num{23} & \num{20} & \num{0} & \num{23} & \num{179} & \num{1} \\ \hline
 \end{tabular}
-\caption{Solvers on E19...}
-\label{tab:E19}
 \end{table}
 
+%\subsection{Results Discussion???}
 
 \chapter{Conclusion}
-We have implemented quantifier elimination DQBF solver DQBDD that uses BDDs. We have shown missing proofs used for quantifier localisation while fixing the disjunction problem??? as well as added proof for universal expansion for subformulas. We have done an extensive evaluation of different heuristics used in DQBDD and compared the best ones with other DQBF solvers. We have shown that our solver is da best so fuck off
+In this thesis, we have proposed and implemented a DQBF solver DQBDD that uses binary decision diagrams as an underlying representation of formulas. This solver is based on quantifier elimination and uses quantifier localisation which we have corrected and enhanced by adding a possibility to eliminate universal variables in subformulas.
 
-As future work we are planning to???
+Additionally, we have done an extensive experimental evaluation of different heuristics used in DQBDD and compared the best one with other DQBF solvers. We have shown that DQBDD performs very well, especially for partial equivalence checking problem.
+
+\section{Future Work}
+
+For future work there are multiple things possible to do:
 \begin{itemize}
-    \item it is a good idea to think whether HQS and DQBDD can be combined as in AIGsolve where they use AIGs but try to change them to BDDs when possible??? add BDDs to HQS similarly as BDDs are used in AIGsolve, especially during the localisation phase, it seems that the case where we did not localise (and so did not create quantifier tree) it never went out of memory, however it can during locaslisation when the tree is too big. This is because when we create just BDD, no tree, we do it from the gates and so the same gate represents the same BDD so we do not create it multiple times. But for the localisation algorithm to work properly, we have to create for each gate multiple same quantifier trees, because we might push stuff inside them in one branch but not in other. However, this might be too much, maybe it is better to just have tree share subtrees and when we see we need to push something, create a copy then??? This is a bit similar to how they do it in HQS, they basically transform AIG to quantifier tree sharing subtrees or something like that, but they never create copies, they push only if all parents share the quantifiers?? We could combine this somehow and do it like that, and then when we create the BDD, we create it up to some size or something, otherwise we keep it as AIG???
-    \item It would be also good idea to add more preprocessing (PSPACE subset, approximations, using bloqqer with caqe) ?
-    \item Another possible direction is to implement the quantifier elimination only of those universal variables which result in qbf and possibly design and implement a QBF solver using BDDs which could solve it???
-    \item Finally, we should look into whether initializing variable order for BDDs makes sense (and what should it be) and what other reordering techniques could we use (we now use dynamic sifting, could be interesting to try others that CUDD implements, also would be interesting to use ''static'' reordering, where we would say when to reorder)
+  \item We are planning to evaluate the impact of ordering of variables in BDDs. We can check whether it would make sense to set up some initial ordering and to decide what this ordering should be. We are also planning to try different reordering techniques used for BDDs, especially those that are already implemented in CUDD. They can be used dynamically, as we do now, but we can also gauge whether it is not better to decide when exactly we should reorder the variables in the algorithm.
+  \item Another line of thinking would be to somehow combine HQS and DQBDD, similarly how it is done in QBF solver AIGSol\-ve~\cite{AIGSolve}. This solver uses mainly AIGs to represent the matrix of the formula, but during quantifier elimination, it can be turned into BDD with some size limit. If this BDD is created, quantifier elimination is done on it (as it is faster for BDDs as for AIGs) and then returned back to AIG, otherwise quantifier elimination is done directly on AIG. We could also use AIG or some similar structure during the localisation phase, where DQBDD sometimes hits the memory limit. This structure would reuse subtrees representing the same subformula (reducing the memory usage), and they would be copied only if there are some variables being pushed into them. Similar structure is already used in HQS, called quantifier graph~\cite{HQSquantifierLocalisation}.
+  \item We are also planning to use more preprocessing techniques, especially the QBF approximations as explained in Section~\ref{sec:prepro:approximations} and the check whether an input formula can be effectively transformed into QBF as explained in Section~\ref{sec:prepro:pspacesubclass}. For these, we could also use some state of the art QBF solver.
+  \item Another possible direction is to implement the quantifier elimination of only those universal variables which result in QBF as is done in HQS and possibly design and implement a QBF solver using BDDs which could solve it.
 \end{itemize}
 
 \begingroup
@@ -1618,9 +1667,9 @@ As future work we are planning to???
 %  \addcontentsline{toc}{chapter}{\indexname} %% table of contents.
 %  \printindex
 
-\appendix %% Start the appendices.
-\chapter{DQBDD}
-\label{appendix:DQBDD}
-TODO documentation for the tool 
+%\appendix %% Start the appendices.
+%\chapter{DQBDD}
+%\label{appendix:DQBDD}
+%TODO documentation for the tool 
 
 \end{document}
