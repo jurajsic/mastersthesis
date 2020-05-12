@@ -29,7 +29,7 @@
   %% <http://mirrors.ctan.org/macros/latex/contrib/fithesis/guide/mu/fi.pdf>.
 ]{fithesis3}
 %% The following section sets up the locales used in the thesis.
-\usepackage[resetfonts]{cmap} %% We need to load the T2A font encoding
+%\usepackage[resetfonts]{cmap} %% We need to load the T2A font encoding
 %\usepackage[T1,T2A]{fontenc}  %% to use the Cyrillic fonts with Russian texts.
 \usepackage[
   main=english, %% By using `czech` or `slovak` as the main locale
@@ -842,6 +842,8 @@ In figures, each node $n$ is denoted by its assigned operation or literal $\qtla
   Figure~\ref{fig:QTex} shows an example of quantifier tree representing DQBF \[\forall x_1 \exists y_1(x_1) (\exists y_2(\emptyset) \itholds (y_2 \lor \neg x_1) \land x_1 \land \forall x_2 \itholds (x_2 \lor \neg y_1)).\]
 \end{example}
 
+\chapter{Quantifier Manipulation}
+
 \chapter{State of the Art}
 \label{chap:SoA}
 In this chapter, we give an overview of existing solutions and solvers for the satisfiability problem of DQBF. Because there are already multiple surveys about DQBF~\cite{DQBFStateOfArtTalk,DQBFStateOfArt,DQBFStateOfArtNew}, we give only a short overview of most solvers and techniques. However, we go into more details for the solver HQS, because it is currently the best performing solver (winner of the DQBF track of the QBF Evaluation 2018~\cite{QBFeval18} and 2019~\cite{QBFeval19}) and the methods we use for developing our solver are based on the workings of this solver.
@@ -1048,7 +1050,7 @@ After doing this, we start applying the rules~\eqref{loc:undisj} for universal a
 
 The set $vChildren$ is then for existential variable, by the rule~\eqref{loc:exboth}, the set of all children containing $v$, while for universal variable, by the rule~\eqref{loc:undisj}, a set of all children containing $v$ or containing some existential variable dependent on $v$. Again, we stop when we get to a variable whose $vChildren$ is the set of all children (line~\ref{localiseor:bcompare}), otherwise we create a new child combining the children from $vChildren$ (except in the case that $vChildren$ contains only one child) and push $v$ into it (lines~\ref{localiseor:bcombine}-\ref{localiseor:bremove}).  
 
-\newcommand{\scalesize}{0.73}
+\newcommand{\scalesize}{1}%{0.73}
 
 \begin{figure}
   \centering
@@ -1082,6 +1084,7 @@ The set $vChildren$ is then for existential variable, by the rule~\eqref{loc:exb
   \label{fig:localise:start}
   \end{subfigure}
   \begin{subfigure}{0.98\textwidth}%{0.48\textwidth}
+  \bigskip
   \centering
   \scalebox{\scalesize}
   {\begin{forest}
@@ -1111,6 +1114,8 @@ The set $vChildren$ is then for existential variable, by the rule~\eqref{loc:exb
   \caption{After pushing $y_1$ and $x_3$}
   \label{fig:localise:disj1push}
   \end{subfigure}
+\end{figure}%
+\begin{figure}\ContinuedFloat
   \begin{subfigure}{0.98\textwidth}%{0.48\textwidth}
   \centering
   \scalebox{\scalesize}
@@ -1145,6 +1150,7 @@ The set $vChildren$ is then for existential variable, by the rule~\eqref{loc:exb
   \label{fig:localise:disj2push}
   \end{subfigure}
   \begin{subfigure}{0.98\textwidth}%{0.48\textwidth}
+  \bigskip
   \centering
   \scalebox{\scalesize}
   {\begin{forest}
@@ -1183,7 +1189,7 @@ The set $vChildren$ is then for existential variable, by the rule~\eqref{loc:exb
 
 \begin{example}
   \label{ex:QTlocalising}
-  Figure~\ref{fig:localise} shows an example of localisation. We start by calling \textproc{LocaliseOR} on the root of the tree in Figure~\ref{fig:localise:start}. This first tries to push existential quantifiers $y_1$ and $y_2$ by using \eqref{loc:exdisj} and Theorem~\ref{thrm:localisedijunction}. This is only possible for $y_1$. For $y_2$, both children nodes of root that contain $y_2$, contain also universal variable $x_2$, which is not in its dependency set. On Figure~\ref{fig:localise:disj1push} the aftermath of this action is shown in red. Notice that $y$ was renamed not only in the prefix but also in terminal nodes. In blue we show where $x_3$ was pushed after finishing the processing of existential variables and starting the second part of the algorithm. Here, we first push $x_3$, because only one child contains it. Also, for the same reason we do not create a new child for it. This is not true for $y_2$ and $x_1$ which are both in two children, therefore we have to create a new children for them combining the children that contain them. On Figure~\ref{fig:localise:disj2push} we can see the result of \textproc{LocaliseOR} for the root. In red is the newly created child to which $x_1$ was pushed and in blue the child to which $y_2$ was pushed. Variable $x_2$ was not pushed, because both resulting children contain it. After this, we start localising for children and their children which results in the tree on Figure~\ref{fig:localise:end}. It shows how function \textproc{LocaliseAND} pushed variables for each ${\land}$ node.
+  Figure~\ref{fig:localise} shows an example of localisation. We start by calling \textproc{LocaliseOR} on the root of the tree in Figure~\ref{fig:localise:start}. This first tries to push existential quantifiers $y_1$ and $y_2$ by using \eqref{loc:exdisj} and Theorem~\ref{thrm:localisedijunction}. This is only possible for $y_1$. For $y_2$, both children nodes of root that contain $y_2$, contain also universal variable $x_2$, which is not in its dependency set. In Figure~\ref{fig:localise:disj1push} the aftermath of this action is shown in red. Notice that $y$ was renamed not only in the prefix but also in terminal nodes. In blue we show where $x_3$ was pushed after finishing the processing of existential variables and starting the second part of the algorithm. Here, we first push $x_3$, because only one child contains it. Also, for the same reason we do not create a new child for it. This is not true for $y_2$ and $x_1$ which are both in two children, therefore we have to create a new children for them combining the children that contain them. In Figure~\ref{fig:localise:disj2push} we can see the result of \textproc{LocaliseOR} for the root. In red is the newly created child to which $x_1$ was pushed and in blue the child to which $y_2$ was pushed. Variable $x_2$ was not pushed, because both resulting children contain it. After this, we start localising for children and their children which results in the tree in Figure~\ref{fig:localise:end}. It shows how function \textproc{LocaliseAND} pushed variables for each ${\land}$ node.
 \end{example}
 
 \section{Transformation to BDD}
@@ -1234,20 +1240,21 @@ Function \textproc{EliminateQuantifiers} on line~\ref{turntobdd:eliminate} can e
 \end{itemize}
 
 
-\begin{figure}[t]
-  \begin{subfigure}{0.48\textwidth}
+\begin{figure}
   \centering
-  \scalebox{0.7}{\begin{forest}
+  \begin{subfigure}{0.98\textwidth}
+  \centering
+  \scalebox{\scalesize}{\begin{forest}
     [$\forall x_2$, for descendants={circle, draw, minimum size=2em, inner sep=1pt}
       [${\lor}$
         [${\lor}$, edge label={node[midway,above left]{$\forall x_1$}}
           [${\land}$
             [$x_1$]
-            [$y_1$,edge label={node[midway,above right]{$\exists y_1(x_1)$}}]
+            [$y_1'$,edge label={node[midway,above right]{$\exists y_1'(x_1)$}}]
           ]
           [${\land}$
             [$x_2$]
-            [$y_1$, edge label={node[midway,above right]{$\exists y_1(x_1)$}}]
+            [$y_1''$, edge label={node[midway,above right]{$\exists y_1''(x_1)$}}]
           ]
         ]
         [${\lor}$, edge label={node[midway,above right]{$\exists y_2(\emptyset)$}}
@@ -1267,44 +1274,55 @@ Function \textproc{EliminateQuantifiers} on line~\ref{turntobdd:eliminate} can e
   \caption{The starting tree}
   \label{fig:eliminate:start}
   \end{subfigure}
-  \begin{subfigure}{0.48\textwidth}
+  \begin{subfigure}{0.98\textwidth}
   \centering
-  \par\vspace{0.4cm}
-  \scalebox{0.7}{\begin{forest}
+  \scalebox{\scalesize}{\begin{forest}
     [$\forall x_2$
       [${\lor}$, circle, draw, minimum size=2em, inner sep=1pt, for children={circle, draw, minimum size=2em, inner sep=1pt}
         [${\lor}$, edge label={node[midway,above left]{$\forall x_1$}}
           [$x_1$]
           [$x_2$]
         ]
-        [${\lor}$, edge label={node[midway,above right]{$\exists y_2(\emptyset)$}}
+        [${\lor}$, for descendants={circle, draw, minimum size=2em, inner sep=1pt}, edge label={node[midway,above right]{$\exists y_2(\emptyset)$}}
+          [${\land}$
+            [$x_2$]
+            [$y_2$]
+          ]
+          [${\land}$
+            [$\neg x_2$]
+            [$\neg y_2$]
+            [$x_3$,edge label={node[midway,above right]{$\forall x_3$}}]
+          ]
+        ]
+      ]
+    ]
+  \end{forest}}
+  %\par\vspace{0.4cm}
+  \caption{After transforming ${\land}$ nodes in the left subtree}
+  \label{fig:eliminate:leftterminals}
+  \end{subfigure}
+  \begin{subfigure}{0.58\textwidth}
+  \centering
+  %\par\vspace{0.4cm}
+  \scalebox{\scalesize}{\begin{forest}
+    [$\forall x_2$
+      [${\lor}$, circle, draw, minimum size=2em, inner sep=1pt
+        [$x_2$]
+        [${\lor}$, circle, draw, minimum size=2em, inner sep=1pt, edge label={node[midway,above right]{$\exists y_2(\emptyset)$}}
           [$x_2 \land y_2$]
           [$0$]
         ]
       ]
     ]
   \end{forest}}
-  \par\vspace{0.4cm}
-  \caption{After transforming ${\land}$ nodes}
-  \label{fig:eliminate:terminals}
-  \end{subfigure}
-  \par\bigskip
-  \begin{subfigure}{0.48\textwidth}
+  %\par\vspace{0.4cm}
+  \caption{After transforming further nodes}
+  \label{fig:eliminate:rightterminals}
+  \end{subfigure}%
+  \begin{subfigure}{0.4\textwidth}
   \centering
-  \scalebox{0.7}{\begin{forest}
-    [$\forall x_2$
-      [${\lor}$, circle, draw, minimum size=2em, inner sep=1pt
-        [$x_1 \lor x_2$, edge label={node[midway,above left]{$\forall x_1$}}]
-        [$x_2 \land y_2$, edge label={node[midway,above right]{$\exists y_2(\emptyset)$}}]
-      ]
-    ]
-  \end{forest}}
-  \caption{Before transforming the root}
-  \label{fig:eliminate:secondtolast}
-  \end{subfigure}
-  \begin{subfigure}{0.48\textwidth}
-  \centering
-  \scalebox{0.7}{\begin{forest}
+  \vspace{15pt}
+  \scalebox{\scalesize}{\begin{forest}
     [$\forall x_2 \exists y_2(\emptyset)$
       [${\lor}$, circle, draw, minimum size=2em, inner sep=1pt
         [$x_2$]
@@ -1312,6 +1330,7 @@ Function \textproc{EliminateQuantifiers} on line~\ref{turntobdd:eliminate} can e
       ]
     ]
   \end{forest}}
+  \vspace{15pt}
   \caption{The final tree}
   \label{fig:eliminate:end}
   \end{subfigure}
@@ -1321,12 +1340,12 @@ Function \textproc{EliminateQuantifiers} on line~\ref{turntobdd:eliminate} can e
 
 \begin{example}
   \label{ex:QTeliminating}
-  Figure~\ref{fig:eliminate} shows the transformation to BDD for the quantifier tree from Example~\ref{ex:QTlocalising} which uses \QEsimple{} quantifier elimination. We can transform the terminal nodes that represent $\exists y_1(x_1) \itholds y_1$ by eliminating $y_1$ using Theorem~\ref{thrm:exElim} to $0 \lor 1 \equiv 1$. For $\forall x_3 \itholds x_3$, using universal expansion, we get $0 \land 1 \equiv 0$. Using these, Figure~\ref{fig:eliminate:terminals} shows the tree after turning the ${\land}$ nodes to BDDs. After that, we transform the children of the root node resulting in Figure~\ref{fig:eliminate:secondtolast}. Here, we can eliminate $x_1$ in the first child resulting in $(0 \lor x_2) \land (1 \lor x_2) \equiv x_2$. We cannot eliminate $y_2$ in the second child, because it contains $x_2$ which is not in the dependecy set of $y_2$. That is why we extract it back to root resulting in the tree in Figure~\ref{fig:eliminate:end}. And because $x_2 \lor (x_2 \land y_2) \equiv x_2 \land y_2$, the resulting formula is then $\forall x_2 \exists y_2(\emptyset) \itholds (x_2 \land y_2)$.
+  Figure~\ref{fig:eliminate} shows the transformation to BDD for the quantifier tree from Example~\ref{ex:QTlocalising} which uses \QEall{} quantifier elimination. The algorithm starts with the leftmost nodes where it transform the terminal node that represents $\exists y_1'(x_1) \itholds y_1'$ to $0 \lor 1 \equiv 1$ by eliminating $y_1'$ using Theorem~\ref{thrm:exElim}. Similarly for the $y''$ node. Figure~\ref{fig:eliminate:leftterminals} then shows the tree after transforming the ${\land}$ nodes in the left subtree to BDDs. The nodes $x_1$ and $x_2$, which are not in circle, actually represent the BDDs which are in $childBDDs$ of the left ${\lor}$ node. After this, we create the BDD for $x_1 \lor x_2$ and perform universal expansion for $x_1$ which results in $(0 \lor x_2) \land (1 \lor x_2) \equiv x_2$. Moving to the right subtree, we turn the left ${\land}$ node to the BDD for $x_2 \land y_2$ and the right one (after eliminating $x_3$) to $\neg x_2 \land \neg y_2 \land 0 \land 1 \equiv 0$. Figure~\ref{fig:eliminate:rightterminals} shows the state of the tree after these transformations. Here, we cannot eliminate $y_2$ in the ${\lor}$ node, because it contains $x_2$, which is not in the dependency set of $y_2$. That is why we extract it back to root resulting in the tree in Figure~\ref{fig:eliminate:end}. And because $x_2 \lor (x_2 \land y_2) \equiv x_2 \land y_2$, the resulting BDD represents the formula $\forall x_2 \exists y_2(\emptyset) \itholds (x_2 \land y_2)$.
 \end{example}
 
 \section{Quantifier Elimination}
 \label{sec:algelimination}
-In this section we present the algorithm for eliminating all quantifiers. This algorithm is implemented as function \textproc{EliminateAllQuantifiers}, which is used in Algorithm~\ref{alg:general} for eliminating all quantifiers in the final formula (line~\ref{alg:general:elimination}) and can also be used to eliminate quantifiers during transformation to BDDs (line~\ref{turntobdd:eliminate} of Algorithm~\ref{alg:turntobdd}, it is an implementation of \QEall{} option).
+In this section we present the algorithm for eliminating all possible quantifiers. This algorithm is implemented as function \textproc{Eliminate\-All\-Quantifiers}, which is used in Algorithm~\ref{alg:general} for eliminating all quantifiers in the final formula (line~\ref{alg:general:elimination}) and can also be used to eliminate quantifiers during transformation to BDDs (line~\ref{turntobdd:eliminate} of Algorithm~\ref{alg:turntobdd}, it is an implementation of \QEall{} option).
 
 \begin{algorithm}
   \caption{Quantifier elimination algorithm}
@@ -1337,9 +1356,9 @@ In this section we present the algorithm for eliminating all quantifiers. This a
         \State choose $x$ from $\uprefix{n}$\label{allelimination:choose}
         \State $\phi_n = \forall\text{-expansion}(x,\phi_n)$\Comment{Theorem~\ref{thrm:unExpan}} \label{allelimination:uelim}
         \State remove $x$ from $\prefix{n}$\label{allelimination:uremove} and all dependency sets
-        \State $Q_{\forall} = \set{x \in \vars{\phi_n} | x \in \uprefix{n'} \text{ for some ancestor } n' \text{ of } n}$\label{allelimination:uset}
-        \State $Q_{\exists} = \set{y \in \vars{\phi_n} | y \in \eprefix{n'} \text{ for some ancestor } n' \text{ of } n}$\label{allelimination:eset}
-        \State $E = \set{y \in \eprefix{n} | Q_{\forall} \subseteq D_y \text{ and } D_{y'} \subseteq D_y \text{ for all } y \in Q_{\exists}}$\label{allelimination:etoremove}
+        \State $Q_{\forall} = \set{x \in \vars{\phi_n} | x \in \uprefix{n'} \text{ for some ancestor\footnotemark {} } n' \text{ of } n}$\label{allelimination:uset}
+        \State $Q_{\exists} = \set{y \in \vars{\phi_n} | y \in \eprefix{n'} \text{ for some ancestor\addtocounter{footnote}{-1}\addtocounter{Hfootnote}{-1}\footnotemark {} } n' \text{ of } n}$\label{allelimination:eset}
+        \State $E = \set{y \in \eprefix{n} | Q_{\forall} \subseteq D_y \text{ and } D_{y'} \subseteq D_y \text{ for all } y' \in Q_{\exists}}$\label{allelimination:etoremove}
         \ForAll{$y \in E$}\label{allelimination:eelimforstart}
           \State $\phi_n = \exists\text{-elimination}(y,\phi_n)$\Comment{Theorem~\ref{thrm:exElim}}\label{allelimination:eelim}
           \State remove $y$ from $\prefix{n}$\label{allelimination:eremove}
@@ -1348,24 +1367,25 @@ In this section we present the algorithm for eliminating all quantifiers. This a
     \EndFunction
   \end{algorithmic}
 \end{algorithm}
+\footnotetext{we assume that $n$ is an ancestor to itself}
 
 Algorithm~\ref{alg:allelimination} takes as input a node $n$ and a BDD $\phi_n$ representing the matrix of DQBF given by the subtree rooted in $n$. This algorithm is similar to Algorithm~\ref{alg:QE} which is used in HQS. However, while that one was used only for DQBF in PNF, this algorithm works for any subformula. It iteratively eliminates universal variables occuring in prefix $\prefix{n}$ using universal expansion (Theorem~\ref{thrm:unExpan}) and also all possible existential variables using Theorem~\ref{thrm:exElim}.
 
-The next universal variable to eliminate is chosen on line~\ref{allelimination:choose} by some heuristic after which we eliminate it from $\phi_n$ and remove it from the quantifier prefix of $n$ (lines~\ref{allelimination:uelim}~and~\ref{allelimination:uremove}). We 
+The next universal variable $x$ to eliminate is chosen on line~\ref{allelimination:choose} by some heuristic after which we eliminate it from $\phi_n$ and remove it from the quantifier prefix of $n$ (lines~\ref{allelimination:uelim}~and~\ref{allelimination:uremove}). We can do this, because according to~\eqref{loc:exswap},~\eqref{loc:unswap} and~\eqref{loc:bothswap}, we can reorder the quantifiers in the prefix $\prefix{n}$ so that at the end of the prefix we will have the variable $x$ followed by only those existential variables that are dependent on $x$ which is the condition of Theorem~\ref{thrm:unExpan}.
 
-On lines~\ref{allelimination:uset}~and~\ref{allelimination:eset} the sets $Q_{\forall}$ and $Q_{\exists}$ are initialized as all variables occurring in $\phi_n$ which are universally or existentially quantified in the quantifier tree. We find them by going trough quantifier prefixes of all ancestors of $n$ (we assume that $n$ is ancestor to itself). We use these sets to compute the set $E$ on line~\ref{allelimination:etoremove} of all existential variables from prefix $\prefix{n}$ which fulfill the conditions set by Theorem~\ref{thrm:exElim}. These variables are those that can be existentially eliminated which we do on lines~\ref{allelimination:eelimforstart}-\ref{allelimination:eelimforend}.
+On lines~\ref{allelimination:uset}~and~\ref{allelimination:eset} the sets $Q_{\forall}$ and $Q_{\exists}$ are initialized to all variables occurring in $\phi_n$ that are universally or existentially quantified in the quantifier tree. We find them by going trough quantifier prefixes of all ancestors of $n$ (we assume that $n$ is an ancestor to itself). We use these sets to compute the set $E$ on line~\ref{allelimination:etoremove} of all existential variables from prefix $\prefix{n}$ which fulfill the conditions set by Theorem~\ref{thrm:exElim}. For each $y \in E$, it holds that all universal variables in $\phi_n$ and all universal variables in dependency sets of existential variables in $\phi_n$ are in $D_y$. The variables from $E$ are then eliminated on lines~\ref{allelimination:eelimforstart}-\ref{allelimination:eelimforend}.
 
-The heuristics we use for choosing the next universal variable to eliminate on line~\ref{allelimination:choose} are these:
+We use three heuristics for choosing the next universal variable to eliminate on line~\ref{allelimination:choose}:
 \begin{itemize}
-    \item The order of universal variables from $\uprefix{n}$ is set at the beginning based on the number of existential variables that depend on them (from lowest to highest). This is done so the number of created existential variables do not grow so fast. %so the created duplicates do not count in, i.e. 
+    \item \QUatbeginning{}: The order of universal variables from $\uprefix{n}$ is set at the beginning based on the number of existential variables that depend on them (from lowest to highest). We do this to keep the number of newly created existential variables low. %so the created duplicates do not count in, i.e. 
     As an example, let
     \[\forall x_1 \forall x_2 \forall x_3 \exists y_1(x_1, x_2) \exists y_2(x_1,x_2) \exists y_3(x_3) \exists y_4(x_3) \exists y_5 (x_3)\]
     be the quantifier prefix $\prefix{n}$. The order is either $x_1, x_2, x_3$ or $x_2, x_1, x_3$, because for both $x_1$ and $x_2$ only two existential variables $y_1$ and $y_2$ depend on them while for $x_3$ it is three ($y_3$, $y_4$, $y_5$). This heuristic was introduced with HQS~\cite{HQSquantifierElimination}, 
-    \item The next heuristic is similar, but the order is not set at the beginning. The next universal variable to eliminate is then the one with the current lowest number of existential variables that depend on it. This means that the existential variables which were created as a copies during universal expansion also count here. For example, take $\prefix{n}$ from the previous example. In this heuristic, at the beginning either $x_1$ or $x_2$ is chosen as in the previous one, because two existential variables depend on them while on $x_3$ three depend. Assume that $x_1$ was chosen and eliminated without any other variable getting removed. The quantifier prefix $\prefix{n}$ is then
+    \item \QUcurrentlowest{}: The next heuristic is similar, but the order is not set at the beginning. The next universal variable to eliminate is then the one with the current lowest number of existential variables that depend on it. This means that the existential variables which were created as a copies during universal expansion also count here. For example, take $\prefix{n}$ from the previous example. In this heuristic, at the beginning either $x_1$ or $x_2$ is chosen as in the previous one, because two existential variables depend on them while on $x_3$ three depend. Assume that $x_1$ was chosen and eliminated without any other variable getting removed. The quantifier prefix $\prefix{n}$ is then
     \[\forall x_2 \forall x_3 \exists y_1(x_2) \exists y_2(x_2) \exists y_1'(x_2) \exists y_2'(x_2) \exists y_3(x_3) \exists y_4(x_3) \exists y_5 (x_3)\]
     where $y_1'$ and $y_2'$ were created as copies of $y_1$ and $y_2$ during universal expansion. Now, in the previous heuristic $x_2$ would be chosen. However, here $x_3$ is chosen because it still depends only on three variables, while $x_2$ now depends on four. This heuristic was introduced by Gitina et al.~\cite{HQSsimpleAlg}.
-    \item Another heuristic we use is based on the number of variables in the BDDs representing the two conjuncts used for universal expansion in Theorem~\ref{thrm:unExpan}. That is, let $x \in \uprefix{n}$ and $\psi_1^{-x}\substitute{x}{0}$, $\psi_2^{-x}\substitute{x}{1}$
-    be the two conjuncts from Theorem~\ref{thrm:unExpan} as if we were doing universal expansion. Because the operation of replacing variables with constants is fast for BDDs, we can create BDDs for these two formulas and check for the amount of variables in both of them, that is the number of variables in the set $\vars{\psi_1^{-x}\substitute{x}{0}} \cup \vars{\psi_2^{-x}\substitute{x}{1}}$. Because BDDs remove the variables which are not needed, the number of variables in this union can be smaller than expected. We can do this for all universal variables and choose the one with the lowest number of variables in this set. Notice, that this heuristic behaves like the previous one if no variables are removed in BDDs.
+    \item \QUvarsinconjuncts{}: Another heuristic we use is based on the number of variables in the BDDs representing the two conjuncts used for universal expansion in Theorem~\ref{thrm:unExpan}. That is, let $x \in \uprefix{n}$ and $\psi_1^{-x}\substitute{x}{0}$, $\psi_2^{-x}\substitute{x}{1}$
+    be the two conjuncts from Theorem~\ref{thrm:unExpan} as if we were doing universal expansion. Because the operation of replacing variables with constants is fast for BDDs, we can create BDDs for these two formulas and check for the amount of variables in both of them, that is the number of variables in the set $\vars{\psi_1^{-x}\substitute{x}{0}} \cup \vars{\psi_2^{-x}\substitute{x}{1}}$. Because BDDs remove the variables which are not needed, the number of variables in this union for BDDs can be smaller than we would expect. We can do this for all universal variables and choose the one with the lowest number of variables in the corresponding union. Notice, that this heuristic behaves like the previous one if no variables are removed in BDDs.
     %\item something with creating depency tree, to find existential variables to remove as fast as possible (not sure if possible) --- maybe possible, basically remove those universal vars that will make it possible to remove as much existential vars as possible on the level??? 
 \end{itemize}
 
@@ -1401,22 +1421,24 @@ The heuristics we use for choosing the next universal variable to eliminate on l
 
 \chapter{Implementation}
 \label{chap:implementation}
-We implemented the algorithm as a tool DQBDD~\footnote{the source code can be found at \url{https://github.com/jurajsic/DQBDD}} from Chapter~\ref{chap:algorithm} in C\texttt{++} using version 3.0.0 of the CUDD\footnote{\url{https://github.com/ivmai/cudd}} package~\cite{CUDD} for BDD manipulation, version 2.2.0 of the cxxopts\footnote{\url{https://github.com/jarro2783/cxxopts}} library for parsing command-line arguments and preprocessor HQSpre~\cite{HQSpre2}, more specifically the version that was used with HQS with quantifier localisation~\cite{HQSquantifierLocalisation}.
+\begin{sloppypar}
+We implemented the algorithm of Chapter~\ref{chap:algorithm}a in a new tool called DQBDD\footnote{the source code can be found at \url{https://github.com/jurajsic/DQBDD}}. The tool is written in C\texttt{++} using version 3.0.0 of the CUDD\footnote{\url{https://github.com/ivmai/cudd}} package~\cite{CUDD} for BDD manipulation, version 2.2.0 of the cxxopts\footnote{\url{https://github.com/jarro2783/cxxopts}} library for parsing command-line arguments, and pre\-pro\-ces\-sor HQSpre~\cite{HQSpre2}, more specifically the version that was used with HQS with quantifier localisation~\cite{HQSquantifierLocalisation}.
+\end{sloppypar}
 
-The tool takes as an input \DQDIMACS{}~\cite{iDQandDQDIMACS} file on which we can run the preprocessor HQSpre. As was explained in Section~\ref{sec:preprocessing}, HQSpre can extract logical gates from variables in the formula that can be then replaced by them resulting in formula with fewer variables. This results in a formula that does not need to be in PCNF, which most solvers cannot handle. However, as HQS, our solver can work with non-PCNF formulas, stemming from the fact that we represent matrices as either BDDs or quantifier trees. This means that we can use this feature of HQSpre similarly as it is used for HQS.
+The tool takes as an input a \DQDIMACS{}~\cite{iDQandDQDIMACS} file on which we can run the preprocessor HQSpre. As was explained in Section~\ref{sec:preprocessing}, HQSpre can extract logical gates from variables in the formula that can be then replaced by them resulting in formula with fewer variables. This results in a formula that does not need to be in PCNF, which most solvers cannot handle. However, as HQS, our solver can work with non-PCNF formulas, stemming from the fact that we represent DQBFs as quantifier trees. This means that we can use this feature of HQSpre similarly as it is used for HQS.
 
-First we check how many gates can be extracted. If this number is low (we use less than 5), then we run preprocessor normally, without caring whether these gates will get destroyed or not. If there is enough gates, then we run preprocessor normally on a copy of the formula to check if it can solve it. It it cannot, we run the preprocessor with gate preservation setting on. This will ensure that during preprocessing no clause from which these gates are extracted is touched and at the end of preprocessing we can extract these gates while creating BDD or quantifier tree.
+First we check how many gates can be extracted. If this number is low (we use less than 5), then we run preprocessor normally, without caring whether these gates will get destroyed or not. If there are many gates, then we run preprocessor normally on a copy of the formula to check if it can solve it. If it cannot, we run the preprocessor with gate preservation set on. This will ensure that during preprocessing no clause from which these gates can be extracted is touched and at the end of preprocessing, we can extract these gates while creating a quantifier tree.
 
-On the result we run Algorithm~\ref{alg:general} with chosen heuristics for elimination of quantifiers. If we choose that nothing is eliminated during the transformation of quantifier tree to BDD as explained in Section~\ref{sec:algturntobdd}, we skip localisation and this transformation and create BDD directly from the output of preprocessor. Also, during the final elimination of quantifiers (line~\ref{alg:general:elimination}), we can stop after the final universal variable is eliminated and we can keep all the existential variables. Then if the resulting BDD is $0$, the formula is unsatisfiable. Otherwise it is satisfiable. This stems from the fact that we work with ROBDDs and for unsatisfiable formula all paths over the leftover existential variables in the resulting BDD go to $0$ while for satisfiable one, there is at least one path going to $1$.
+We run Algorithm~\ref{alg:general} on the preprocessed formula with chosen heuristics for elimination of quantifiers and for the choice of the next universal variable to eliminate. If we choose \QEnone{} as elimination heuristic as explained in Section~\ref{sec:algturntobdd}, we can skip localisation and create BDD directly from the output of preprocessor. Also, during the final elimination of quantifiers (line~\ref{alg:general:elimination}), we can stop after the final universal variable is eliminated and we can keep all the existential variables. Then if the resulting BDD is $0$, the formula is unsatisfiable. Otherwise it is satisfiable. This stems from the fact that for unsatisfiable formulas all paths over the leftover existential variables in the resulting BDD go to $0$, while for satisfiable ones, there is at least one path going to $1$.
 
-While applying any operation on BDDs, some variables can disappear from it, because the formula does not depend on their value. We can use this and apply the rules~\eqref{elim:univ} and \eqref{elim:exist} to remove unneeded quantifiers whenever we change the formula. This can result in better elimination algorithm because we might sever unneeded dependencies.
+Furthermore, while applying any operation on BDDs, some variables can disappear from it, because the formula does not depend on their value. We can use this and apply the rules~\eqref{elim:univ} and \eqref{elim:exist} to remove unneeded quantifiers whenever we change the formula. This can speed up quantifier elimination because some irrelevant dependencies can be removed.
 
 As explained in Section~\ref{sec:BDD}, the size of a BDD depends on the order of the variables. This is why we also use dynamic reordering provided by CUDD which reorders the variables using some heuristics whenever the BDDs grow too big. We use CUDD's implementation of Rudell's sifting algorithm~\cite{BDDsifting}.
 
+Additionally, as an optimisation, we do not create copies blabla nor do we remove copies blabla Even though this results in something that is not a valid DQBF, as there will be two quantifiers for the same variable however, this is not problematic.
+
 % TODO upravit aby to sem zapadalo + veci co honza napisal k tomuto
 As we already mentioned, we do not need to create copies of variables on line~\ref{localiseand:upush} of Algorithm~\ref{alg:localiseand} or on line~\ref{localiseor:epush} of Algorithm~\ref{alg:localiseor}. This is partially because the next part of Algorithm~\ref{alg:general} we extract these variables back anyway so at the end we do not end up with multiple copies of same variables. The only problem could be that we could possibly have two distinct subformulas with universally quantified $x$ and existentially quantified $y$ depending on it. This could cause problem during elimination of $x$, where if we eliminate it only in one subformula using Theorem~\ref{thrm:unExpan} we would create a copy of $y$ which would cause problems during quantifier extraction. However, this cannot happen, from the way variables are pushed inside. When we push universal variable $x$ on line~\ref{localiseand:upush} of Algorithm~\ref{alg:localiseand} to child $n'$, all quantified existential variables in $n'$ are not in other children. This stems from the fact, that on line~\ref{localiseand:epush} we push existential variables into one child that contain its occurrences. Similarly, when we push universal variable $v$ on line~\ref{localiseor:bpush} of Algorithm~\ref{alg:localiseor}, we are pushing into $vChildren$ which must contain all existential variables dependent on $v$. Another problem with not creating copies could be on line~\ref{localiseand:uremove} of Algorithm~\ref{alg:localiseand} where we remove $x$ from its dependencies. This could be a problem if we removed from one of the dependency in this subformula, but in another the dependency stayed. However, this cannot happen for exactly the same reason as in a previous problem.
-
-% TODO popisat triedy???
 
 \chapter{Experimental Results}
 \label{chap:experiments}
