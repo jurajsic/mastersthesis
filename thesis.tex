@@ -65,7 +65,7 @@
       In this thesis we devise and implement a satisfiability solver DQBDD for \emph{dependency quantified Boolean formulas} (DQBFs), which are an extension of \emph{quantified Boolean formulas} (QBFs) where the dependencies between quantifiers are explicitly given. It uses \emph{binary decision diagrams} (BDDs) as an underlying representation of Boolean formulas with quantifier elimination approach for solving. We show that an existing solution based on quantifier elimination which uses quantifier localisation to push quantifiers inside the formula is erroneous and propose a fix for it with an enhancement which allows universal quantifier elimination inside subformulas. Finally, we compare the performance of DQBDD with existing state-of-the-art tools (dCAQE, HQS, iDQ and iProver) and show that it results in a very competitive solver.
     },
     thanks        = {%
-      I would like to thank my advisor doc. RNDr. Jan Strej\v{c}ek, Ph.D. for all his ??? help with writing this thesis, his poznamky?? and daco??? TODO!!!
+      I would like to thank my advisor doc. RNDr. Jan Strejček, Ph.D. for all his help with writing this thesis, especially for the fruitful discussions we held and for finding the time to thoroughly read the drafts and offer very helpful and extensive improvement suggestions.
     },
     bib           = {bibliography.bib},
     assignment    = {assignment.pdf},
@@ -702,18 +702,7 @@ In figures, each node $n$ is denoted by its assigned operation or literal $\qtla
 
 \chapter{Transformations of DQBFs}
 \label{chap:quantmanip}
-%In this chapter we give some theoretical results for DQBFs in NNF, which show the equisatisfiability of different DQBFs. which can result in their simplification. These results can be then used for developing a DQBF solver which checks whether an input DQBF is satisfiable or not. TODO!!!!!
-
-%For the latter, we give rules for shifting and eliminating quantifiers inside formula. We then use these for developing our solver in Chapter~\ref{chap:algorithm}. 
-
 In this chapter we give theorems showing equisatisfiabilities of some DQBFs in NNF. Such formulas can be replaced with each other, allowing us to push (pull) quantifiers inside (from) the formula (Section~\ref{sec:quantLocalisation}) or eliminate them (Section~\ref{sec:quantElimination}). We use these results in Chapter~\ref{chap:algorithm} to develop an algorithm solving DQBFs.
-%\begin{itemize}
-%    \item pushing quantifiers inside formula,
-%    \item elimination of quantified variables or
-%    \item ????removal of universal variables from the dependency sets of existential variables.????
-%\end{itemize}
-
-
 
 \section{Shifting Quantifiers}
 \label{sec:quantLocalisation}
@@ -998,8 +987,6 @@ Scholl et al.~\cite{PSPACEsubclass} investigated whether there is another DQBF s
 
 \chapter{Suggested Algorithm}
 \label{chap:algorithm}
-%TODO: decide the name, our/suggested/new/... algorithm
-
 In this chapter we describe the algorithm for solving satisfiability of DQBF using BDDs. This algorithm is based on the localisation algorithm for HQS~\cite{HQSquantifierLocalisation} which follows in similar vein. However, we update it with the corrected procedure for localisation of quantifiers as explained in Section~\ref{sec:quantLocalisation} and we add more thorough elimination of quantifiers using theorems from Section~\ref{sec:quantElimination}.
 
 \section{High Level Definition}
@@ -1510,7 +1497,7 @@ We use three heuristics for choosing the next universal variable to eliminate on
 \chapter{Implementation: DQBDD}
 \label{chap:implementation}
 \begin{sloppypar}
-We have implemented the algorithm of Chapter~\ref{chap:algorithm} in a new tool called DQBDD\footnote{the source code can be found at \url{https://github.com/jurajsic/DQBDD}} (see Appendix~\ref{appendix:DQBDD} for documentation). The tool is written in \Cplusplus{} using version 3.0.0 of the CUDD\footnote{\url{https://github.com/ivmai/cudd}} package~\cite{CUDD} for BDD manipulation, version 2.2.0 of the cxxopts\footnote{\url{https://github.com/jarro2783/cxxopts}} library for parsing command-line arguments, and pre\-pro\-ces\-sor HQSpre~\cite{HQSpre2}, more specifically the version that was used with HQS with quantifier localisation~\cite{HQSquantifierLocalisation}.
+We have implemented the algorithm of Chapter~\ref{chap:algorithm} in a new tool called DQBDD\footnote{the source code can be found at \url{https://github.com/jurajsic/DQBDD} and also as an attachment of this thesis -- see Appendix~\ref{appendix:attachments}} (see Appendix~\ref{appendix:DQBDD} for documentation). The tool is written in \Cplusplus{} using version 3.0.0 of the CUDD\footnote{\url{https://github.com/ivmai/cudd}} package~\cite{CUDD} for BDD manipulation, version 2.2.0 of the cxxopts\footnote{\url{https://github.com/jarro2783/cxxopts}} library for parsing command-line arguments, and pre\-pro\-ces\-sor HQSpre~\cite{HQSpre2}, more specifically the version that was used with HQS with quantifier localisation~\cite{HQSquantifierLocalisation}.
 \end{sloppypar}
 
 The tool takes as an input a file in \DQDIMACS{} format~\cite{iDQandDQDIMACS} (see Appendix~\ref{appendix:DQDIMACS}) on which we can run the preprocessor HQSpre. As was explained in Section~\ref{sec:preprocessing}, HQSpre can extract logical gates from variables in the formula that can be then replaced by them resulting in formula with fewer variables. This results in a formula that may not be in PCNF, which most solvers cannot handle. However, as HQS, our solver can work with non-PCNF formulas, stemming from the fact that we represent DQBFs as quantifier trees. This means that we can use this feature of HQSpre similarly as it is used in HQS.
@@ -1530,9 +1517,6 @@ Additionally, as an optimisation, we do not create copies of variables on line~\
 
 We can also optimise Algorithm~\ref{alg:turntobdd} by checking on line~\ref{turntobdd:callforchild} whether the child BDD corresponds to 0 (or 1). If it does and $\qtlabel{n} = {\land}$ (or ${\lor}$), then we can directly return 0 (or 1).
 
-% TODO upravit aby to sem zapadalo + veci co honza napisal k tomuto
-%As we already mentioned, we do not need to create copies of variables on line~\ref{localiseand:upush} of Algorithm~\ref{alg:localiseand} or on line~\ref{localiseor:epush} of Algorithm~\ref{alg:localiseor}. This is partially because the next part of Algorithm~\ref{alg:general} we extract these variables back anyway so at the end we do not end up with multiple copies of same variables. The only problem could be that we could possibly have two distinct subformulas with universally quantified $x$ and existentially quantified $y$ depending on it. This could cause problem during elimination of $x$, where if we eliminate it only in one subformula using Theorem~\ref{thrm:unExpan} we would create a copy of $y$ which would cause problems during quantifier extraction. However, this cannot happen, from the way variables are pushed inside. When we push universal variable $x$ on line~\ref{localiseand:upush} of Algorithm~\ref{alg:localiseand} to child $n'$, all quantified existential variables in $n'$ are not in other children. This stems from the fact, that on line~\ref{localiseand:epush} we push existential variables into one child that contain its occurrences. Similarly, when we push universal variable $v$ on line~\ref{localiseor:bpush} of Algorithm~\ref{alg:localiseor}, we are pushing into $vChildren$ which must contain all existential variables dependent on $v$. Another problem with not creating copies could be on line~\ref{localiseand:uremove} of Algorithm~\ref{alg:localiseand} where we remove $x$ from its dependencies. This could be a problem if we removed from one of the dependency in this subformula, but in another the dependency stayed. However, this cannot happen for exactly the same reason as in a previous problem.
-
 \chapter{Experimental Results}
 \label{chap:experiments}
 This chapter shows the experimental results of DQBDD heuristics comparison and its comparison with other publicly available DQBF solvers 
@@ -1541,7 +1525,7 @@ iProver v3.1\footnote{\url{http://www.cs.man.ac.uk/~korovink/iprover/}, run with
 dCAQE v4.0.1\footnote{\url{https://github.com/ltentrup/caqe/}},
 and HQS with the erroneous quantifier localisation\footnote{\url{https://abs.informatik.uni-freiburg.de/src/projects_view.php?projectID=21}}). All our benchmarks were run on 24 core machine with \SI{2.10}{GHz} Intel Xeon CPU (with at most 6 different runs in parallel) using BenchExec v2.2~\cite{benchexec}, a framework for reliable benchmarking and rescource measurement, where we set the runtime limit at \SI{900}{s} of CPU time and the memory consumption limit at \SI{4}{GB} per benchmark.
 
-All used benchmarks with the results and BenchExec definitions can be found in a github repository\footnote{\url{https://github.com/jurajsic/DQBFbenchmarks}}.
+All used benchmarks with the results and BenchExec definitions can be found in a github repository\footnote{\url{https://github.com/jurajsic/DQBFbenchmarks}} and as an attachment of this thesis (see Appendix~\ref{appendix:attachments}).
 
 \section{Benchmark Sets}
 We use these benchmark sets for the experimental evaluation:
@@ -1661,7 +1645,7 @@ Table~\ref{tab:PEC1} shows the comparison of all solvers for PEC1 benchmarks tha
 
 The remaining two solvers -- HQS and iDQ -- solved 413 instances each where HQS was 249 times faster than iDQ. Also notice that even though HQS solved less instances than DQBDD, DQBDD total runtime was still significantly smaller than HQS total runtime.
 
-\begin{table}[h]
+\begin{table}[ht]
 \centering
 \caption{Comparison of solvers for PEC1 benchmark set}% with the total number of solved instances (\textbf{\#}) and the time taken to solve them, the number of solved satisfiable (\textbf{S}), unsatisfiable (\textbf{U}), and unique~(\textbf{*}) instances and the number of unsolved instances broken down to those that reached the time (\textbf{T}) or memory limit (\textbf{M}), or ended prematurely for some other reason (\textbf{O}).}
 \label{tab:PEC1}
@@ -1839,7 +1823,7 @@ The results for SAT benchmark set are in Table~\ref{tab:SAT}. This set consists 
 \end{table}
 
 \subsection{E19}
-Finally, Table~\ref{tab:E19cac} shows the comparison of solvers for E19 benchmark set with the cactus plot in Figure~\ref{fig:cactusE19}. As this set is a combination of previous sets (with also some new benchmarks), it is the most interesting for ``real'' comparison. However, this set is still dominated by PEC benchmarks, which shows up in the results: both DQBDD and HQS solved the most benchmarks, with 139 each (see Figure~\ref{fig:E19dqbddVShqs} for their runtime comparison). This is followed by dCAQE which solved 111 instances, then iProver with 50 instances, and finally iDQ with only 27 instances. Even though DQBDD solved the most, it was still the fastest, taking only \SI{3440.76}{s} for all of its solved instances. On average, this is \SI{24.75}{s} per instance, where dCAQE took \SI{39.06}{s} per instance, HQS took \SI{48.9}{s}, iDQ took \SI{136.97}{s} and iProver \SI{149.8}{s}.
+Finally, Table~\ref{tab:E19} shows the comparison of solvers for E19 benchmark set with the cactus plot in Figure~\ref{fig:cactusE19}. As this set is a combination of previous sets (with also some new benchmarks), it is the most interesting for ``real'' comparison. However, this set is still dominated by PEC benchmarks, which shows up in the results: both DQBDD and HQS solved the most benchmarks, with 139 each (see Figure~\ref{fig:E19dqbddVShqs} for their runtime comparison). This is followed by dCAQE which solved 111 instances, then iProver with 50 instances, and finally iDQ with only 27 instances. Even though DQBDD solved the most, it was still the fastest, taking only \SI{3440.76}{s} for all of its solved instances. On average, this is \SI{24.75}{s} per instance, where dCAQE took \SI{39.06}{s} per instance, HQS took \SI{48.9}{s}, iDQ took \SI{136.97}{s} and iProver \SI{149.8}{s}.
 
 There was also a discrepancy in this benchmark set. One instance, which is not in other benchmark sets, was deemed satisfiable by dCAQE while HQS claimed its unsatisfiability. Again, we believe that dCAQE solved it incorrectly.
 
@@ -1897,26 +1881,17 @@ For future work there are multiple things possible to do:
 \printbibliography[heading=bibintoc]
 \endgroup
 
-%\chapter{Inserting the index}
-%After using the \verb"\makeindex" macro and loading the
-%\texttt{makeidx} package that provides additional indexing
-%commands, index entries can be created by issuing the \verb"\index"
-%command. \index{dummy text|(}It is possible to create ranged index
-%entries, which will encompass a span of text.\index{dummy text|)}
-%To insert complex typographic material -- such as $\alpha$
-%\index{alpha@$\alpha$} or \TeX{} \index{TeX@\TeX} --
-%into the index, you need to specify a text string, which will
-%determine how the entry will be sorted. It is also possible to
-%create hierarchal entries. \index{vehicles!trucks}
-%\index{vehicles!speed cars}
-
-%index:
-%  \makeatletter\thesis@blocks@clear\makeatother
-%  \phantomsection %% Print the index and insert it into the
-%  \addcontentsline{toc}{chapter}{\indexname} %% table of contents.
-%  \printindex
 
 \appendix %% Start the appendices.
+
+\chapter{Attached Files}
+\label{appendix:attachments}
+As a part of this thesis, these attachments, which can be found in the Information System of Masaryk University as well as linked github repositories, are included:
+\begin{itemize}
+    \item src\footnote{\url{https://github.com/jurajsic/DQBDD}} TODO
+    \item benchmarks\footnote{\url{https://github.com/jurajsic/DQBFbenchmarks}} TODO
+    \item docs github??? TODO
+\end{itemize}
 
 \chapter{Documentation for DQBDD}
 \label{appendix:DQBDD}
@@ -1966,11 +1941,11 @@ where \verb|<input file>| should be formula to solve in DQDIMACS format. The pos
                                 quantifiers (default: 1)
   -p, --preprocess arg          Use preprocessing
                                 (default: 1)
-  -e, --elimination-choice arg  Decide what to eliminate on 
+  -e, --elimination-choice arg  Decide what to eliminate on
                                 each level of quantifier
                                 tree during transformation
                                 to formula (default: 1)
-  -u, --uvar-choice             The heuristics by which the 
+  -u, --uvar-choice             The heuristics by which the
                                 next universal variable for
                                 elimination is chosen
                                 (default: 0)
@@ -2050,23 +2025,25 @@ The format is defined by this BNF grammar (based on the one for \texttt{QDIMACS}
 where the terminal symbols \verb|EOL| and \verb|EOF| stand for the end-of-line and end-of-file markers respectively, \verb|[<expr>]| denotes that \verb|<expr>| is an optional expression, and concatenation of expressions has precedence over choice between expressions. Furthermore, we have these additional constraints:
 \begin{itemize}
     \item The first \verb|<pnum>| in \verb|<problem_line>| corresponds to the maximal possible number of distinct atoms appearing in the prefix and in the matrix, i.e., all the members of the quantified sets and the absolute value of each literal in all the clauses is less than or equal to this number.
-    \item The second \verb|<pnum>| in \verb|<problem_line>| corresponds to the number of clauses appearing in the matrix, i.e., the number of <clause> expressions which <matrix> is comprised of.
+    \item \begin{sloppypar} The second \verb|<pnum>| in \verb|<problem_line>| corresponds to the number of clauses appearing in the matrix, i.e., the number of <clause> expressions which <matrix> is comprised of. \end{sloppypar}
     \item Each atom in the prefix must appear in the matrix.
     \item It is not possible to have two \verb|<quant_set>| after each other, where both have \verb|a| or both have \verb|e| as \verb|<quantifier>|.
     \item The same atom cannot appear in the prefix more than once except for atoms occurring in the second and further place of \verb|atom_set| with \verb|d| as \verb|<quantifier>|. These atoms have to appear somewhere before in the prefix in \verb|<quant_set>| with \verb|a| quantifier.
 \end{itemize}
 
 \section{Semantics}
-The meaning behind \verb|prefix| is that atoms appearing with \verb|<quantifier>| equal to
+The \verb|prefix| represents the DQBF prefix where atoms appearing in \verb|<atom_set>| following \verb|<quantifier>| equal to
 \begin{itemize}
     \item \verb|a| are universally quantified variables,
     \item \verb|e| are existentially quantified variables where each of them is dependent on all universally quantified variables which already appeared before and 
     \item \verb|d| are an existential variable with universal variables in its dependency set, that is the first atom is the existential variable $y$ and all others are universal variables in the dependency set $D_y$.
 \end{itemize}
 
-The number $n$ in \verb|<literal>| represents either the variable $x_n$ if it is positive or $\neg x_n$ if it is negative. Furthermore, all variables which appear in the matrix but do not appear in the prefix are existentially quantified with empty dependency sets. 
+\begin{sloppypar}
+The \verb|matrix| represents the BF in CNF with clauses in \verb|<clause_list>| where the number $n$ in \verb|<literal>| represents either the variable $x_n$ if it is positive or $\neg x_n$ if it is negative. Furthermore, all variables which appear in the matrix but do not appear in the prefix are existentially quantified with empty dependency sets. 
+\end{sloppypar}
 
-Note, that \DQDIMACS{} is by removing \verb|d| quantifiers backwards compatible with \texttt{QDIMACS} (used for QBFs) format and by removing the whole prefix with \texttt{DIMACS} (used for BFs) format.
+Note, that \DQDIMACS{} is, by removing \verb|d| quantifiers, backwards compatible with \texttt{QDIMACS} (used for QBFs) format and, by removing the whole prefix, with \texttt{DIMACS} (used for BFs) format.
 
 \section{An Example}
 As an example, we have that
