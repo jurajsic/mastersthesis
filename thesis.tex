@@ -137,6 +137,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\usepackage{enumitem}
+
 % Stuff for tables
 % for combining rows
 \usepackage{multirow}
@@ -273,9 +275,12 @@
 \newcommand{\QEsimple}{\textbf{Simple}}
 \newcommand{\QEall}{\textbf{All}}
 % - for the order of univ. vars to eliminate
-\newcommand{\QUatbeginning}{\textbf{AtBeginning}}
+\newcommand{\QUatbeginning}{\textbf{At\-Be\-gin\-ning}}
 \newcommand{\QUcurrentlowest}{\textbf{CurrentLowest}}
 \newcommand{\QUvarsinconjuncts}{\textbf{VarsInConjuncts}}
+
+% C++
+\newcommand{\Cplusplus}{C\texttt{++}}
 
 %\renewcommand{\phi}{\varphi}
 
@@ -297,9 +302,10 @@ In recent years, DQBF solving is on a rise (driven mostly by PEC) which resulted
 
 \emph{Binary decision diagrams} (BDDs)~\cite{BDD} are another data structure that can represent Boolean formulas. Since its introduction, BDDs have been used in many different applications. Compared to AIGs, they are a better representation in the way that, for a given variable ordering, there is only one BDD for each class of equivalent Boolean formulas.
 
-In this work, we are interested in creating a DQBF solver that uses BDDs as an underlying representation of formulas combined with quantifier elimination. We use \emph{quantifier localisation}~\cite{HQSquantifierLocalisation} (also used in HQS) which allows us to push quantifiers inside the formula and eliminate them only ``locally'' in subformulas. We show that the localisation used in HQS is erroneous and we give a corrected version of the localisation algorithm. We also give an important missing proof that shows the localisation can also be used in subformulas and enhance it with ``local'' universal expansion. We do this in Chapter~\ref{chap:theory} where we present all the needed theory.
-%TODO fix this with new chapter
-Chapter~\ref{chap:SoA} gives an overview of existing DQBF solving techniques. In Chapter~\ref{chap:algorithm} we show the fixed algorithm with enhancement. Chapter~\ref{chap:implementation} describes the implementation of the algorithm resulting in tool DQBDD. Finally, we perform an experimental evaluation where we compare DQBDD with other solvers in Chapter~\ref{chap:experiments}.
+In this work, we are interested in creating a DQBF solver that uses BDDs as an underlying representation of formulas combined with quantifier elimination. We use \emph{quantifier localisation}~\cite{HQSquantifierLocalisation} (also used in HQS) which allows us to push quantifiers inside the formula and eliminate them only ``locally'' in subformulas. We show that the localisation used in HQS is erroneous and we give a corrected version of the localisation algorithm. We also give an important missing proof that shows the localisation can also be used in subformulas and enhance it with ``local'' universal expansion. 
+
+We present all the needed theory in Chapter~\ref{chap:theory}. In Chapter~\ref{chap:quantmanip} we give the aforementioned proofs.
+Chapter~\ref{chap:SoA} gives an overview of existing DQBF solving techniques. In Chapter~\ref{chap:algorithm} we show the new algorithm and describe its implementation in Chapter~\ref{chap:implementation} resulting in tool DQBDD. Finally, we perform an experimental evaluation where we compare DQBDD with other solvers in Chapter~\ref{chap:experiments}.
 
 \chapter{Theory}
 \label{chap:theory}
@@ -693,7 +699,7 @@ In figures, each node $n$ is denoted by its assigned operation or literal $\qtla
   Figure~\ref{fig:QTex} shows an example of quantifier tree representing DQBF \[\forall x_1 \exists y_1(x_1) (\exists y_2(\emptyset) \itholds (y_2 \lor \neg x_1) \land x_1 \land \forall x_2 \itholds (x_2 \lor \neg y_1)).\]
 \end{example}
 
-\chapter{Quantifiers Manipulations}
+\chapter{Transformations of DQBFs}
 \label{chap:quantmanip}
 %In this chapter we give some theoretical results for DQBFs in NNF, which show the equisatisfiability of different DQBFs. which can result in their simplification. These results can be then used for developing a DQBF solver which checks whether an input DQBF is satisfiable or not. TODO!!!!!
 
@@ -729,10 +735,9 @@ We start with a theorem that shows some rules by which we can push (extract) qua
   \end{align}
 \end{theorem}
 
-To make these rules more usable for DQBF in NNF we have to show that they also work while replacing subformulas. Except for~\eqref{loc:unconj2}, this was not proven by Ge-Ernst et al.~\cite{HQSquantifierLocalisation} even though they use them for replacing subformulas. As we will show, this was used erroneously because the rule~\eqref{loc:exdisj} does not generally hold. However, for other rules there is no problem as we show in Theorem~\ref{thrm:quantLocalSubformulas}. But first we give some helpful notions and lemmas we use for the proof of Theorem~\ref{thrm:quantLocalSubformulas}.
+To make these rules more usable for DQBF in NNF we have to show that they also work while replacing subformulas. Except for~\eqref{loc:unconj2}, this was not proven by Ge-Ernst et al.~\cite{HQSquantifierLocalisation} even though they use them for replacing subformulas. As we will show, this was used erroneously because the rule~\eqref{loc:exdisj} does not generally hold. However, for other rules there is no problem as we show in Theorem~\ref{thrm:quantLocalSubformulas}. But first we give some helpful notions and lemmas we use for the proofs of following theorems.
 
-%TODO popis definition a ze ??? if the value of v(\phi') changes, then the value of $v(\phi)$ chanes too 
-In the proof we work with Skolem function mappings, which turn DQBFs to BFs. We will want to show, that some subformulas are ``important'', i.e. changing their evaluation change the evaluation of the whole formula. Therefore we define the notion of dependency of Boolean formula on its subformula.
+In the proofs we work with Skolem function mappings, which turn DQBFs to BFs. We will want to show, that some subformulas are ``important'', i.e. changing their evaluation change the evaluation of the whole formula. Therefore we define the notion of dependency of Boolean formula on its subformula.
 \begin{definition}
   Let $\phi, \phi' \in \BF{V}$, $v \in \valtns{V}$ and $\phi'$ is subformula of $\phi$. We say that $\phi$ \emph{depends on} $\phi'$ \emph{in} v, if $v(\phi\substitute{\phi'}{0}) \not= v(\phi\substitute{\phi'}{1})$.
 \end{definition}
@@ -760,15 +765,6 @@ Next, we prove a lemma that says that if $\phi$ depends on its subformula $\phi'
   Because we can only change the values of variable inside $\phi'$, it still holds that $v'(\phi\substitute{\phi'}{1}) = v(\phi\substitute{\phi'}{1})$ and $v'(\phi\substitute{\phi'}{0}) = v(\phi\substitute{\phi'}{0})$. Then, from the fact that $\phi$ depends on $\phi'$ in $v$, we have $v'(\phi\substitute{\phi'}{1}) = v(\phi\substitute{\phi'}{1}) \not= v'(\phi\substitute{\phi'}{0}) = v(\phi\substitute{\phi'}{0})$ which means that $\phi$ depends on $\phi'$ in $v'$.
 \end{proof}
 
-%We first prove a lemma that says that if we have subformula   such that no negation occurs before it, we do not care ???
-%\begin{lemma}
-%  \label{thrm:???}
-%  Let $\phi, \phi_1, \phi_2 \in \BF{V}$ where $\phi_1$ is a subformula of $\phi$ and for each subformula $\neg \phi'$ of $\phi$ we have that $\phi_1$ is not subformula of $\phi'$ Let $v \in \valtns{V}$ where $v(\phi) = v(\phi_2) = 1$ and $v(\phi_1) = 0$.
-%\end{lemma}
-%\begin{proof}
-%  TODO
-%\end{proof}
-
 \begin{theorem}
   \label{thrm:quantLocalSubformulas}
   Let $\phi$ be the left side formula and $\phi'$ be the right side formula of the same equisatisfiability other than~\eqref{loc:exdisj} from Theorem~\ref{thrm:quantLocalEq}. Let $\psi \in \DQBF{V}$ such that $\phi$ is a subformula of $\psi$ and $\psi'$, which results from $\psi$ by replacing $\phi$ with $\phi'$, is a valid DQBF. Then $\psi \approx \psi'$.
@@ -784,8 +780,7 @@ Next, we prove a lemma that says that if $\phi$ depends on its subformula $\phi'
   it holds $s' \in \seman{\psi'}$. Note that for $y \in \evars{\psi_1}$ we have $s'(y) = s(y)$ as, according to the way DQBFs are defined, $\psi_1$ and $\psi_2$ cannot share the same quantification, therefore $\evars{\psi_1} \cap \evars{\psi_2} = \emptyset$.
   
   Let $v \in \valtns{\uvars{\psi'}}$. We need to show that $v(s'(\psi')) = 1$. Because $s \in \seman{\psi}$, it holds that $v(s(\psi)) = 1$. For the case that $v(x') = v(x)$ we get $v(s(\psi)) = v(s'(\psi'))$, because BFs $s(\psi)$ and $s(\psi')$ differ only in some replacements of $x$ by $x'$. Therefore we assume that $v(x') \not= v(x)$. We know that $\psi$ and $\psi'$ differ only in the formulas $\phi$ and $\phi'$, therefore we can only focus on the case where $s(\psi)$ depends on $s(\phi)$ in $v$ (otherwise $v(s(\psi)) = v(s'(\psi'))$). %(that is the value of $v(s(\psi))$ would change if the value of $v(s(\phi))$ changed). 
-  Also, $\psi$ is in NNF, which means that in the tree of operations, negation cannot be before $\phi$. We can then apply Lemma~\ref{lemma:nonegdepends} and we get $v(s(\phi)) = 1$. 
-  %This means that we can focus only on the case where $v(s(\phi)) = 1$, otherwise the value of $v(s(\psi))$ would not depend on the subformula $s(\phi)$. 
+  Also, $\psi$ is in NNF, which means that in the tree of operations, negation cannot be before $\phi$. We can then apply Lemma~\ref{lemma:nonegdepends} and we get $v(s(\phi)) = 1$.
   This means we need to show that $v(s'(\phi')) = 1$.
   
   We have that for $v(s(\phi)) = v(s(\forall x \itholds (\psi_1 \land \psi_2))) = v(s(\psi_1) \land s(\psi_2))$ to be equal to one, it has to hold that $v(s(\psi_1)) = 1$ and $v(s(\psi_2)) = 1$. Also, for $v'$ which is equal to $v$, except that $v'(x) \not= v(x)$, it holds that $v'(s(\psi)) = 1$ (from $s \in \seman{\psi}$). Because $x$ is not outside $s(\phi)$, we can use Lemma~\ref{lemma:dependschangedval} to see that $\psi$ depends on $\phi$ in $v'$ too, and by applying Lemma~\ref{lemma:nonegdepends} we get $v'(s(\phi)) = 1$.
@@ -795,8 +790,6 @@ Next, we prove a lemma that says that if $\phi$ depends on its subformula $\phi'
   For the other direction, let $s' \in \seman{\psi'}$. It can be easily shown by similar argument that $s$, where $s(y) = s'(y)\substitute{x'}{x}$ for $y \in \evars{\psi_2}$ and $s(y) = s'(y)$ otherwise, is a satisfying Skolem functions mapping of $\psi$.
   
   \eqref{loc:unconj2} This was proven by Ge-Ernst et al.~\cite[Theorem 4]{HQSquantifierLocalisation}.
-  
-  %(\ref{loc:exdisj}) Again, we show that $\seman{\psi} \not= \emptyset$ iff $\seman{\psi'} \not= \emptyset$. First, let $s \in \seman{\psi}$. It is easy to see, that $s'$, where $s'(y) = s'(y') = s(y)$ and for other variables $s'(v) = s(v)$, is a satisfying Skolem functions mapping of $\psi'$, because $s(\psi)$ and $s(\psi')$ are the same BFs. For the other direction, let $s' \in \seman{\psi'}$. Using similar arguments as in the case (\ref{loc:unconj1}) and realising that disjunction valuates to true if either of its operators is true, we can see that at least one of $s_1$ and $s_2$, where $s_1(y) = s'(y)$, $s_2(y) = s'(y')$ and for other variable $s_1(v) = s_2(v) = s'(v)$, is a satisfying Skolem functions mapping of $\psi$.
   
   \eqref{loc:undisj}\eqref{loc:exboth}\eqref{loc:exswap}\eqref{loc:unswap}\eqref{loc:bothswap} Because $\uvars{\psi} = \uvars{\psi'}$, $\evars{\psi} = \evars{\psi'}$, and $\fvars{\psi} = \fvars{\psi'}$ and the dependency sets do not change, it holds that $\Scands{\psi} = \Scands{\psi'}$. Also, for any $s \in \Scands{\psi}$ it holds that $s(\psi)$ is the same BF as $s(\psi')$ which means that $\seman{\psi} = \seman{\psi'}$, therefore $\psi \approx \psi'$.
 \end{proof}
@@ -810,7 +803,7 @@ which is satisfiable for $s$ where $s(y) = 1$ and $s(y') = 0$. To fix this, we n
 \[\forall x_1 \forall x_2 \itholds (\exists y(\emptyset) \itholds ((x_1 \land y) \lor (x_2 \land \neg y)) \lor (\neg x_1 \land \neg x_2)),\]
 we have that $(x_1 \land y)$ contains $x_1$, which is not in $(x_2 \land \neg y)$. and $x_2$ is only in the second disjunct. However, after applying the rule~\eqref{loc:exdisj} we get
 \[\forall x_1 \forall x_2 \itholds ((\exists y(\emptyset) \itholds (x_1 \land y) \lor \exists y'(\emptyset) \itholds (x_2 \land \neg y')) \lor (\neg x_1 \land \neg x_2)),\]
-which becomes satisfiable. The problem here is that $x_1$ and $x_2$ are in $(\neg x_1 \land \neg x_2)$, which is outside the subformula we are applying the rule $\eqref{loc:exdisj}$ on. Therefore, we can put in a condition that the sets of universal variables (except the ones from $D_y$) from the disjuncts are disjoint and as the next theorem shows, it is enough that universal variables from one of these disjuncts are not outside this subformula. We also need to not only look at the universal variables occurring in the disjuncts, but also at the ones from the dependency sets of existential variables occurring in the disjuncts.
+which becomes satisfiable. The problem here is that $x_1$ and $x_2$ are in $(\neg x_1 \land \neg x_2)$, which is outside the subformula we are applying the rule $\eqref{loc:exdisj}$ on. Therefore, we can put in a condition that the sets of universal variables (except the ones from $D_y$) from the disjuncts are disjoint and, as the next theorem shows, it is enough that universal variables from one of these disjuncts are not outside this subformula. We also need to not only look at the universal variables occurring in the disjuncts, but also at the ones from the dependency sets of existential variables occurring in the disjuncts.
 
 \begin{theorem}
   \label{thrm:localisedijunction}
@@ -818,7 +811,6 @@ which becomes satisfiable. The problem here is that $x_1$ and $x_2$ are in $(\ne
   \[A_{\psi_1} = \Set{x \in \uvars{\psi} \setminus D_y | x \in \vars{\psi_1} \text{ or } x \in D_{y_1} \text{ for some } y_1 \in \vars{\psi_1} \cap \evars{\psi}}\]
   and 
   \[A_{\psi_2} = \Set{x \in \uvars{\psi} \setminus D_y | x \in \vars{\psi_2} \text{ or } x \in D_{y_2} \text{ for some } y_2 \in \vars{\psi_2} \cap \evars{\psi}}.\] 
-  %\[\fvars{\psi_1 \lor \psi_2} \cup \evars{\psi_1 \lor \psi_2} \subseteq D_y \cup \fvars{\psi} \cup \Set{y' \in \evars{\psi} | D_y' \subseteq D_y \cup \uvars{\psi_1 \lor \psi_2}}.\] 
   Assume that $A_{\psi_1} \cap A_{\psi_2} = \emptyset$ and each variable $x$ from $A_{\psi_1}$ can only occur in $\psi$ outside the subformula $\exists y(D_y) \itholds (\psi_1 \lor \psi_2)$ as quantification $\forall x$ or in a dependency set, but not in the dependency set of any existential variable in $\psi$ that occurs outside the subformula. Then $\psi \approx \psi'$ where $\psi'$ results from $\psi$ by replacing the subformula $\exists y(D_y) \itholds (\psi_1 \lor \psi_2)$ by \[\left(\exists y(D_y) \itholds \psi_1 \lor \exists y'(D_y) \itholds \psi_2\substitute{y}{y'}\right).\]
 \end{theorem}
 \begin{proof}
@@ -826,7 +818,7 @@ which becomes satisfiable. The problem here is that $x_1$ and $x_2$ are in $(\ne
   
   First, let $s \in \seman{\psi}$. It is easy to see that $s'$, where $s'(y') = s(y)$ and for other variables it maps to the same Skolem function as $s$, is a satisfying Skolem functions mapping of $\psi'$, because $s(\psi)$ and $s(\psi')$ are the same BFs.
   
-  Now, assume that $s' \in \seman{\psi'}$. For the rest of the proof, for every valuation $v \in \valtns{\uvars{\psi}}$ (where it holds that $v \in \valtns{\uvars{\psi'}}$, because $\uvars{\psi} = \uvars{\psi'}$) we use $v_{D_y}$ to denote the restriction of $v$ to $D_y$. Let $s$ be a Skolem function mapping of $\psi$ such that for $v \in \valtns{\uvars{\psi}}$ %$v_{D_y} \in \valtns{D_y}$ we have 
+  Now, assume that $s' \in \seman{\psi'}$. In the rest of the proof, for every valuation $v \in \valtns{\uvars{\psi}}$ (where it also holds that $v \in \valtns{\uvars{\psi'}}$, because $\uvars{\psi} = \uvars{\psi'}$) we use $v_{D_y}$ to denote the restriction of $v$ to $D_y$. Let $s$ be a Skolem function mapping of $\psi$ such that for $v \in \valtns{\uvars{\psi}}$ 
   \begin{itemize}
       \item $s(y)(v) = s'(y)(v)$ if for all valuations $v' \in \valtns{\uvars{\psi}}$, for which it holds that $v'_{D_y} = v_{D_y}$ and $s'(\psi')$ depends on the subformula $s'(\phi')$ in $v$, we have $v(s'(\psi_1)) = 1$,
       \item $s(y)(v) = s'(y')(v)$ otherwise.
@@ -836,14 +828,20 @@ which becomes satisfiable. The problem here is that $x_1$ and $x_2$ are in $(\ne
   Let $v \in \valtns{\uvars{\psi}}$ be a valuation. We need to show that $v(s(\psi)) = 1$. With similar reasoning as in the proof of case~\eqref{loc:unconj1} of Theorem~\ref{thrm:quantLocalSubformulas}, we can assume that $s'(\psi')$ depends on the subformula $s'(\phi')$ in $v$ and $v(s'(\phi')) = 1$. Because the only difference between $s(\psi)$ and $s'(\psi')$ is in subformulas $s(\phi)$ and $s'(\phi)$, we only need to show that $v(s(\phi)) = 1$.
   
   Because 
-  \[s'(\phi') = s'(\exists y(D_y) \itholds \psi_1 \lor \exists y'(D_y) \itholds \psi_2\substitute{y}{y'}) = s'(\psi_1) \lor s'(\psi_2\substitute{y}{y'})\] is a disjunction, it has to hold that $v(s (\psi_1)) = 1$ or $v(s'(\psi_2\substitute{y}{y'})) = 1$. If they're both equal to 1, then it does not matter whether $s(y)(v) = s'(y)(v)$ or $s(y)(v) = s'(y')(v)$, it will always hold that $v(s(\phi)) = 1$. If we have $v(s'(\psi_1)) = 0$ and $v(s'(\psi_2\substitute{y}{y'})) = 1$, then from the definition of $s$, we get $s(y)(v) = s'(y')(v)$ and so $v(s(\psi_2)) = v(s(\psi_2\substitute{y}{y'})) = 1$ and therefore $v(s(\phi)) = 1$.
+  \[s'(\phi') = s'(\exists y(D_y) \itholds \psi_1 \lor \exists y'(D_y) \itholds \psi_2\substitute{y}{y'}) = s'(\psi_1) \lor s'(\psi_2\substitute{y}{y'})\] is a disjunction, it has to hold that $v(s'(\psi_1)) = 1$ or $v(s'(\psi_2\substitute{y}{y'})) = 1$.
+  If they are both equal to 1, then it does not matter whether $s(y)(v) = s'(y)(v)$ or $s(y)(v) = s'(y')(v)$, it will always hold that $v(s(\phi)) = 1$.
+  If we have $v(s'(\psi_1)) = 0$ and $v(s'(\psi_2\substitute{y}{y'})) = 1$, then from the definition of $s$, we get $s(y)(v) = s'(y')(v)$ and so $v(s(\psi_2)) = v(s(\psi_2\substitute{y}{y'})) = 1$ and therefore $v(s(\phi)) = 1$.
   
-  For the last case, $v(s'(\psi_1)) = 1$ and $v(s'(\psi_2\substitute{y}{y'})) = 0$, we need to show that $s(y)(v) = s'(y)(v)$, because then $v(s(\psi_1)) = v(s'(\psi_1)) = 1$ therefore $v(s(\phi)) = 1$. For that, it has to hold that for each valuation $v' \in \valtns{\uvars{\psi}}$ where $v'_{D_y} = v_{D_y}$ and $(s'(\psi'))$ depends on $s'(\phi')$ in $v$, it has to hold $v'(s'(\psi_1)) = 1$. Assume that this does not hold meaning that there exists some $v'$ fulfilling those conditions where $v'(s'(\psi_1)) = 0$. We show contradiction. %Then, because the value of $v'(s'(\psi'))$ (which has to be equal to 1 from $s' \in \seman{\psi'}$) depends on the subformula $s'(\phi')$ it has to hold that $v'(s'(\phi')) = 1$ (again, the similar argument with $\phi'$ being in NNF as in proof of Theorem~\ref{thrm:quantLocalSubformulas}). 
+  For the last case, $v(s'(\psi_1)) = 1$ and $v(s'(\psi_2\substitute{y}{y'})) = 0$, we need to show that $s(y)(v) = s'(y)(v)$, because then $v(s(\psi_1)) = v(s'(\psi_1)) = 1$ therefore $v(s(\phi)) = 1$. For that, we need to show that for each valuation $v' \in \valtns{\uvars{\psi}}$ where $v'_{D_y} = v_{D_y}$ and $s'(\psi')$ depends on $s'(\phi')$ in $v$, it holds $v'(s'(\psi_1)) = 1$. Assume that this does not hold meaning that there exists some $v'$ fulfilling these conditions where $v'(s'(\psi_1)) = 0$. We now show contradiction.
   
-  Let $v'' \in \valtns{\uvars{\psi}}$ be a valuation such that $v''(x) = v'(x)$ for all $x \in A_{\psi_1}$ and $v''(x) = v(x)$ otherwise. This means that for restriction $v''_{D_y}$ of $v''$ to $D_y$ it holds $v''_{D_y} = v_{D_y} = v'_{D_y}$. Because $s'(\psi_1)$ contains only variables from $A_{\psi_1} \cup D_y$ we have $v''(s'(\psi_1)) = v'(s'(\psi_1)) = 0$. Also $v''(s'(\psi_2\substitute{y}{y'})) = v(s'(\psi_2\substitute{y}{y'})) = 0$ which means $v''(s'(\phi')) = 0$. Furthermore, because variables from $A_{\psi_1}$ are not ``outside'' the subformula $s'(\phi')$ (from the assumption of the theorem) and all the ``outside'' variables were set to the same value as $v$, we get that the value of $v''(s'(\psi'))$ depends on the subformula $s'(\phi')$ (as was the case for $v$). However, this would mean (using the same argument of being in NNF as in the proof of Theorem~\ref{thrm:quantLocalSubformulas}) that $v''(s'(\phi')) = 1$ which is a contradiction.
-  %First, the assumption $A_{\psi_1} \cap A_{\psi_2} \subseteq D_y$ tells us that for any two $s,s' \in \Scands{\psi}$ it holds that the variables occurring both in $s(\psi_1)$ and $s'(\psi_2)$ are from $D_y$. 
-  %We will prove that for some $s$, where $s(y)$ is a combination of  $s'(y)$ and $s'(y')$, and $s(v) = s'(v)$ for other variables, is a satisfying Skolem functions mapping of $\psi'$. Let $v \in \valtns{\psi'}$ be a valuation and $v_{D_y}$ its restriction to $D_y$. With similar reasoning as in the proof of case~(\ref{loc:unconj1}) of Theorem~\ref{thrm:quantLocalSubformulas} we only need to show that $v(s(\phi)) = 1$ assuming that $v(s'(\phi')) = 1$. From this assumption we can infer that $v(s'(\psi_1)) = 1$ or $v(s'(\psi_2\substitute{y}{y'})) = 1$. Without loss of generality assume that $v(s'(\psi_1)) = 1$. Then we set $s(y)(v_{D_y})$ to $s'(y)(v_{D_y})$ which means that $v(s(\psi_1)) = 1$, therefore $v(s(\phi)) = 1$. However, we need to show that for different valuation $v' \in \valtns{\psi'}$ such that $v'(x) = v(x)$ for $x \in D_y$ (therefore $v_{D_y}' = v_{D_y}$) it also holds that $v'(s'(\psi_1)) = 1$ (and so $v'(s(\phi)) = 1$). Assume now it does not hold. For $v'(s'(\phi'))$ to be equal to $1$ it would have to hold then that $v'(s'(\psi_2\substitute{y}{y'})) = 1$. There needs to be a valuation with restriction to $D_y$ equal to $v_{D_y}$ such that it evaluates $s'(\psi_2\substitute{y}{y'})$ to $0$, otherwise we could set $s(y)(v_{D_y})$ to $s'(y')(v_{D_y})$. For simplicity, assume that $v$ is such a valuation, therefore $v(s'(\psi_2\substitute{y}{y'})) = 0$. This means that we can create valuation $v''$ where we set variables from $s'(\psi_1)$ to the same value as $v$ and variables from $s'(\psi_2\substitute{y}{y'})$ to the same value as $v'$ (others do not matter). This is possible because variables occurring both in $s'(\psi_1)$ and $s'(\psi_2\substitute{y}{y'})$ are only those that are in $D_y$ (see the beginning of the proof) and $v_{D_y} = v_{D_y}'$. However, in this valuation it holds that $v''(s'(\psi_1)) = v''(s'(\psi_2\substitute{y}{y'})) = 0$ which means that $v''(s'(\phi')) = 0$ which is contradiction .... with what... this is not true, it does not have to be equal to 1, it is only subformula......
+  Let $v'' \in \valtns{\uvars{\psi}}$ be a valuation such that $v''(x) = v'(x)$ for all $x \in A_{\psi_1}$ and $v''(x) = v(x)$ otherwise. This means that $v''_{D_y} = v_{D_y} = v'_{D_y}$. Because $s'(\psi_1)$ contains only variables from $A_{\psi_1} \cup D_y$ we have $v''(s'(\psi_1)) = v'(s'(\psi_1)) = 0$. Moreover, because $A_{\psi_1} \cap A_{\psi_2} = \emptyset$ (from the assumption of the theorem) and $s'(\psi_2\substitute{y}{y'})$ contains only variables from $A_{\psi_2} \cup D_y$, we have $v''(s'(\psi_2\substitute{y}{y'})) = v(s'(\psi_2\substitute{y}{y'})) = 0$. Together, this means $v''(s'(\phi')) = 0$.
+  
+  Furthermore, because variables from $A_{\psi_1}$ are not ``outside'' the subformula $s'(\phi')$ (from the assumption of the theorem) and all the ``outside'' variables are set to the same value as $v$, we can use Lemma~\ref{lemma:dependschangedval} to show that $s'(\psi')$ depends on the subformula $s'(\phi')$ in $v''$ (as was the case for $v$). However, because $\psi'$ is in NNF and so $s'(\phi')$ does not have negation anywhere in front of it, we can use Lemma~\ref{lemma:nonegdepends} to show that $v''(s'(\phi')) = v''(s'(\psi')) = 1$ (because $s' \in \seman{\psi'}$) which is a contradiction.
 \end{proof}
+
+\begin{remark}
+  The condition that variables from $A_{\psi_1}$ cannot occur outside the subformula $\exists y(D_y) \itholds (\psi_1 \lor \psi_2)$ can be replaced with the same condition for $A_{\psi_2}$. The proof would then have just a minor differences.
+\end{remark}
 
 \section{Quantifier Elimination}
 \label{sec:quantElimination}
@@ -861,7 +859,7 @@ Let $\psi \in \DQBF{V}$ be a formula such that the left side of one of the previ
 \begin{proof}
   We show the general case $\psi \approx \psi'$ for both equisatisfiabilities.
   
-  \eqref{elim:univ} Again, we want to prove $\seman{\psi} = \seman{\psi'}$. For $s \in \seman{\psi'}$ it is obvious that also $s \in \seman{\psi}$. For $s \in \seman{\psi}$ we can create $s'$ where $s'(y) = s(y)\substitute{x}{0}$ where $s(y)\substitute{x}{0}$ is a Boolean function which can be represented by a BF that represents $s(y)$ with $x$ substituted by $0$. Then $s' \in \seman{\psi'}$ because for each valuation $v \in \valtns{\uvars{\psi}}$ where $v(x) = 0$, we have $v(s'(\psi')) = v(s(\psi)) = 1$.
+  \eqref{elim:univ} Again, we want to prove $\seman{\psi} = \seman{\psi'}$. For $s \in \seman{\psi'}$ it is obvious that also $s \in \seman{\psi}$. For $s \in \seman{\psi}$ we can create $s'$ where $s'(y) = s_{x=0}(y)$ where $s_{x=0}(y)$ is a Boolean function that behave like $s_y$ where $x$ is set to $0$. Then $s' \in \seman{\psi'}$ because for each valuation $v \in \valtns{\uvars{\psi}}$ where $v(x) = 0$, we have $v(s'(\psi')) = v(s(\psi)) = 1$.
   
   \eqref{elim:exist} Stems from the fact that $s(\psi)$ and $s(\psi')$ are the same BF for any $s \in \Scands{\psi}$.
 \end{proof}
@@ -870,16 +868,20 @@ The next theorem shows how to eliminate universal quantifiers generally by unive
 
 \begin{theorem}[Universal Expansion]
 \label{thrm:unExpan}
-  Let $\psi, \psi_1 \in \DQBF{V}$ such that $\forall x \itholds \psi_1$ is a subformula of $\psi$ where $\psi_1$ does not include any quantifications other than the ones bounded to variables from the set $E_{x} = \set{y \in \evars{\psi_1} | x \in D_y}$ of all existential variables dependent on $x$. Let $\psi_2$ be a DQBF that results from $\psi_1$ by substituting each $y \in E_x$ with a fresh variable $y'$ not occurring in $\psi$ where we set $D_{y'} = D_y$. Then $\psi \approx \psi'$ where $\psi'$ results from $\psi$ by replacing the subformula $\forall x \itholds \psi_1$ by 
+  Let $\psi, \psi_1 \in \DQBF{V}$ such that $\forall x \itholds \psi_1$ is a subformula of $\psi$ where $\psi_1$ does not include any quantifications other than the ones bounded to variables from the set $E_{x} = \set{y \in \evars{\psi} | x \in D_y}$ of all existential variables dependent on $x$. Let $\psi_2$ be a DQBF that results from $\psi_1$ by substituting each $y \in E_x$ with a fresh variable $y'$ not occurring in $\psi$ where we set $D_{y'} = D_y$. Then $\psi \approx \psi'$ where $\psi'$ results from $\psi$ by replacing the subformula $\forall x \itholds \psi_1$ by 
   \[\xi = (\psi_1^{-x}\substitute{x}{0} \land \psi_2^{-x}\substitute{x}{1}).\]
 \end{theorem}
 \begin{proof}
-  First notice that each $y \in E_x$ must be entirely inside $\psi_1$ (even the ``$\exists y$'' bit). This stems from the way the set $\DQBF{V}$ is constructed; the dependency sets of new existential variables can only be formed from free or completely new variables and if ``$\exists y$'' was outside $\forall x \itholds \psi_1$, then $x \in D_y$ would have to be a free or new variable. Also, because of the assumption that only quantifiers bounded to existential variables from $E_x$
+  Note that each $y \in E_x$ must be entirely inside $\psi_1$ (even the ``$\exists y$'' bit). This stems from the way the set $\DQBF{V}$ is constructed; the dependency sets of new existential variables can only be formed from free or completely new variables and if ``$\exists y$'' was outside $\forall x \itholds \psi_1$, then $x \in D_y$ would have to be a free or new variable. Also, because of the assumption that only quantifiers bounded to existential variables from $E_x$
   are in $\psi_1$ it is obvious that $\psi' \in \DQBF{V}$. With that we can now prove that $\seman{\psi} \not= \emptyset$ iff $\seman{\psi'} \not= \emptyset$.
   
-  First we prove that if $\seman{\psi} \not= \emptyset$, then $\seman{\psi'} \not= \emptyset$. Let $s \in \seman{\psi}$. We build a satisfying Skolem functions mapping $s'$ of $\psi'$. For all $y \in (\evars{\psi} \setminus E_x)$ set $s'(y) = s(y)$. For $y \in E_x$ and its copy $y' \in \evars{\psi_2}$ we set $s'(y) = s_{x=0}(y)$ and $s'(y') = s_{x=1}(y)$ where $s_{x=0}(y)$ and $s_{x=1}(y)$ denote Boolean functions that behave like $s(y)$ where $x$ is set to $0$ or $1$ respectively. Then $s'$ is a Skolem functions mapping of $\psi'$. To make it satisfying, we have to prove that BF $s'(\psi')$ is true in all valuations over $\uvars{\psi'}$. Notice that $\uvars{\psi'} = \uvars{\psi} \setminus \set{x}$. Let $v$ be one such valuation and denote $v_{x\mapsto0}$ and $v_{x\mapsto1}$ valuations over $\uvars{\psi}$ such that $v(x') = v_{x\mapsto0}(x') = v_{x\mapsto1}(x')$ for $x' \in \uvars{\psi'}$, $v_{x\mapsto0}(x) = 0$ and $v_{x\mapsto1}(x) = 1$. Notice, that $v_{x\mapsto0}(s(\forall x\itholds\psi_1)) = v(s'(\psi_1^{-x}\substitute{x}{0}))$ and $v_{x\mapsto1}(s(\forall x\itholds\psi_1)) = v(s'(\psi_2^{-x}\substitute{x}{1})$. Therefore, if $v_{x\mapsto0}(s(\forall x\itholds\psi_1)) = v_{x\mapsto1}(s(\forall x\itholds\psi_1)) = \kappa$, $\kappa \in \set{0,1}$, then $v(s'(\xi)) = \kappa$. If $v_{x\mapsto0}(s(\forall x\itholds\psi_1)) \not= v_{x\mapsto1}(s(\forall x\itholds\psi_1))$ then $v(s'(\xi)) = 0$ where either $v_{x\mapsto0}(s(\forall x\itholds\psi_1)) = 0$ or $v_{x\mapsto1}(s(\forall x\itholds\psi_1)) = 0$. This means that $v(s'(\xi))$ is equal to $v_{x\mapsto0}(s(\forall x\itholds\psi_1))$ or $v_{x\mapsto1}(s(\forall x\itholds\psi_1))$. Also, because $s \in \seman{\psi}$, it has to hold that $v_{x\mapsto0}(s(\psi)) = v_{x\mapsto1}(s(\psi)) = 1$. Furthermore, the only difference in $s(\psi)$ and $s(\psi')$ are the subformulas $s(\forall x\itholds\psi_1)$ and $s'(\xi)$. This all means that $v(s'(\psi')) = 1$.
+  First we prove that if $\seman{\psi} \not= \emptyset$, then $\seman{\psi'} \not= \emptyset$. Let $s \in \seman{\psi}$. We build a satisfying Skolem functions mapping $s'$ of $\psi'$. For $y \in E_x$ and its copy $y' \in \evars{\psi_2}$ we set $s'(y) = s_{x=0}(y)$ and $s'(y') = s_{x=1}(y)$ where $s_{x=0}(y)$ and $s_{x=1}(y)$ denote Boolean functions that behave like $s(y)$ where $x$ is set to $0$ or $1$ respectively. Otherwise we set $s'(y) = s(y)$. Then $s'$ is a Skolem functions mapping of $\psi'$.
+  
+  To show that it is satisfying, we have to prove that BF $s'(\psi')$ is true in all valuations over $\uvars{\psi'}$. Notice that $\uvars{\psi'} = \uvars{\psi} \setminus \set{x}$. Let $v$ be one such valuation and denote $v_{x\mapsto0}$ and $v_{x\mapsto1}$ valuations over $\uvars{\psi}$ such that $v(x') = v_{x\mapsto0}(x') = v_{x\mapsto1}(x')$ for $x' \in \uvars{\psi'}$, $v_{x\mapsto0}(x) = 0$ and $v_{x\mapsto1}(x) = 1$. It holds that $v_{x\mapsto0}(s(\forall x\itholds\psi_1)) = v(s'(\psi_1^{-x}\substitute{x}{0}))$ and $v_{x\mapsto1}(s(\forall x\itholds\psi_1)) = v(s'(\psi_2^{-x}\substitute{x}{1})$.
+  
+  Therefore, if $v_{x\mapsto0}(s(\forall x\itholds\psi_1)) = v_{x\mapsto1}(s(\forall x\itholds\psi_1)) = \kappa$, where $\kappa \in \set{0,1}$, then $v(s'(\xi)) = \kappa$. If $v_{x\mapsto0}(s(\forall x\itholds\psi_1)) \not= v_{x\mapsto1}(s(\forall x\itholds\psi_1))$ then $v(s'(\xi)) = 0$ where either $v_{x\mapsto0}(s(\forall x\itholds\psi_1)) = 0$ or $v_{x\mapsto1}(s(\forall x\itholds\psi_1)) = 0$. This means that $v(s'(\xi))$ is equal to $v_{x\mapsto0}(s(\forall x\itholds\psi_1))$ or $v_{x\mapsto1}(s(\forall x\itholds\psi_1))$. Also, because $s \in \seman{\psi}$, it has to hold that $v_{x\mapsto0}(s(\psi)) = v_{x\mapsto1}(s(\psi)) = 1$. Furthermore, the only difference in $s(\psi)$ and $s(\psi')$ are the subformulas $s(\forall x\itholds\psi_1)$ and $s'(\xi)$. This all means that $v(s'(\psi')) = 1$.
 
-  Now we prove the other direction. Let $s' \in \seman{\psi'}$. We build a satisfying Skolem functions mapping $s$ of $\psi$. For all $y \in (\evars{\psi} \setminus E_x)$ we set $s(y) = s'(y)$. For $y \in E_x$ with a copy $y' \in \evars{\psi_2}$ we set $s(y)$ to Boolean function that is represented by BF $((\neg x \land s'(y)) \lor (x \land s'(y')))$ where $s'(y)$ and $s'(y')$ are replaced with BFs representing them. It is obviously a Skolem functions mapping, thus we need to prove that $s(\psi)$ is true in all valuations. Let $v$ be a valuation over $\uvars{\psi}$. Without loss of generality assume that $v(x) = 0$. Then $v(s(y)) = v(s'(y))$. This means that $v(s(\forall x \itholds \psi_1)) = v(s(\psi_1^{-x}\substitute{x}{0}))$. Again we show that $v(s(\psi)) = 1$ from the facts that $v(s'(\psi')) = 1$ (because $s' \in \seman{\psi'}$) and that the only difference in $s(\psi)$ and $s(\psi')$ are the subformulas $s(\forall x\itholds\psi_1)$ and $s'(\xi)$. If $v(s'(\xi)) = 1$ then $v(s(\forall x \itholds \psi_1)) = v(s'(\psi_1^{-x}\substitute{x}{0}) = 1$ and from the previous facts it means that $v(s(\psi)) = 1$. For the case when $v(s'(\xi)) = 0$ we have to realise that because $\psi'$ is in NNF, $s'(\xi)$ occurs in $s'(\psi')$ in a tree of ${\land}$ and ${\lor}$ operations. That means that even if we replaced $s'(\xi)$ with $s(\forall x \itholds \psi_1)$ and $v(s(\forall x \itholds \psi_1)) = 1$, this cannot change the value of the reulting formula $v(s(\psi))$ from $1$ to $0$, therefore $v(s(\psi)) = 1$.
+  Now we prove the other direction. Let $s' \in \seman{\psi'}$. We build a satisfying Skolem functions mapping $s$ of $\psi$. For $y \in E_x$ with a copy $y' \in \evars{\psi_2}$ we set $s(y)$ to Boolean function that is represented by BF $((\neg x \land s'(y)) \lor (x \land s'(y')))$ where $s'(y)$ and $s'(y')$ are replaced with BFs representing them. Otherwise we set $s(y) = s'(y)$. It is obviously a Skolem functions mapping, thus we need to prove that $s(\psi)$ is true in all valuations. Let $v$ be a valuation over $\uvars{\psi}$. Without loss of generality assume that $v(x) = 0$. Then $v(s(y)) = v(s'(y))$. This means that $v(s(\forall x \itholds \psi_1)) = v(s(\psi_1^{-x}\substitute{x}{0}))$. Again we show that $v(s(\psi)) = 1$ from the facts that $v(s'(\psi')) = 1$ (because $s' \in \seman{\psi'}$) and that the only difference in $s(\psi)$ and $s(\psi')$ are the subformulas $s(\forall x\itholds\psi_1)$ and $s'(\xi)$. If $v(s'(\xi)) = 1$ then $v(s(\forall x \itholds \psi_1)) = v(s'(\psi_1^{-x}\substitute{x}{0}) = 1$ and from the previous facts it means that $v(s(\psi)) = 1$. For the case when $v(s'(\xi)) = 0$ we have to realise that because $\psi'$ is in NNF, $s'(\xi)$ occurs in $s'(\psi')$ in a tree of ${\land}$ and ${\lor}$ operations. That means that even if we replaced $s'(\xi)$ with $s(\forall x \itholds \psi_1)$ and $v(s(\forall x \itholds \psi_1)) = 1$, this cannot change the value of the resulting formula $v(s(\psi))$ from $1$ to $0$, therefore $v(s(\psi)) = 1$.
 \end{proof}
 \begin{example}
 Let
@@ -969,11 +971,16 @@ Last but not least, Ge-Ernst et al.~\cite{HQSquantifierLocalisation} have given 
 
 \section{Preprocessing}
 \label{sec:preprocessing}
-In previous sections, we give an overview of techniques used for implementations of different solvers. This sections explains some techniques that are used before the actual solvers run, called fittingly preprocessing.
+In previous sections, we gave an overview of techniques used for implementations of different solvers. This sections explains some techniques that are used before the actual solvers run, called fittingly preprocessing.
 
 \subsection{HQSpre}
 \label{sec:HQSpre}
-The first and only preprocessing engine for DQBF called HQSpre~\cite{HQSpre1,HQSpre2,HQSpreJournal} took many techniques used for QBF preprocessing and lifted them to the DQBF case. We explain only one technique here, called \emph{gate extraction}. As was mentioned in Section~\ref{sec:BF:CNF}, transforming BF to an equisatisfiable formula in CNF can result in polynomial increase of the size of the formula by adding new variables. Gate extraction works in opposite direction --- it tries to extract this newly introduced variables and turn the formula back into one that is not in CNF. This does not mean that gate extraction works only on formulas in CNF, it can be used generally by finding connections between variables which make it possible to replace a variable by some Boolean function of existing variables. However, this technique can only be used by solvers which can work on DQBFs which are not in PCNF. Currently, that is only HQS. For a thorough explanation of other techniques used by HQSpre we refer the reader to the work by Wimmer et al.~\cite{HQSpreJournal}. 
+The first and only preprocessing engine for DQBF, called HQSpre~\cite{HQSpre1,HQSpre2,HQSpreJournal}, took many techniques used for QBF preprocessing and lifted them to the DQBF case. It takes as an input a DQBF in PCNF and transforms it to a simpler DQBF. It can also sometimes solve the input formula during this simplification. 
+
+We explain here only one technique, called \emph{gate extraction}. As was mentioned in Section~\ref{sec:BF:CNF}, Tseitin transformation of BF to an equisatisfiable formula in CNF can result in polynomial increase of the size of the formula by adding new variables. Gate extraction works in the opposite direction --- it tries to find and extract this newly introduced variables and turn the formula back into one that is not in CNF. %This does not mean that gate extraction works only on formulas in CNF, it can be used generally by finding connections between variables which make it possible to replace a variable by some Boolean function of existing variables. 
+For example, if we had $(x_1 \land x_2)$ somewhere in the original non-CNF formula, Tseitin transformation would swap it with a new variable $y$ and add new clauses $(\neg y \lor x_1)$, $(\neg y \lor x_2)$, and $(y \lor \neg x_1 \lor \neg x_2)$. Gate extraction then looks for these clauses and if it finds them, it removes them and replace the variable $y$ back with $x_1 \land x_2$.
+
+However, this technique can only be used by solvers which can work on DQBFs whose matrix is not in CNF. Currently, that is only HQS. For a thorough explanation of other techniques used by HQSpre we refer the reader to the work by Wimmer et al.~\cite{HQSpreJournal}. 
 
 \subsection{Approximations}
 \label{sec:prepro:approximations}
@@ -981,7 +988,11 @@ Another technique which is used in some solvers as preprocessing step is to find
 
 \subsection{\texorpdfstring{$\PSPACE$}{PSPACE} Subclass}
 \label{sec:prepro:pspacesubclass}
-The last preprocessing technique is simply put just a check whether DQBF does not belong to a subclass of problems which are in $\PSPACE$ and if it does, it is transformed to QBF (which is $\PSPACE$-complete) on which an existing QBF solver is run. The simplest such subclass would be those DQBFs whose dependencies are linearly ordered. Then it can be easily transformed into QBF by reordering the quantifiers. Scholl et al.~\cite{PSPACEsubclass} investigated whether there is another DQBF subclass which is in $\PSPACE$. They show that DQBFs where the dependency sets are either equal or pairwise disjoint can be transformed into QBFs with just linear increase in size. Thus having a check on whether an input DQBF belongs to this class before running a DQBF solver and if it does transforming it into QBF and running a QBF solver can improve the efficiency. They show this by adding this preprocessing step to HQS which results in increase of solved instances.
+The last preprocessing technique is simply put just a check whether DQBF does not belong to a subclass of problems which are in $\PSPACE$ and if it does, it is transformed to QBF (which is $\PSPACE$-complete) on which an existing QBF solver is run.
+
+The simplest such subclass would be those DQBFs whose dependency sets are linearly ordered. We can check for this by comparing all the dependency sets of the same size. If they are the same, then we can check if they form a linear order and if they do reorder the quantifiers based on it, thus creating QBF.
+
+Scholl et al.~\cite{PSPACEsubclass} investigated whether there is another DQBF subclass which is in $\PSPACE$. They show that DQBFs where the dependency sets are either equal or pairwise disjoint can be transformed into QBFs with just linear increase in size. Thus having a check on whether an input DQBF belongs to this class before running a DQBF solver and if it does transforming it into QBF and running a QBF solver can improve the efficiency. They show this by adding this preprocessing step to HQS which results in increase of solved instances.
 
 \chapter{Suggested Algorithm}
 \label{chap:algorithm}
@@ -1059,7 +1070,7 @@ Algorithm~\ref{alg:localise} shows the implementation of localising quantifiers.
         \ForAll{$n' \in \children{n}$}
           \If{$x \in V_{n'}$}
             \State \Call{PushVar}{$x$, $n'$}\label{localiseand:upush}
-            \State \Call{ReplaceVarWithFreshVar}{$x$, $n'$}
+            \State \Call{ReplaceVarWithFreshVar}{$x$, $n'$} \label{localiseand:ufreshvar}
           \Else
             \State remove $x$ from dependencies of all $y \in \evars{n'}$\label{localiseand:uremovedep}
           \EndIf
@@ -1092,7 +1103,7 @@ After pushing all possible existential variables we can start pushing universal 
         \If{$yChildren$ fulfill the conditions from Theorem~\ref{thrm:localisedijunction}}\label{localiseor:checkconditions}
           \ForAll{$n' \in yChildren$}
             \State \Call{PushVar}{$y$, $n'$}\label{localiseor:epush}
-            \State \Call{ReplaceVarWithFreshVar}{$y$, $n'$}
+            \State \Call{ReplaceVarWithFreshVar}{$y$, $n'$}\label{localiseor:efreshvar}
           \EndFor
           \State remove $y$ from $\prefix{n}$
         \EndIf
@@ -1116,7 +1127,7 @@ After pushing all possible existential variables we can start pushing universal 
 
 Algorithm~\ref{alg:localiseor} shows the function \textproc{LocaliseOR}. This function first tries to push existential quantifiers using the rule \eqref{loc:exdisj} according to Theorem~\ref{thrm:localisedijunction} (lines~\ref{localiseor:estart}-\ref{localiseor:eend}). Then, using the rule~\eqref{loc:exboth}, we try to do the same thing with leftover existential and universal variables as was done with existential variables in \textproc{LocaliseAND}: we take the variable occurring in the smallest number of children, create new child from these children and push this variable inside (lines~\ref{localiseor:bstart}-\ref{localiseor:bend}). However, by pushing both universal and existential variables at the same time, we need to look for universal variables which can become pushable according to the rule~\eqref{loc:bothswap}.
 
-In the part where we try to apply the rule~\eqref{loc:exboth} according to Theorem~\ref{thrm:localisedijunction} we go trough each existential variable $y$ and check if it fulfills the conditions of Theorem~\ref{thrm:localisedijunction}. However, we can first apply the rule~\eqref{loc:exboth} to divide children of $y$ to those that do not contain $y$ and those that contain it and only work with those that contain it. On line~\ref{localiseor:egetchildren} we find the set of children containing $y$ and then check if they fulfill the conditions from Theorem~\ref{thrm:localisedijunction} (line~\ref{localiseor:checkconditions}). To fulfill them, we find for each child $n' \in yChildren$ the set $A_{n'}$ of universal variables which are not in $D_y$ such that they occur in the subtree rooted in $n'$ (as literal in terminal node) or in the dependency set of some existential variable in $\vars{n'}$. If all these sets are pairwise disjoint and variables from at most one of these sets are occurring outside the subtree rooted in corresponding node, we can push $y$ into every child in $yChildren$ (line~\ref{localiseor:epush}). Again, according to~\eqref{loc:exdisj} we need to create a copy of $y$, which is accomplished by the call to function \textproc{ReplaceVarWithFreshVar}.
+In the part where we try to apply the rule~\eqref{loc:exboth} according to Theorem~\ref{thrm:localisedijunction} we go trough each existential variable $y$ and check if it fulfills the conditions of Theorem~\ref{thrm:localisedijunction}. However, we can first apply the rule~\eqref{loc:exboth} to divide children of $y$ to those that do not contain $y$ and those that contain it and only work with those that contain it. On line~\ref{localiseor:egetchildren} we find the set of children containing $y$ and then check if they fulfill the conditions from Theorem~\ref{thrm:localisedijunction} (line~\ref{localiseor:checkconditions}). To fulfill them, we find for each child $n' \in yChildren$ the set $A_{n'}$ of universal variables which are not in $D_y$ such that they occur in the subtree rooted in $n'$ (as literal in terminal node) or in the dependency set of some existential variable in $\vars{n'}$. If all these sets are pairwise disjoint and variables from at most one of these sets are occurring outside the subtree rooted in corresponding node, we can push $y$ into every child in $yChildren$ (line~\ref{localiseor:epush}). Again, according to~\eqref{loc:exdisj} we need to create a copy of $y$, which is accomplished by the call to function \textproc{ReplaceVarWithFreshVar} on line~\ref{localiseor:efreshvar}.
 
 After doing this, we start applying the rules~\eqref{loc:undisj} for universal and~\eqref{loc:exboth} for existential variables similarly as was done in Algorithm~\ref{alg:localiseand}. We do it at the same time, so we always push the variable with fewest number of children to combine. This means that function \textproc{GetNextVarToPush} on line~\ref{localiseor:getnextvar} returns a variable for which the set $vChildren$ on line~\ref{localiseor:bgetchildren} has fewest number of elements. However, it does not take all universal variables into consideration, some of them might not be pushable per the rule~\eqref{loc:bothswap}. Therefore it computes the set $\set{x \in \uprefix{n} | x \not\in D_y \text{ for all } y \in \eprefix{n}}$ from which universal variables can be chosen (the same set is used on line~\ref{localiseand:upossible} of Algorithm~\ref{alg:localiseand}).
 
@@ -1300,7 +1311,9 @@ In this section we give an overview of the function \textproc{TurnToBDD} which a
   \end{algorithmic}
 \end{algorithm}
 
-Algorithm~\ref{alg:turntobdd} shows an implementation of this function. Based on the type of the node $n$, it decides what to do. For terminal nodes, it just return the BDD representing the literal $\qtlabel{n}$ (line~\ref{turntobdd:returnterminal}). For non-terminal nodes, it calls itself recursively for all children of $n$ (line~\ref{turntobdd:callforchild}), eliminates some variables in it (line~\ref{turntobdd:eliminate}), and finally pulls quantifiers from them (line~\ref{turntobdd:pullquantifiers}, $\prefix{n}\prefix{n'}$ is the concatenation of the two prefixes). The quantifiers can be pulled from the children based on the rules \eqref{loc:unconj1}, \eqref{loc:undisj}, \eqref{loc:exdisj} (the conditions of Theorem~\ref{thrm:localisedijunction} were already checked) and \eqref{loc:exboth} of Theorem~\ref{thrm:quantLocalEq}. Also, according to \eqref{loc:unconj1} and \eqref{loc:exdisj} we can rename the copies of variables which we created during localising back to original name and we do so on line~\ref{turntobdd:renamecopies}. On line~\ref{turntobdd:returnnonterminal}, the algorithm returns the resulting BDD which is the application of the operation $\qtlabel{n}$ on the children BDDs.
+Algorithm~\ref{alg:turntobdd} shows an implementation of this function. Based on the type of the node $n$, it decides what to do. For terminal nodes, it just return the BDD representing the literal $\qtlabel{n}$ (line~\ref{turntobdd:returnterminal}). For non-terminal nodes, it calls itself recursively for all children of $n$ (line~\ref{turntobdd:callforchild}), eliminates some variables in it (line~\ref{turntobdd:eliminate}), and finally pulls quantifiers from them (line~\ref{turntobdd:pullquantifiers}, $\prefix{n}\prefix{n'}$ is the concatenation of the two prefixes). The quantifiers can be pulled from the children based on the rules \eqref{loc:unconj1}, \eqref{loc:undisj}, \eqref{loc:exdisj} 
+%(the conditions of Theorem~\ref{thrm:localisedijunction} were already checked)
+and \eqref{loc:exboth} of Theorem~\ref{thrm:quantLocalEq}. Also, according to \eqref{loc:unconj1} and \eqref{loc:exdisj} we can rename the copies of variables which we created during localising back to the original name and we do so on line~\ref{turntobdd:renamecopies}. On line~\ref{turntobdd:returnnonterminal}, the algorithm returns the resulting BDD which is the application of the operation $\qtlabel{n}$ on the children BDDs.
 
 Function \textproc{EliminateQuantifiers} on line~\ref{turntobdd:eliminate} can eliminate these quantifiers:
 \begin{itemize}
@@ -1427,7 +1440,8 @@ In this section we present the algorithm for eliminating all possible quantifier
       \While{$\uprefix{n}$ is not empty}%there is some universal variable $x$ in $\psi$
         \State choose $x$ from $\uprefix{n}$\label{allelimination:choose}
         \State $\phi_n = \forall\text{-expansion}(x,\phi_n)$\Comment{Theorem~\ref{thrm:unExpan}} \label{allelimination:uelim}
-        \State remove $x$ from $\prefix{n}$\label{allelimination:uremove} and all dependency sets
+        \State add created copies of existential variables to $\prefix{n}$ \label{allelimination:epull}
+        \State remove $x$ from $\prefix{n}$ and all dependency sets \label{allelimination:uremove}
         \State $Q_{\forall} = \set{x \in \vars{\phi_n} | x \in \uprefix{n'} \text{ for some ancestor\footnotemark {} } n' \text{ of } n}$\label{allelimination:uset}
         \State $Q_{\exists} = \set{y \in \vars{\phi_n} | y \in \eprefix{n'} \text{ for some ancestor\addtocounter{footnote}{-1}\addtocounter{Hfootnote}{-1}\footnotemark {} } n' \text{ of } n}$\label{allelimination:eset}
         \State $E = \set{y \in \eprefix{n} | Q_{\forall} \subseteq D_y \text{ and } D_{y'} \subseteq D_y \text{ for all } y' \in Q_{\exists}}$\label{allelimination:etoremove}
@@ -1443,7 +1457,7 @@ In this section we present the algorithm for eliminating all possible quantifier
 
 Algorithm~\ref{alg:allelimination} takes as input a node $n$ and a BDD $\phi_n$ representing the matrix of DQBF given by the subtree rooted in $n$. This algorithm is similar to Algorithm~\ref{alg:QE} which is used in HQS. However, while that one was used only for DQBF in PNF, this algorithm works for any subformula. It iteratively eliminates universal variables occurring in prefix $\prefix{n}$ using universal expansion (Theorem~\ref{thrm:unExpan}) and also all possible existential variables using Theorem~\ref{thrm:exElim}.
 
-The next universal variable $x$ to eliminate is chosen on line~\ref{allelimination:choose} by some heuristic after which we eliminate it from $\phi_n$ and remove it from the quantifier prefix of $n$ (lines~\ref{allelimination:uelim}~and~\ref{allelimination:uremove}). We can do this, because according to~\eqref{loc:exswap},~\eqref{loc:unswap} and~\eqref{loc:bothswap}, we can reorder the quantifiers in the prefix $\prefix{n}$ so that at the end of the prefix we will have the variable $x$ followed by only those existential variables that are dependent on $x$ which is the condition of Theorem~\ref{thrm:unExpan}.
+The next universal variable $x$ to eliminate is chosen on line~\ref{allelimination:choose} by some heuristic after which we eliminate it from $\phi_n$ and remove it from the quantifier prefix of $n$ (lines~\ref{allelimination:uelim}~and~\ref{allelimination:uremove}). We can do this, because according to~\eqref{loc:exswap},~\eqref{loc:unswap} and~\eqref{loc:bothswap}, we can reorder the quantifiers in the prefix $\prefix{n}$ so that at the end of the prefix we will have the variable $x$ followed by only those existential variables that are dependent on $x$ which is the condition of Theorem~\ref{thrm:unExpan}. Also, we use \eqref{loc:exboth} to pull the existential variables and its created copies back to $\prefix{n}$ on line~\ref{allelimination:epull}.
 
 On lines~\ref{allelimination:uset}~and~\ref{allelimination:eset} the sets $Q_{\forall}$ and $Q_{\exists}$ are initialized to all variables occurring in $\phi_n$ that are universally or existentially quantified in the quantifier tree. We find them by going trough quantifier prefixes of all ancestors of $n$ (we assume that $n$ is an ancestor to itself). On line~\ref{allelimination:etoremove} we use these sets to compute the set $E$ of all existential variables from prefix $\prefix{n}$ which fulfill the conditions set by Theorem~\ref{thrm:exElim}: for each $y \in E$, it holds that all universal variables in $\phi_n$ and all universal variables in dependency sets of existential variables in $\phi_n$ are in $D_y$. The variables from $E$ are then eliminated on lines~\ref{allelimination:eelimforstart}-\ref{allelimination:eelimforend}.
 
@@ -1494,31 +1508,36 @@ We use three heuristics for choosing the next universal variable to eliminate on
 \chapter{Implementation: DQBDD}
 \label{chap:implementation}
 \begin{sloppypar}
-We have implemented the algorithm of Chapter~\ref{chap:algorithm} in a new tool called DQBDD\footnote{the source code can be found at \url{https://github.com/jurajsic/DQBDD}}. The tool is written in C\texttt{++} using version 3.0.0 of the CUDD\footnote{\url{https://github.com/ivmai/cudd}} package~\cite{CUDD} for BDD manipulation, version 2.2.0 of the cxxopts\footnote{\url{https://github.com/jarro2783/cxxopts}} library for parsing command-line arguments, and pre\-pro\-ces\-sor HQSpre~\cite{HQSpre2}, more specifically the version that was used with HQS with quantifier localisation~\cite{HQSquantifierLocalisation}.
+We have implemented the algorithm of Chapter~\ref{chap:algorithm} in a new tool called DQBDD\footnote{the source code can be found at \url{https://github.com/jurajsic/DQBDD}} (see Appendix~\ref{appendix:DQBDD} for documentation). The tool is written in \Cplusplus{} using version 3.0.0 of the CUDD\footnote{\url{https://github.com/ivmai/cudd}} package~\cite{CUDD} for BDD manipulation, version 2.2.0 of the cxxopts\footnote{\url{https://github.com/jarro2783/cxxopts}} library for parsing command-line arguments, and pre\-pro\-ces\-sor HQSpre~\cite{HQSpre2}, more specifically the version that was used with HQS with quantifier localisation~\cite{HQSquantifierLocalisation}.
 \end{sloppypar}
 
-The tool takes as an input a \DQDIMACS{}~\cite{iDQandDQDIMACS} file on which we can run the preprocessor HQSpre. As was explained in Section~\ref{sec:preprocessing}, HQSpre can extract logical gates from variables in the formula that can be then replaced by them resulting in formula with fewer variables. This results in a formula that may not be in PCNF, which most solvers cannot handle. However, as HQS, our solver can work with non-PCNF formulas, stemming from the fact that we represent DQBFs as quantifier trees. This means that we can use this feature of HQSpre similarly as it is used in HQS. However, it may happen that matrix is not in NNF, that is why we use equalities from Section~\ref{sec:BF:NNF} to push negations to variables.
+The tool takes as an input a file in \DQDIMACS{} format~\cite{iDQandDQDIMACS} (see Appendix~\ref{appendix:DQDIMACS}) on which we can run the preprocessor HQSpre. As was explained in Section~\ref{sec:preprocessing}, HQSpre can extract logical gates from variables in the formula that can be then replaced by them resulting in formula with fewer variables. This results in a formula that may not be in PCNF, which most solvers cannot handle. However, as HQS, our solver can work with non-PCNF formulas, stemming from the fact that we represent DQBFs as quantifier trees. This means that we can use this feature of HQSpre similarly as it is used in HQS.
 
-First we check how many gates can be extracted. If this number is low (we use less than 5), then we run preprocessor normally, without caring whether these gates will get destroyed or not. If there are many gates, then we run preprocessor normally on a copy of the formula to check if it can solve it. If it cannot, we run the preprocessor with gate preservation set on. This will ensure that during preprocessing no clause from which these gates can be extracted is touched and at the end of preprocessing, we can extract these gates while creating a quantifier tree.
+%First we check how many gates can be extracted. If this number is low (we use less than 5), then we run preprocessor normally, without extracting them. % caring whether these gates will get destroyed or not. 
+%If there are many gates, then
+We run preprocessor twice. 
+In the first run, we run it normally on a copy of the formula, without extracting any gates, just to check if HQSpre can solve it. If it cannot, we run the preprocessor with gate preservation set on. This will ensure that during preprocessing, no clause, from which these gates can be extracted, is touched and at the end of preprocessing, we can extract these gates while creating a quantifier tree. However, if there are just few gates (we use less than 5), then their preservation does not make sense and we run preprocessor just once, normally, without extracting any gates. During this creation, we use the equalities from Section~\ref{sec:BF:NNF} to push negations to variables so that the resulting formula is in NNF.
 
-We run Algorithm~\ref{alg:general} on the preprocessed formula with chosen heuristics for elimination of quantifiers and for the choice of the next universal variable to eliminate. If we choose \QEnone{} as elimination heuristic as explained in Section~\ref{sec:algturntobdd}, we can skip localisation and create BDD directly from the output of preprocessor. Also, during the final elimination of quantifiers (line~\ref{alg:general:elimination}), we can stop after the final universal variable is eliminated and we can keep all the existential variables. Then if the resulting BDD is $0$, the formula is unsatisfiable. Otherwise it is satisfiable. This stems from the fact that for unsatisfiable formulas all paths over the leftover existential variables in the resulting BDD go to $0$, while for satisfiable ones, there is at least one path going to $1$.
+We then run Algorithm~\ref{alg:general} on the preprocessed formula with chosen heuristics for elimination of quantifiers (Section~\ref{sec:algturntobdd}) and for the choice of the next universal variable to eliminate (Section~\ref{sec:algelimination}). If we choose \QEnone{} as the elimination heuristic as explained in Section~\ref{sec:algturntobdd}, we can skip localisation and create BDD directly from the output of preprocessor. Also, during the final elimination of quantifiers (line~\ref{alg:general:elimination} of Algorithm~\ref{alg:general}), we can stop after the final universal variable is eliminated and we can keep all the existential variables. Then if the resulting BDD is $0$, the formula is unsatisfiable. Otherwise it is satisfiable. This stems from the fact that for unsatisfiable formulas all paths over the leftover existential variables in the resulting BDD go to $0$, while for satisfiable ones, there is at least one path going to $1$.
 
 Furthermore, while applying any operation on BDDs, some variables can disappear from it, because the formula does not depend on their value. We can use this and apply the rules~\eqref{elim:univ} and \eqref{elim:exist} to remove unneeded quantifiers whenever we change the formula. This can speed up quantifier elimination because some irrelevant dependencies can be removed.
 
 As explained in Section~\ref{sec:BDD}, the size of a BDD depends on the order of the variables. This is why we also use dynamic reordering provided by CUDD which reorders the variables using some heuristics whenever the BDDs grow too big. We use CUDD's implementation of Rudell's sifting algorithm~\cite{BDDsifting}.
 
-Additionally, as an optimisation, we do not create copies blabla nor do we remove copies blabla Even though this results in something that is not a valid DQBF, as there will be two quantifiers for the same variable however, this is not problematic.
+Additionally, as an optimisation, we do not create copies of variables on line~\ref{localiseand:ufreshvar} of Algorithm~\ref{alg:localiseand} or on line~\ref{localiseor:efreshvar} of Algorithm~\ref{alg:localiseor}. Even though this results in something that is not a valid DQBF, it does not cause problems as we would rename them back on line~\ref{turntobdd:renamecopies} of Algorithm~\ref{alg:turntobdd} anyway. However, we do lose some ability in pushing existential variables according to Theorem~\ref{thrm:localisedijunction}, because the variables from the set $A_{\psi_1}$ of this theorem can sometimes occur outside the subformula, while normally there would be only copies of them outside the subformula.
+
+We can also optimise Algorithm~\ref{alg:turntobdd} by checking on line~\ref{turntobdd:callforchild} whether the child BDD corresponds to 0 (or 1). If it does and $\qtlabel{n} = {\land}$ (or ${\lor}$), then we can directly return 0 (or 1).
 
 % TODO upravit aby to sem zapadalo + veci co honza napisal k tomuto
-As we already mentioned, we do not need to create copies of variables on line~\ref{localiseand:upush} of Algorithm~\ref{alg:localiseand} or on line~\ref{localiseor:epush} of Algorithm~\ref{alg:localiseor}. This is partially because the next part of Algorithm~\ref{alg:general} we extract these variables back anyway so at the end we do not end up with multiple copies of same variables. The only problem could be that we could possibly have two distinct subformulas with universally quantified $x$ and existentially quantified $y$ depending on it. This could cause problem during elimination of $x$, where if we eliminate it only in one subformula using Theorem~\ref{thrm:unExpan} we would create a copy of $y$ which would cause problems during quantifier extraction. However, this cannot happen, from the way variables are pushed inside. When we push universal variable $x$ on line~\ref{localiseand:upush} of Algorithm~\ref{alg:localiseand} to child $n'$, all quantified existential variables in $n'$ are not in other children. This stems from the fact, that on line~\ref{localiseand:epush} we push existential variables into one child that contain its occurrences. Similarly, when we push universal variable $v$ on line~\ref{localiseor:bpush} of Algorithm~\ref{alg:localiseor}, we are pushing into $vChildren$ which must contain all existential variables dependent on $v$. Another problem with not creating copies could be on line~\ref{localiseand:uremove} of Algorithm~\ref{alg:localiseand} where we remove $x$ from its dependencies. This could be a problem if we removed from one of the dependency in this subformula, but in another the dependency stayed. However, this cannot happen for exactly the same reason as in a previous problem.
+%As we already mentioned, we do not need to create copies of variables on line~\ref{localiseand:upush} of Algorithm~\ref{alg:localiseand} or on line~\ref{localiseor:epush} of Algorithm~\ref{alg:localiseor}. This is partially because the next part of Algorithm~\ref{alg:general} we extract these variables back anyway so at the end we do not end up with multiple copies of same variables. The only problem could be that we could possibly have two distinct subformulas with universally quantified $x$ and existentially quantified $y$ depending on it. This could cause problem during elimination of $x$, where if we eliminate it only in one subformula using Theorem~\ref{thrm:unExpan} we would create a copy of $y$ which would cause problems during quantifier extraction. However, this cannot happen, from the way variables are pushed inside. When we push universal variable $x$ on line~\ref{localiseand:upush} of Algorithm~\ref{alg:localiseand} to child $n'$, all quantified existential variables in $n'$ are not in other children. This stems from the fact, that on line~\ref{localiseand:epush} we push existential variables into one child that contain its occurrences. Similarly, when we push universal variable $v$ on line~\ref{localiseor:bpush} of Algorithm~\ref{alg:localiseor}, we are pushing into $vChildren$ which must contain all existential variables dependent on $v$. Another problem with not creating copies could be on line~\ref{localiseand:uremove} of Algorithm~\ref{alg:localiseand} where we remove $x$ from its dependencies. This could be a problem if we removed from one of the dependency in this subformula, but in another the dependency stayed. However, this cannot happen for exactly the same reason as in a previous problem.
 
 \chapter{Experimental Results}
 \label{chap:experiments}
 This chapter shows the experimental results of DQBDD heuristics comparison and its comparison with other publicly available DQBF solvers 
 (iDQ v1.0\footnote{\url{http://fmv.jku.at/idq/}},
 iProver v3.1\footnote{\url{http://www.cs.man.ac.uk/~korovink/iprover/}, run with \texttt{``-{}-qbf\_mode true -{}-inst\_out\_proof false -{}-res\_out\_proof false''}},
-dCAQE v4.0.1\footnote{\url{https://github.com/ltentrup/caqe/}}
-and HQS with the erroneous quantifier localisation\footnote{\url{https://abs.informatik.uni-freiburg.de/src/projects_view.php?projectID=21}}). All our benchmarks were run on 24 core machine with \SI{2.10}{GHz} Intel Xeon CPU (with at most 6 different runs in parallel) using BenchExec v2.2~\cite{benchexec}, a framework for reliable benchmarking and rescource measurement, where we set the runtime limit at \SI{900}{s} and the memory consumption limit at \SI{4}{GB} per benchmark.
+dCAQE v4.0.1\footnote{\url{https://github.com/ltentrup/caqe/}},
+and HQS with the erroneous quantifier localisation\footnote{\url{https://abs.informatik.uni-freiburg.de/src/projects_view.php?projectID=21}}). All our benchmarks were run on 24 core machine with \SI{2.10}{GHz} Intel Xeon CPU (with at most 6 different runs in parallel) using BenchExec v2.2~\cite{benchexec}, a framework for reliable benchmarking and rescource measurement, where we set the runtime limit at \SI{900}{s} of CPU time and the memory consumption limit at \SI{4}{GB} per benchmark.
 
 All used benchmarks with the results and BenchExec definitions can be found in a github repository\footnote{\url{https://github.com/jurajsic/DQBFbenchmarks}}.
 
@@ -1529,7 +1548,7 @@ We use these benchmark sets for the experimental evaluation:
 %The first set consists of 4316 DQBF encodings of partial equivalence checking problem for incomplete circuits from various sources~\cite{iDQandDQDIMACS,FastDQBFRefutation,HQSsimpleAlg,PECScholl}. Incomplete circuits are combinational circuits containing missing parts, so called Black-Boxes. For these we only know their input and output signals, the functionality is unknown. The partial equivalence checking problem answers the question whether the given complete and incomplete circuit are equivalent.
 
 \paragraph{PEC1}
-The first set consists of 1200 DQBF encodings of partial equivalence checking (PEC) problem for incomplete circuits used by Fr\"{o}hlich et al. for evaluating their DQBF solver iDQ~\cite{iDQandDQDIMACS}. Incomplete circuits are combinational circuits containing some missing parts, so called black-boxes. For these we only know their input and output signals, the functionality is unknown. The partial equivalence checking problem answers the question whether there exists an implementation of black-boxes in some given incomplete circuit such that a different complete circuit is equivalent to it.
+The first set consists of 1200 DQBF encodings of \emph{partial equivalence checking} (PEC) problem~\cite{PECScholl} for incomplete circuits used by Fr\"{o}hlich et al. for evaluating their DQBF solver iDQ~\cite{iDQandDQDIMACS}. Incomplete circuits are combinational circuits containing some missing parts, so called black-boxes. For these we only know their input and output signals, the functionality is unknown. The partial equivalence checking problem answers the question whether there exists an implementation of black-boxes in some given incomplete circuit such that a different complete circuit is equivalent to it.
 
 \paragraph{PEC2}
 This is another set of DQBF encodings for PEC, these are from Finkbeiner et al.~\cite{FastDQBFRefutation}. This set contains 2000 instances with over-proportionally many unsatisfiable ones.
@@ -1538,13 +1557,13 @@ This is another set of DQBF encodings for PEC, these are from Finkbeiner et al.~
 One more set of 1116 PEC encodings~\cite{HQSsimpleAlg,PECScholl}.
 
 \paragraph{CSP}
-This set consists of 461 instances of controller synthesis problem~\cite{CSPbenchmarks} in which we try to find safe controller for controllable transition system. Controllable transition system is composed of states and two types of inputs -- uncontrollable and controllable -- which decide to which state the system moves. Controller decides the controllable inputs and a safe controller is such a controller that the transition system always stays in some set of safe states.
+This set consists of 461 instances of \emph{controller synthesis problem} (CSP)~\cite{CSPbenchmarks} in which we try to find a safe controller for a \emph{controllable transition system}. A controllable transition system is composed of states and two types of inputs -- uncontrollable and controllable -- which decide to which state the system moves. Controller decides the controllable inputs and a \emph{safe} controller is such a controller that the transition system always stays in a given set of safe states.
 
 \paragraph{SAT}
 The next set is created from 34 SAT instances which are transformed into equisatisfiable DQBF with exponentially smaller number of variables~\cite{SATbenchmarks}.
 
 \paragraph{E19}
-The last benchmark set consists of 334 instances used for evaluation of DQBF solvers at QBF Evaluation 2019~\cite{QBFeval19} which is a selected combination of previous benchmarks with some extra instances not occurring in any of the previous sets.
+The last benchmark set consists of 334 instances used for evaluation of DQBF solvers at QBF Evaluation 2019~\cite{QBFeval19}, which is a selected combination of previous benchmarks with some extra instances not occurring in any of the previous sets.
 
 
 \section{Preprocessing}
@@ -1552,7 +1571,7 @@ First, we run preprocessor HQSpre on all benchmarks. Table~\ref{tab:HQSpre} show
 
 \begin{table}[ht]
 \centering
-\caption{Results of HQSpre where \textbf{S} is the number of solved satisfiable instances, \textbf{U} number of solved unsatisfiable instances and \textbf{?} number of unsolved instances.}
+\caption{Results of HQSpre, where \textbf{S} is the number of solved satisfiable instances, \textbf{U} the number of solved unsatisfiable instances, and \textbf{?} the number of unsolved instances.}
 \label{tab:HQSpre}
 \begin{tabular}{c|r|r|r|r|r|r|}
 \hhline{~*{6}{-}}
@@ -1567,10 +1586,10 @@ First, we run preprocessor HQSpre on all benchmarks. Table~\ref{tab:HQSpre} show
 \end{tabular}
 \end{table}
 
-We removed the solved instances from the benchmarks sets and we run the solvers only on the results of unsolved instances (as the preprocessor simplified these). The resulting times of these runs are then combination of HQSpre and solver runtime. However, we do not run HQS and DQBDD on these simplified instances, as both of these solvers incorporate HQSpre in their solving routine (as explained in Chapter~\ref{chap:implementation}), therefore we run them on the original instances. We still run them only on the instances which were not solved by HQSpre because the incorporated HQSpre in these solvers would have solved other instances anyway. The time of HQSpre is then not added to these solvers, because the runtime of preprocessing is included in the runtime of those two solvers.
+We removed the solved instances from the benchmarks sets and we run the solvers only on the remaining instances in the preprocessed form. The resulting times of these runs are then combination of HQSpre and solver runtime. Technically, we do not run HQS and DQBDD on these simplified instances, as both of these solvers incorporate HQSpre in their solving routine (as explained in Chapter~\ref{chap:implementation}), therefore we run them on the original instances. We still run them only on the instances that were not solved by HQSpre. The time of HQSpre is then not added to these solvers, because the runtime of preprocessing is included in the runtime of those two solvers.
 
 \section{Heuristics Comparison}
-To be able to compare DQBDD to other solvers it is important to choose the right heuristics for choosing the universal variables to be eliminated (see Section~\ref{sec:algelimination}) and for which quantifiers to eliminate in quantifier tree during transformation to BDD (see Section~\ref{sec:algturntobdd}). For this we compare these heuristics on E19 benchmark set as it is a selected combination of other benchmarks and it is reasonably small. 
+Before we compare DQBDD to other solvers, it is important to choose the right heuristics for choosing the universal variables to be eliminated (see Section~\ref{sec:algelimination}) and for which quantifiers to eliminate in quantifier tree during transformation to BDD (see Section~\ref{sec:algturntobdd}). For this we compare these heuristics on E19 benchmark set as it is a selected combination of other benchmarks and it is reasonably small. 
 
 Table~\ref{tab:heurcomp} shows this comparison where we run every possible combination of heuristics. It shows the number of solved instances (\textbf{\#}) and from these the number of \textbf{S}atisfiable and \textbf{U}n\-sa\-ti\-sfi\-able instances. It is obvious that it is best to eliminate only simple quantifiers (meaning all possible existential variables and only those universal variables which do not have any dependency) during the transformation to BDD. However, eliminating all universal variables during this transformation was not much worse compared to eliminating simple ones, only a few less instances were solved.
 
@@ -1585,11 +1604,11 @@ To also show that it is better to use dynamic reordering, we run DQBDD (with sim
 \begin{tabular}{l||l|l|l|l|l|l|l|l|l}
 %\hline
 \multicolumn{1}{c||}{\textbf{order of the next}} & \multicolumn{9}{c}{\textbf{which quantifiers to eliminate}} \\ \hhline{~*{9}{-}} 
-\multicolumn{1}{c||}{\textbf{universal variable}} & \multicolumn{3}{c|}{\textbf{none}}     & \multicolumn{3}{c|}{\textbf{simple}}   & \multicolumn{3}{c}{\textbf{all}} \\ \hhline{~*{9}{-}} 
+\multicolumn{1}{c||}{\textbf{universal variable}} & \multicolumn{3}{c|}{\textbf{\QEnone{}}}     & \multicolumn{3}{c|}{\textbf{\QEsimple{}}}   & \multicolumn{3}{c}{\textbf{\QEall{}}} \\ \hhline{~*{9}{-}} 
 \multicolumn{1}{c||}{\textbf{to eliminate}} & \multicolumn{1}{c}{\textbf{\#}} & \multicolumn{1}{c|}{\textbf{S}} & \multicolumn{1}{c|}{\textbf{U}} & \multicolumn{1}{c|}{\textbf{\#}} & \multicolumn{1}{c|}{\textbf{S}} & \multicolumn{1}{c|}{\textbf{U}} & \multicolumn{1}{c|}{\textbf{\#}} & \multicolumn{1}{c|}{\textbf{S}} & \multicolumn{1}{c|}{\textbf{U}} \\ \hline
-\textbf{set at beginning}    & 94 & 41 & 53 & 139 & 43 & 96 & 134 & 38 & 96 \\ %\hline
-\textbf{current lowest}      & 94 & 41 & 53 & 138 & 42 & 96 & 134 & 38 & 96 \\ %\hline
-\textbf{vars in conjuncts}   & 94 & 41 & 53 & 139 & 43 & 96 & 135 & 40 & 95 \\ %\hline
+\textbf{\QUatbeginning{}}    & 94 & 41 & 53 & 139 & 43 & 96 & 134 & 38 & 96 \\ %\hline
+\textbf{\QUcurrentlowest{}}      & 94 & 41 & 53 & 138 & 42 & 96 & 134 & 38 & 96 \\ %\hline
+\textbf{\QUvarsinconjuncts{}}   & 94 & 41 & 53 & 139 & 43 & 96 & 135 & 40 & 95 \\ %\hline
 \end{tabular}
 \end{table}
 
@@ -1657,6 +1676,24 @@ We can now compare DQBDD with the chosen heuristics (simple quantifier eliminati
   \label{fig:runtimecomp}
 \end{figure}
 
+\begin{figure}
+  \centering
+  \begin{subfigure}{0.98\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figures/PEC1logcactusplot.pdf}
+    \caption{PEC1}
+    \label{fig:cactusPEC1}
+  \end{subfigure}
+  \begin{subfigure}{0.98\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figures/PEC2logcactusplot.pdf}
+    \caption{PEC2}
+    \label{fig:cactusPEC2}
+  \end{subfigure}
+  \caption{Cactus plots for PEC1 and PEC2}
+  \label{fig:cactusPEC12}
+\end{figure}
+
 \subsection{PEC1}
 
 \begin{table}[t]
@@ -1667,7 +1704,7 @@ We can now compare DQBDD with the chosen heuristics (simple quantifier eliminati
 \hline
 \multicolumn{1}{|c|}{}                                  & \multicolumn{5}{c|}{\textbf{Solved}}                                                                                                                                        & \multicolumn{3}{c|}{\textbf{Unsolved}}                                                                 \\  \hhline{~*{8}{-}}
 \multicolumn{1}{|c|}{\multirow{-2}{*}{\textbf{Solver}}} & \multicolumn{1}{c|}{\textbf{\#}} & \multicolumn{1}{c|}{\textbf{Time (s)}} & \multicolumn{1}{c|}{\textbf{S}} & \multicolumn{1}{c|}{\textbf{U}} & \multicolumn{1}{c|}{\textbf{*}} & \multicolumn{1}{c|}{\textbf{T}} & \multicolumn{1}{c|}{\textbf{M}} & \multicolumn{1}{c|}{\textbf{O}} \\ \hline
-\textbf{dCAQE} & \num{433} & \num{134.89} & \num{48} & \num{385} & \num{0} & \num{0} & \num{0} & \num{0} \\ \hline
+\textbf{dCAQE} & \textbf{433} & \num{134.89} & \textbf{48} & \textbf{385} & \num{0} & \num{0} & \num{0} & \num{0} \\ \hline
 \textbf{DQBDD} & \num{430} & \num{18.38} & \num{47} & \num{383} & \num{0} & \num{0} & \num{3} & \num{0} \\ \hline
 \textbf{HQS} & \num{413} & \num{68.06} & \num{44} & \num{369} & \num{0} & \num{2} & \num{0} & \num{18} \\ \hline
 \textbf{iDQ} & \num{413} & \num{16943.53} & \num{40} & \num{373} & \num{0} & \num{20} & \num{0} & \num{0} \\ \hline
@@ -1677,12 +1714,12 @@ We can now compare DQBDD with the chosen heuristics (simple quantifier eliminati
 
 Table~\ref{tab:PEC1} shows the comparison of all solvers for PEC1 benchmarks which were not solved by HQSpre. All solvers solved most of the instances, while dCAQE solved \emph{all} 433 instances. This is followed by DQBDD and iProver which did not solve only three or six instances respectively. For the three instances that DQBDD did not solve, it reached the memory limit during quantifier localisation. Furthermore, the total runtime of DQBDD for solved instances is seven times less than dCAQE which in turn is 67 times less than iProver. On average, this means that it took DQBDD \SI{0.04}{s} to solve one instance while dCAQE took \SI{0.31}{s} and iProver took \SI{31.25}{s} per instance. The comparison of solving times for DQBDD and dCAQE is shown in Figure~\ref{fig:PEC1dqbddVSdcaqe}.
 
-The remaining two solvers -- HQS and iDQ -- solved 413 instances each where HQS was 249 times faster than iDQ. Also notice that even though HQS solved less instances than DQBDD, DQBDD total runtime was still smaller than HQS total runtime.
+The remaining two solvers -- HQS and iDQ -- solved 413 instances each where HQS was 249 times faster than iDQ. Also notice that even though HQS solved less instances than DQBDD, DQBDD total runtime was still significantly smaller than HQS total runtime.
 
 \subsection{PEC2}
 The comparison of all solvers on all 2000 benchmarks from PEC2 benchmark set (as none of them were solved by HQSpre) is shown in Table~\ref{tab:PEC2}. Here, dCAQE, iDQ and iProver solved just a few instances whereas DQBDD and HQS solved most of them. For DQBDD, there was only one unsolved instance (caused by reaching memory limit during quantifier localisation) while HQS did not solve 278. Even with this, DQBDD was still more than twice as fast compared with HQS. Figure~\ref{fig:PEC2dqbddVShqs} shows the comparison of solving times of DQBDD and HQS.
 
-The success of DQBDD and HQS for this benchmark set could be explained by gate extraction as explained in Section~\ref{sec:preprocessing} which simplifies input formulas. This stems from the fact that PEC problem encodes circuits, which means there are possibly many gates to extract which can result in much more simplified formula compared to the formula in PCNF.
+The success of DQBDD and HQS for this benchmark set could be explained by gate extraction as explained in Section~\ref{sec:preprocessing} which simplifies input formulas. This stems from the fact that PEC problems encode circuits, which means there are possibly many gates to extract which can result in much more simplified formula compared to the formula in PCNF.
 
 \begin{table}[ht]
 \centering
@@ -1693,17 +1730,35 @@ The success of DQBDD and HQS for this benchmark set could be explained by gate e
 \multicolumn{1}{|c|}{}                                  & \multicolumn{5}{c|}{\textbf{Solved}}                                                                                                                                        & \multicolumn{3}{c|}{\textbf{Unsolved}}                                                                 \\  \hhline{~*{8}{-}}
 \multicolumn{1}{|c|}{\multirow{-2}{*}{\textbf{Solver}}} & \multicolumn{1}{c|}{\textbf{\#}} & \multicolumn{1}{c|}{\textbf{Time (s)}} & \multicolumn{1}{c|}{\textbf{S}} & \multicolumn{1}{c|}{\textbf{U}} & \multicolumn{1}{c|}{\textbf{*}} & \multicolumn{1}{c|}{\textbf{T}} & \multicolumn{1}{c|}{\textbf{M}} & \multicolumn{1}{c|}{\textbf{O}} \\ \hline
 \textbf{dCAQE} & \num{34} & \num{134.12} & \num{0} & \num{34} & \num{0} & \num{1961} & \num{5} & \num{0} \\ \hline
-\textbf{DQBDD} & \num{1999} & \num{19618.36} & \num{123} & \num{1876} & \num{278} & \num{0} & \num{1} & \num{0} \\ \hline
+\textbf{DQBDD} & \textbf{1999} & \num{19618.36} & \textbf{123} & \textbf{1876} & \textbf{278} & \num{0} & \num{1} & \num{0} \\ \hline
 \textbf{HQS} & \num{1722} & \num{51769.75} & \num{80} & \num{1642} & \num{1} & \num{246} & \num{0} & \num{32} \\ \hline
 \textbf{iDQ} & \num{4} & \num{292.66} & \num{0} & \num{4} & \num{0} & \num{1996} & \num{0} & \num{0} \\ \hline
 \textbf{iProver} & \num{41} & \num{3382.37} & \num{1} & \num{40} & \num{0} & \num{9} & \num{1950} & \num{0} \\ \hline
 \end{tabular}
 \end{table}
 
-\subsection{PEC3}
-The results for the last PEC benchmark set are shown in Table~\ref{tab:PEC3}. Again, DQBDD and HQS solved the most instances (possibly because of gate extraction) followed by dCAQE, iProver and finally by iDQ. Furthermore, DQBDD solved \num{132} instances more than HQS, where DQBDD took on average \SI{18.19}{s} per instance while HQS took \SI{15.73}{s}. Figure~\ref{fig:PEC3dqbddVShqs} shows the comparison of their runtimes for this benchmark set.
+\begin{figure}
+  \centering
+  \begin{subfigure}{0.98\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figures/PEC3logcactusplot.pdf}
+    \caption{PEC3}
+    \label{fig:cactusPEC3}
+  \end{subfigure}
+  \begin{subfigure}{0.98\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figures/CSPlogcactusplot.pdf}
+    \caption{CSP}
+    \label{fig:cactusCSP}
+  \end{subfigure}
+  \caption{Cactus plots for PEC3 and CSP}
+  \label{fig:cactusPEC3CSP}
+\end{figure}
 
-In this benchmark there were also three discrepancies: dCAQE solved three instances as satisfiable while HQS or DQBDD solved them as unsatisfiable (each solved two of them; iDQ and iProver did not solve them). This cannot be explained by the erroneous implementation of quantifier localisation in HQS because it can only turn unsatisfiable formulas to satisfiable ones. As both HQS and DQBDD use similar techniques for solving, it is hard to tell whether there is a mistake in dCAQE or HQS and DQBDD. Also, because dCAQE works with the result of HQSpre without gate extraction and both HQS and DQBDD work with the result with gate extraction, the mistake could also be in HQSpre. However, we tried running all three instances using DQBDD with only the preprocessing without gate extraction and it determined all three as unsatisfiable, therefore we dismiss the possibility of mistake in HQSpre.
+\subsection{PEC3}
+The results for the last PEC benchmark set are shown in Table~\ref{tab:PEC3}. Again, DQBDD and HQS solved the most instances (possibly because of gate extraction) followed by dCAQE, iProver, and finally by iDQ. Furthermore, DQBDD solved \num{132} instances more than HQS, where DQBDD took on average \SI{18.19}{s} per instance while HQS took \SI{15.73}{s}. Figure~\ref{fig:PEC3dqbddVShqs} shows the comparison of their runtimes for this benchmark set.
+
+In this benchmark there were also three discrepancies: dCAQE solved three instances as satisfiable while HQS or DQBDD solved them as unsatisfiable (each solved two of them; iDQ and iProver did not solve them). This cannot be explained by the erroneous implementation of quantifier localisation in HQS because it can only turn unsatisfiable formulas to satisfiable ones. As both HQS and DQBDD use similar techniques for solving, it is hard to tell whether there is a mistake in dCAQE or HQS and DQBDD. However, as we show in Appendix~\ref{appendix:wrongdcaqe}, we can find a simple unsatisfiable DQBF which dCAQE determines as satisfiable. Also, because dCAQE works with the result of HQSpre without gate extraction and both HQS and DQBDD work with the result with gate extraction, the mistake could also be in HQSpre. However, we tried running all three instances using DQBDD with only the preprocessing without gate extraction and it determined all three as unsatisfiable, therefore we dismiss the possibility of mistake in HQSpre. This is why we believe that these instances are unsatisfiable and dCAQE solved them incorrectly.
 
 \begin{table}[ht]
 \centering
@@ -1714,7 +1769,7 @@ In this benchmark there were also three discrepancies: dCAQE solved three instan
 \multicolumn{1}{|c|}{}                                  & \multicolumn{5}{c|}{\textbf{Solved}}                                                                                                                                        & \multicolumn{3}{c|}{\textbf{Unsolved}}                                                                 \\  \hhline{~*{8}{-}}
 \multicolumn{1}{|c|}{\multirow{-2}{*}{\textbf{Solver}}} & \multicolumn{1}{c|}{\textbf{\#}} & \multicolumn{1}{c|}{\textbf{Time (s)}} & \multicolumn{1}{c|}{\textbf{S}} & \multicolumn{1}{c|}{\textbf{U}} & \multicolumn{1}{c|}{\textbf{*}} & \multicolumn{1}{c|}{\textbf{T}} & \multicolumn{1}{c|}{\textbf{M}} & \multicolumn{1}{c|}{\textbf{O}} \\ \hline
 \textbf{dCAQE} & \num{328} & \num{19271.73} & \num{96} & \num{232} & \num{3} & \num{565} & \num{0} & \num{0} \\ \hline
-\textbf{DQBDD} & \num{566} & \num{10293.71} & \num{193} & \num{373} & \num{169} & \num{222} & \num{105} & \num{0} \\ \hline
+\textbf{DQBDD} & \textbf{566} & \num{10293.71} & \textbf{193} & \textbf{373} & \textbf{169} & \num{222} & \num{105} & \num{0} \\ \hline
 \textbf{HQS} & \num{434} & \num{6825.99} & \num{142} & \num{292} & \num{29} & \num{444} & \num{0} & \num{15} \\ \hline
 \textbf{iDQ} & \num{119} & \num{4778.43} & \num{39} & \num{80} & \num{4} & \num{774} & \num{0} & \num{0} \\ \hline
 \textbf{iProver} & \num{184} & \num{6769.89} & \num{55} & \num{129} & \num{0} & \num{8} & \num{701} & \num{0} \\ \hline
@@ -1722,7 +1777,7 @@ In this benchmark there were also three discrepancies: dCAQE solved three instan
 \end{table}
 
 \subsection{CSP}
-Table~\ref{tab:CSP} shows the results for CSP benchmark set. For these, dCAQE, DQBDD, and HQS solved comparatively many instances (with dCAQE the most) while iProver and iDQ solved less. From those three, HQS was on average the fastest, spending \SI{12.01}{s} per instances, closely followed by DQBDD which spent \SI{17.05}{s} per instance. dCAQE was around two times slower than these two, taking on average \SI{31.21}{s} per instance. However, dCAQE runtime is dominated by one instance which took \SI{753.81}{s} to solve and was not solved by other solvers. If we remove this instance, dCAQE took on average \SI{14.41}{s}. Figures~\ref{fig:CSPdqbddVSdcaqe} and \ref{fig:CSPdqbddVShqs} show solving time comparison of DQBDD with dCAQE and HQS respectively.
+Table~\ref{tab:CSP} shows the results for CSP benchmark set. For these, dCAQE, DQBDD, and HQS solved comparatively many instances (with dCAQE the most) while iProver and iDQ solved less. From those three, HQS was on average the fastest, spending \SI{12.01}{s} per instances, followed by DQBDD which spent \SI{17.05}{s} per instance. dCAQE was around two times slower than these two, taking on average \SI{31.21}{s} per instance. However, dCAQE runtime is dominated by one instance which took \SI{753.81}{s} to solve and was not solved by other solvers. If we remove this instance, dCAQE took on average \SI{14.41}{s}. Figures~\ref{fig:CSPdqbddVSdcaqe} and \ref{fig:CSPdqbddVShqs} show solving time comparison of DQBDD with dCAQE and HQS respectively.
 
 \begin{table}[ht]
 \centering
@@ -1732,7 +1787,7 @@ Table~\ref{tab:CSP} shows the results for CSP benchmark set. For these, dCAQE, D
 \hline
 \multicolumn{1}{|c|}{}                                  & \multicolumn{5}{c|}{\textbf{Solved}}                                                                                                                                        & \multicolumn{3}{c|}{\textbf{Unsolved}}                                                                 \\  \hhline{~*{8}{-}}
 \multicolumn{1}{|c|}{\multirow{-2}{*}{\textbf{Solver}}} & \multicolumn{1}{c|}{\textbf{\#}} & \multicolumn{1}{c|}{\textbf{Time (s)}} & \multicolumn{1}{c|}{\textbf{S}} & \multicolumn{1}{c|}{\textbf{U}} & \multicolumn{1}{c|}{\textbf{*}} & \multicolumn{1}{c|}{\textbf{T}} & \multicolumn{1}{c|}{\textbf{M}} & \multicolumn{1}{c|}{\textbf{O}} \\ \hline
-\textbf{dCAQE} & \num{44} & \num{1373.30} & \num{44} & \num{0} & \num{9} & \num{378} & \num{0} & \num{0} \\ \hline
+\textbf{dCAQE} & \textbf{44} & \num{1373.30} & \textbf{44} & \num{0} & \textbf{9} & \num{378} & \num{0} & \num{0} \\ \hline
 \textbf{DQBDD} & \num{40} & \num{681.86} & \num{40} & \num{0} & \num{2} & \num{334} & \num{48} & \num{0} \\ \hline
 \textbf{HQS} & \num{42} & \num{504.51} & \num{42} & \num{0} & \num{1} & \num{82} & \num{0} & \num{298} \\ \hline
 \textbf{iDQ} & \num{10} & \num{281.18} & \num{10} & \num{0} & \num{0} & \num{407} & \num{5} & \num{0} \\ \hline
@@ -1742,7 +1797,7 @@ Table~\ref{tab:CSP} shows the results for CSP benchmark set. For these, dCAQE, D
 
 
 \subsection{SAT}
-The results for SAT benchmark set are in Table~\ref{tab:SAT}. This set consists of only few instances, therefore the comparison is not very interesting. However, we can see that DQBDD did not solve any formulas from this set. This was caused by either not even finishing creation of the quantifier tree (three cases where DQBDD reached the memory limit) or getting stuck while creating the BDD (the cases where DQBDD reached the time limit). This benchmark therefore shows, that BDDs can sometime suffer from scalability problems.
+The results for SAT benchmark set are in Table~\ref{tab:SAT}. This set consists of only few instances, therefore the comparison is not very interesting. However, we can see that DQBDD did not solve any formula from this set. This was caused by either not even finishing creation of the quantifier tree (three cases where DQBDD reached the memory limit) or getting stuck while creating the BDD (the cases where DQBDD reached the time limit). This benchmark therefore shows, that BDDs can sometime suffer from scalability problems.
 
 \begin{table}[ht]
 \centering
@@ -1754,17 +1809,34 @@ The results for SAT benchmark set are in Table~\ref{tab:SAT}. This set consists 
 \multicolumn{1}{|c|}{\multirow{-2}{*}{\textbf{Solver}}} & \multicolumn{1}{c|}{\textbf{\#}} & \multicolumn{1}{c|}{\textbf{Time (s)}} & \multicolumn{1}{c|}{\textbf{S}} & \multicolumn{1}{c|}{\textbf{U}} & \multicolumn{1}{c|}{\textbf{*}} & \multicolumn{1}{c|}{\textbf{T}} & \multicolumn{1}{c|}{\textbf{M}} & \multicolumn{1}{c|}{\textbf{O}} \\ \hline
 \textbf{dCAQE} & \num{7} & \num{2141.37} & \num{3} & \num{4} & \num{0} & \num{15} & \num{0} & \num{0} \\ \hline
 \textbf{DQBDD} & \num{0} & \num{0} & \num{0} & \num{0} & \num{0} & \num{19} & \num{3} & \num{0} \\ \hline
-\textbf{HQS} & \num{7} & \num{3030.71} & \num{5} & \num{2} & \num{2} & \num{15} & \num{0} & \num{0} \\ \hline
-\textbf{iDQ} & \num{9} & \num{2546.24} & \num{4} & \num{5} & \num{1} & \num{13} & \num{0} & \num{0} \\ \hline
-\textbf{iProver} & \num{8} & \num{3260.57} & \num{3} & \num{5} & \num{0} & \num{14} & \num{0} & \num{0} \\ \hline
+\textbf{HQS} & \num{7} & \num{3030.71} & \textbf{5} & \num{2} & \textbf{2} & \num{15} & \num{0} & \num{0} \\ \hline
+\textbf{iDQ} & \textbf{9} & \num{2546.24} & \num{4} & \textbf{5} & \num{1} & \num{13} & \num{0} & \num{0} \\ \hline
+\textbf{iProver} & \num{8} & \num{3260.57} & \num{3} & \textbf{5} & \num{0} & \num{14} & \num{0} & \num{0} \\ \hline
 \end{tabular}
 \end{table}
 
+\begin{figure}
+  \centering
+  \begin{subfigure}{0.98\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figures/E19cactusplot.pdf}
+    \caption{PEC1}
+    \label{fig:cactusPEC1}
+  \end{subfigure}
+  \begin{subfigure}{0.98\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figures/E19logcactusplot.pdf}
+    \caption{PEC2}
+    \label{fig:cactusPEC2}
+  \end{subfigure}
+  \caption{Cactus plots for PEC1 and PEC2}
+  \label{fig:cactusPEC12}
+\end{figure}
 
 \subsection{E19}
-Finally, Table~\ref{tab:E19} shows the comparison of solvers for E19 benchmark set. As this set is a combination of previous sets (with also some new benchmarks), it is the most interesting for ``real'' comparison. However, this set is still dominated by PEC benchmarks, which shows up in the results: both DQBDD and HQS solved the most benchmarks, with 139 each (see Figure~\ref{fig:E19dqbddVShqs} for their runtime comparison). This is followed by dCAQE which solved 111 instance, then iProver with 50 instance and finally iDQ with only 27 instances. Even though DQBDD solved the most, it was still the fastest, taking only \SI{3440.76}{s} for all of its solved instances. On average, this is \SI{24.75}{s} per instance, where dCAQE took \SI{39.06}{s} per instance, HQS took \SI{48.9}{s}, iDQ took \SI{136.97}{s} and iProver \SI{149.8}{s}.
+Finally, Table~\ref{tab:E19} shows the comparison of solvers for E19 benchmark set. As this set is a combination of previous sets (with also some new benchmarks), it is the most interesting for ``real'' comparison. However, this set is still dominated by PEC benchmarks, which shows up in the results: both DQBDD and HQS solved the most benchmarks, with 139 each (see Figure~\ref{fig:E19dqbddVShqs} for their runtime comparison). This is followed by dCAQE which solved 111 instances, then iProver with 50 instances, and finally iDQ with only 27 instances. Even though DQBDD solved the most, it was still the fastest, taking only \SI{3440.76}{s} for all of its solved instances. On average, this is \SI{24.75}{s} per instance, where dCAQE took \SI{39.06}{s} per instance, HQS took \SI{48.9}{s}, iDQ took \SI{136.97}{s} and iProver \SI{149.8}{s}.
 
-There was also a discrepancy in this benchmark set. One instance, which is not in other benchmark sets, was deemed satisfiable by dCAQE while HQS decided its unsatisfiability. Again, we do not know what caused this discrepancy.
+There was also a discrepancy in this benchmark set. One instance, which is not in other benchmark sets, was deemed satisfiable by dCAQE while HQS claimed its unsatisfiability. Again, we believe that dCAQE solved it incorrectly.
 
 \begin{table}[ht]
 \centering
@@ -1775,8 +1847,8 @@ There was also a discrepancy in this benchmark set. One instance, which is not i
 \multicolumn{1}{|c|}{}                                  & \multicolumn{5}{c|}{\textbf{Solved}}                                                                                                                                        & \multicolumn{3}{c|}{\textbf{Unsolved}}                                                                 \\  \hhline{~*{8}{-}}
 \multicolumn{1}{|c|}{\multirow{-2}{*}{\textbf{Solver}}} & \multicolumn{1}{c|}{\textbf{\#}} & \multicolumn{1}{c|}{\textbf{Time (s)}} & \multicolumn{1}{c|}{\textbf{S}} & \multicolumn{1}{c|}{\textbf{U}} & \multicolumn{1}{c|}{\textbf{*}} & \multicolumn{1}{c|}{\textbf{T}} & \multicolumn{1}{c|}{\textbf{M}} & \multicolumn{1}{c|}{\textbf{O}} \\ \hline
 \textbf{dCAQE} & \num{111} & \num{4335.81} & \num{37} & \num{74} & \num{1} & \num{135} & \num{0} & \num{0} \\ \hline
-\textbf{DQBDD} & \num{139} & \num{3440.76} & \num{43} & \num{96} & \num{14} & \num{90} & \num{17} & \num{0} \\ \hline
-\textbf{HQS} & \num{139} & \num{6796.64} & \num{51} & \num{88} & \num{5} & \num{53} & \num{0} & \num{54} \\ \hline
+\textbf{DQBDD} & \textbf{139} & \num{3440.76} & \num{43} & \textbf{96} & \textbf{14} & \num{90} & \num{17} & \num{0} \\ \hline
+\textbf{HQS} & \textbf{139} & \num{6796.64} & \textbf{51} & \num{88} & \num{5} & \num{53} & \num{0} & \num{54} \\ \hline
 \textbf{iDQ} & \num{27} & \num{3698.26} & \num{13} & \num{14} & \num{1} & \num{218} & \num{1} & \num{0} \\ \hline
 \textbf{iProver} & \num{50} & \num{7490.16} & \num{23} & \num{27} & \num{0} & \num{17} & \num{179} & \num{0} \\ \hline
 \end{tabular}
@@ -1787,14 +1859,14 @@ There was also a discrepancy in this benchmark set. One instance, which is not i
 \chapter{Conclusion}
 In this thesis, we have proposed and implemented a DQBF solver DQBDD that uses binary decision diagrams as an underlying representation of formulas. This solver is based on quantifier elimination and uses quantifier localisation which we have corrected and enhanced by adding a possibility to eliminate universal variables in subformulas.
 
-Additionally, we have done an extensive experimental evaluation of different heuristics used in DQBDD and compared the best one with other DQBF solvers. We have shown that DQBDD performs very well, especially for partial equivalence checking problem.
+Additionally, we experimentally evaluated different heuristics used in DQBDD and compared the best one with other DQBF solvers. We have shown that DQBDD performs very well, especially for partial equivalence checking problem.
 
 \section{Future Work}
 
 For future work there are multiple things possible to do:
 \begin{itemize}
   \item We are planning to evaluate the impact of ordering of variables in BDDs. We can check whether it would make sense to set up some initial ordering and to decide what this ordering should be. We are also planning to try different reordering techniques used for BDDs, especially those that are already implemented in CUDD. They can be used dynamically, as we do now, but we can also gauge whether it is not better to decide when exactly we should reorder the variables in the algorithm.
-  \item Another line of thinking would be to somehow combine HQS and DQBDD, similarly how it is done in QBF solver AIGSol\-ve~\cite{AIGSolve}. This solver uses mainly AIGs to represent the matrix of the formula, but during quantifier elimination, it can be turned into BDD with some size limit. If this BDD is created, quantifier elimination is done on it (as it is faster for BDDs as for AIGs) and then returned back to AIG, otherwise quantifier elimination is done directly on AIG. We could also use AIG or some similar structure during the localisation phase, where DQBDD sometimes hits the memory limit. This structure would reuse subtrees representing the same subformula (reducing the memory usage), and they would be copied only if there are some variables being pushed into them. Similar structure is already used in HQS, called quantifier graph~\cite{HQSquantifierLocalisation}.
+  \item Another line of thinking would be to somehow combine HQS and DQBDD, similarly how it is done in QBF solver AIGSol\-ve~\cite{AIGSolve}. This solver uses mainly AIGs to represent the matrix of the formula, but during quantifier elimination, it can be turned into BDD with some size limit. If this BDD is created, quantifier elimination is done on it (as it is faster for BDDs than for AIGs) and then returned back to AIG, otherwise quantifier elimination is done directly on AIG. We could also use AIG or some similar structure during the localisation phase, where DQBDD sometimes hits the memory limit. This structure would reuse subtrees representing the same subformula (reducing the memory usage), and they would be copied only if there are some variables being pushed into them. Similar structure is already used in HQS, called quantifier graph~\cite{HQSquantifierLocalisation}.
   \item We are also planning to use more preprocessing techniques, especially the QBF approximations as explained in Section~\ref{sec:prepro:approximations} and the check whether an input formula can be effectively transformed into QBF as explained in Section~\ref{sec:prepro:pspacesubclass}. For these, we could also use some state of the art QBF solver.
   \item Another possible direction is to implement the quantifier elimination of only those universal variables which result in QBF as is done in HQS and possibly design and implement a QBF solver using BDDs which could solve it.
 \end{itemize}
@@ -1823,9 +1895,198 @@ For future work there are multiple things possible to do:
 %  \addcontentsline{toc}{chapter}{\indexname} %% table of contents.
 %  \printindex
 
-%\appendix %% Start the appendices.
-%\chapter{DQBDD}
-%\label{appendix:DQBDD}
-%TODO documentation for the tool 
+\appendix %% Start the appendices.
+
+\chapter{Documentation for DQBDD}
+\label{appendix:DQBDD}
+DQBDD is a dependency quantifier Boolean formula (DQBF) solver that uses binary decision diagrams (BDDs) as an underlying representation of formulas. It is written in \Cplusplus{} and it reads DQBFs encoded in \DQDIMACS{} format~\cite{iDQandDQDIMACS} for which it checks their satisfiability using quantifier elimination. The source codes with binaries can be found at \url{https://github.com/jurajsic/DQBDD}. 
+
+
+\section{Dependencies}
+There is no need to install any dependency, all of them are compiled with DQBDD. They are these:
+\begin{itemize}
+  \item antom\footnote{\url{https://projects.informatik.uni-freiburg.de/projects/antom}} -- SAT solver used in HQSpre,
+  \item CUDD v3.0.0\footnote{\url{https://github.com/ivmai/cudd}}~\cite{CUDD} -- BDD library,
+  \item cxxopts v2.2.0\footnote{\url{https://github.com/jarro2783/cxxopts}} -- argument parser
+  \item Easylogging\texttt{++} v9.96.7\footnote{\url{https://github.com/zuhd-org/easyloggingpp}} -- \Cplusplus{} logger used in HQSpre,
+  \item HQSpre\footnote{\url{https://abs.informatik.uni-freiburg.de/src/projects_view.php?projectID=21}}~\cite{HQSpreJournal} -- DQBF preprocessor,
+  \item PicoSAT\footnote{\url{http://fmv.jku.at/picosat/}}~\cite{PicoSAT} -- SAT solver used in HQSpre.
+\end{itemize}
+
+\section{Installation}
+To compile DQBDD, a \Cplusplus{} compiler supporting C++14 standard and CMake\footnote{\url{https://cmake.org/}} is needed.
+
+\newpage
+\noindent Execute
+\begin{verbatim}
+
+  mkdir Release
+  cd Release
+  cmake -DCMAKE_BUILD_TYPE=Release ..
+  make
+
+\end{verbatim}
+to build DQBDD which will be located in \verb|Release/src/|.
+
+\section{Usage}
+Run DQBDD with
+\begin{verbatim}
+
+  DQBDD [OPTION...] <input file>
+
+\end{verbatim}
+where \verb|<input file>| should be formula to solve in DQDIMACS format. The possible options are
+\begin{verbatim}
+
+  -h, --help                    Print usage
+  -v, --version                 Print the version number
+  -l, --localise arg            Use quantifier tree with
+                                localisation of
+                                quantifiers (default: 1)
+  -p, --preprocess arg          Use preprocessing
+                                (default: 1)
+  -e, --elimination-choice arg  Decide what to eliminate on 
+                                each level of quantifier
+                                tree during transformation
+                                to formula (default: 1)
+  -u, --uvar-choice             The heuristics by which the 
+                                next universal variable for
+                                elimination is chosen
+                                (default: 0)
+  -d, --dyn-reordering          Allow dynamic reordering of
+                                variables in BDDs
+                                (default: 1)
+
+\end{verbatim}
+where for \verb|--localise|, \verb|--preprocess| and \verb|--dyn-reordering| the arguments are 0 or 1 to turn off or on the corresponding option. The option \verb|--elimination-choice| is used only if we localise and then we have these possible arguments:
+\begin{itemize}
+    \item 0 -- nothing is eliminated (\QEnone{}),
+    \item 1 -- simple quantifiers are eliminated (\QEsimple{}),
+    \item 2 -- all possible quantifiers are eliminated (\QEall{}).
+\end{itemize}
+For the option \verb|--uvar-choice| we have:
+\begin{itemize}
+    \item 0 -- the order of the universal variables is set at beginning (\QUatbeginning{}),
+    \item 1 -- the variable with the currently lowest number of dependencies is chosen (\QUcurrentlowest{}),
+    \item 2 -- the order is based on the number of variables in conjuncts of universal expansion (\QUvarsinconjuncts{}).
+\end{itemize}
+If the formula is satisfiable, the return value is 10, otherwise it is 20.
+
+\section{Examples}
+Running DQBDD as
+\begin{itemize}
+  \item \verb|DQBDD file.dqdimacs|
+\end{itemize}
+solves the formula in \verb|file.dqdimacs| with the default settings,
+\begin{itemize}
+  \item \verb|DQBDD --preprocess 0 --dyn-reordering 0 file.dqdimacs|
+\end{itemize}
+solves the formula in \verb|file.dqdimacs| without running the preprocessor HQSpre first and without using dynamic reordering of variables in BDDs as implemented in CUDD,
+\begin{itemize}
+  \item \verb|DQBDD --localise 0 --uvar-choice 1 file.dqdimacs|
+\end{itemize}
+solves the formula in \verb|file.dqdimacs| without localising quantifiers (or creating quantifier tree) where the next universal variable for universal expansion is always the one that has the minimal number of dependent existential variables,
+\begin{itemize}
+  \item \verb|DQBDD --localise 1 --elimination-choice 2 file.dqdimacs|
+\end{itemize}
+solves the formula in \verb|file.dqdimacs| with localising quantifiers where it eliminates all universal and possible existential variables while creating the final BDD from the quantifier tree.
+
+\section{Licence}
+DQBDD is licenced under version 3 of GNU Lesser General Public License~\cite{lgplv3}.
+
+\chapter{DQDIMACS Format}
+\label{appendix:DQDIMACS}
+In this appendix, we define rhe \DQDIMACS{} format~\cite{iDQandDQDIMACS}, which can represent DQBFs in PCNF. 
+
+\section{Syntax}
+The format is defined by this BNF grammar (based on the one for \texttt{QDIMACS} format~\cite{QDIMACS}):
+\begin{verbatim}
+
+<input> ::= <preamble> <prefix> <matrix> EOF
+
+<preamble>      ::= [<comment_lines>] <problem_line>
+<comment_lines> ::= <comment_line> <comment_lines> 
+                   | <comment_line> 
+<comment_line>  ::= c <text> EOL
+<problem_line>  ::= p cnf <pnum> <pnum> EOL
+
+<prefix>     ::= [<quant_sets>]
+<quant_sets> ::= <quant_set> <quant_sets> | <quant_set>
+<quant_set>  ::= <quantifier> <atom_set> 0 EOL
+<quantifier> ::= e | a | d
+<atom_set>   ::= <pnum> <atom_set> | <pnum>
+
+<matrix>      ::= <clause_list>
+<clause_list> ::= <clause> <clause_list> | <clause> 
+<clause>      ::= <literal> <clause> | <literal> 0 EOL
+<literal>     ::= <num>
+
+<text>  ::= {A sequence of non-special ASCII characters}
+<num>   ::= {A 32-bit signed integer different from 0}
+<pnum>  ::= {A 32-bit signed integer greater than 0}
+
+\end{verbatim}
+where the terminal symbols \verb|EOL| and \verb|EOF| stand for the end-of-line and end-of-file markers respectively, \verb|[<expr>]| denotes that \verb|<expr>| is an optional expression, and concatenation of expressions has precedence over choice between expressions. Furthermore, we have these additional constraints:
+\begin{itemize}
+    \item The first \verb|<pnum>| in \verb|<problem_line>| corresponds to the maximal possible number of distinct atoms appearing in the prefix and in the matrix, i.e., all the members of the quantified sets and the absolute value of each literal in all the clauses is less than or equal to this number.
+    \item The second \verb|<pnum>| in \verb|<problem_line>| corresponds to the number of clauses appearing in the matrix, i.e., the number of <clause> expressions which <matrix> is comprised of.
+    \item Each atom in the prefix must appear in the matrix.
+    \item It is not possible to have two \verb|<quant_set>| after each other, where both have \verb|a| or both have \verb|e| as \verb|<quantifier>|.
+    \item The same atom cannot appear in the prefix more than once except for atoms occurring in the second and further place of \verb|atom_set| with \verb|d| as \verb|<quantifier>|. All these atoms have to appear somewhere before in the prefix in \verb|<quant_set>| with \verb|a| quantifier.
+\end{itemize}
+
+\section{Semantics}
+The meaning behind \verb|prefix| is that atoms appearing with \verb|<quantifier>| equal to
+\begin{itemize}
+    \item \verb|a| are universally quantified variables,
+    \item \verb|e| are existentially quantified variables where each of them is dependent on all universally quantified variables which already appeared before and 
+    \item \verb|d| are an existential variable with universal variables in its dependency set, that is the first atom is the existential variable $y$ and all others are universal variables in the dependency set $D_y$.
+\end{itemize}
+
+The number $n$ in \verb|<literal>| represents either the variable $x_n$ if it is positive or $\neg x_n$ if it is negative. Furthermore, all variables which appear in the matrix but do not appear in the prefix are existentially quantified with empty dependency sets. 
+
+Note, that \DQDIMACS{} is by removing \verb|d| quantifiers backwards compatible with \texttt{QDIMACS} (used for QBFs) format and by removing the whole prefix with \texttt{DIMACS} (used for BFs) format.
+
+\section{An Example}
+As an example, we have that
+\begin{verbatim}
+
+ c Simple example
+ p cnf 5 2
+ a 1 2 0
+ e 3 0
+ d 4 1 0
+ -1 2 3 0
+ -2 -4 5 0
+ 
+\end{verbatim}
+represents DQBF
+\[\forall x_1 \forall  x_2 \exists x_3 (x_1, x_2) \exists x_4(x_1) \exists x_5(\emptyset) \itholds ((\neg x_1 \lor x_2 \lor x_3) \land (\neg x_2 \lor \neg x_4 \lor x_5)).\]
+
+\chapter{DQBF Wrongly Solved by dCAQE}
+\label{appendix:wrongdcaqe}
+Solver dCAQE deems a DQBF, which in \DQDIMACS{} format has the form
+\begin{verbatim}
+
+ p cnf 8 9
+ a 1 2 3 0
+ e 4 5 0
+ a 6 0
+ d 7 6 0
+ d 8 6 0
+ -1  2 3  4  5           0
+ -1  2 3 -4              0
+ -1  2 3    -5     7     0
+  1 -2 3  4  5           0
+  1 -2 3 -4            8 0
+  1 -2 3    -5           0
+  1  2 3  4  5           0
+  1  2 3 -4    -6  -7    0
+  1  2 3    -5  6     -8 0
+ 
+\end{verbatim}
+is satisfiable. However, this formula is not satisfiable. This is because the first three clauses force $x_7$ to be true no matter what $x_6$ is evaluated to. The fourth to sixth clauses force $x_8$ to be true too. The last three clauses then say that $x_4$ and $x_5$ would need to be dependent on $x_6$, which is not the case.
+
+Other solvers (DQBDD, HQS, iDQ, iProver, and also preprocessor HQSpre) correctly decide its unsatisfiability.
 
 \end{document}
