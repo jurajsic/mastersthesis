@@ -406,7 +406,6 @@ The BF $\phi$ is called the \emph{matrix} of $\psi$ and $Q_1 x_1 Q_2 x_2 \dots Q
 Again, we define satisfiability. Usually, satisfiability for QBFs is defined trough valuation function as in BFs case where evaluation of QBFs follows the same rules as BFs with two newly added rules for quantifiers:
 \begin{itemize}
     \item $v(\forall x Q_i x_i \dots Q_n x_n \itholds \phi) = 1$ if both $v(Q_i x_i \dots Q_n x_n \itholds \phi\substitute{x}{0}) = 1$ and $v(Q_i x_i \dots Q_n x_n \itholds \phi\substitute{x}{1}) = 1$, otherwise it equals $0$,
-    %TODO: check if the linebreak is not obvious
     \item $v(\exists x Q_i x_i \dots Q_n x_n \itholds \phi) = 1$ if $v(Q_i x_i \dots Q_n x_n \itholds \phi\substitute{x}{0}) = 1$ or $v(Q_i x_i \dots Q_n x_n \itholds \phi\substitute{x}{1}) = 1$, otherwise it equals $0$.
 \end{itemize}
 \end{sloppypar}
@@ -472,6 +471,7 @@ We first give the definition of the set $\DQBF{V}$ of DQBFs in \emph{negation no
     \renewcommand{\arraystretch}{2}
     %\begin{centering}
     %\hspace*{-0.7cm}
+    \makebox[\textwidth][c]{% center the table over page width
     \begin{tabular}{ccccc}
         \multicolumn{2}{c}{rule} & $V_{.}^{\exists}$ & $V_{.}^{\forall}$ & $V_{.}^{\text{free}}$\\\hline
         {\begin{prooftree}
@@ -519,6 +519,7 @@ We first give the definition of the set $\DQBF{V}$ of DQBFs in \emph{negation no
         \end{prooftree}}}
         & $\evars{\psi}$ & $\uvars{\psi} \cup \set{x}$ & $\fvars{\psi} \setminus \set{x}$\\[5mm]
     \end{tabular}
+    }
     %\end{centering}
     \captionsetup{singlelinecheck=off}
     \caption[.]{The rules defining the syntax of DQBFs in NNF (based on Ge-Ernst et al.~\cite{HQSquantifierLocalisation}) where %}
@@ -934,6 +935,7 @@ Furthermore, a solver for EPR can also be used directly for DQBF. Because EPR be
 Another DQBF solver called dCAQE~\cite{dCAQE} is based on clausal abstraction~\cite{ClausalAbstr}. This solver --- working again on DQBF in PCNF --- first puts universally and existentially quantified variables to some sets (called nodes) which are then divided into levels based on the ordering of dependencies of existential variables. The algorithm then constructs for each node on each level a BF that represents which clauses in CNF it can satisfy (for existential node) or falsify (for universal node). The algorithm then builds a candidate valuation by processing each level. For each level either this valuation is extended, or there is some conflict which means that the algorithm has to backtrack to some lower level and refine the abstraction, or the candidate valuation is a satisfying one which ends the algorithm.
 
 \section{Quantifier Elimination -- HQS}
+\label{sec:HQS}
 The next solver is based on quantifier elimination. This solver's basic premise is simple --- it iteratively chooses some universal variable for universal expansion (Theorem~\ref{thrm:unExpan}) thus eliminating it and then eliminates all existential quantifiers that are dependent on all leftover universal quantifiers using Theorem~\ref{thrm:exElim}.
 
 \begin{algorithm}
@@ -1576,9 +1578,9 @@ First, we run preprocessor HQSpre on all benchmarks. Table~\ref{tab:HQSpre} show
 \begin{tabular}{c|r|r|r|r|r|r|}
 \hhline{~*{6}{-}}
 \cellcolor{white}                % & \textbf{PEC} 
-& \textbf{PEC1} & \textbf{PEC2} & \textbf{PEC3} & \textbf{CSP} & \textbf{SAT} & \textbf{E19} \\ \hline
+& \multicolumn{1}{c|}{\textbf{PEC1}} & \multicolumn{1}{c|}{\textbf{PEC2}} & \multicolumn{1}{c|}{\textbf{PEC3}} & \multicolumn{1}{c|}{\textbf{CSP}} & \multicolumn{1}{c|}{\textbf{SAT}} & \multicolumn{1}{c|}{\textbf{E19}} \\ \hline
 \multicolumn{1}{|l|}{\textbf{S}} % & 111         
-& 86 & 0 & 25 & 33 & 4 & 33 \\ \hline
+& \phantom{000}86 & \phantom{0000}0 & \phantom{000}25 & \phantom{000}33 & \phantom{0000}4 & \phantom{000}33 \\ \hline
 \multicolumn{1}{|l|}{\textbf{U}} % & 879          
 & 681 & 0 & 198 & 6 & 8 & 55 \\ \hline
 \multicolumn{1}{|l|}{\textbf{?}} %& 3326        
@@ -1589,31 +1591,51 @@ First, we run preprocessor HQSpre on all benchmarks. Table~\ref{tab:HQSpre} show
 We removed the solved instances from the benchmarks sets and we run the solvers only on the remaining instances in the preprocessed form. The resulting times of these runs are then combination of HQSpre and solver runtime. Technically, we do not run HQS and DQBDD on these simplified instances, as both of these solvers incorporate HQSpre in their solving routine (as explained in Chapter~\ref{chap:implementation}), therefore we run them on the original instances. We still run them only on the instances that were not solved by HQSpre. The time of HQSpre is then not added to these solvers, because the runtime of preprocessing is included in the runtime of those two solvers.
 
 \section{Heuristics Comparison}
-Before we compare DQBDD to other solvers, it is important to choose the right heuristics for choosing the universal variables to be eliminated (see Section~\ref{sec:algelimination}) and for which quantifiers to eliminate in quantifier tree during transformation to BDD (see Section~\ref{sec:algturntobdd}). For this we compare these heuristics on E19 benchmark set as it is a selected combination of other benchmarks and it is reasonably small. 
+Before we compare DQBDD to other solvers, it is important to choose the right heuristics for choosing the universal variables to be eliminated (\QUatbeginning{}, \QUcurrentlowest{}, or \QUvarsinconjuncts{}, see Section~\ref{sec:algelimination}) and for which quantifiers to eliminate in quantifier tree during transformation to BDD (\QEnone{}, \QEsimple{}, or \QEall{}, see Section~\ref{sec:algturntobdd}). For this, we compare these heuristics on E19 benchmark set as it is a selected combination of other benchmarks and it is reasonably small. 
 
-Table~\ref{tab:heurcomp} shows this comparison where we run every possible combination of heuristics. It shows the number of solved instances (\textbf{\#}) and from these the number of \textbf{S}atisfiable and \textbf{U}n\-sa\-ti\-sfi\-able instances. It is obvious that it is best to eliminate only simple quantifiers (meaning all possible existential variables and only those universal variables which do not have any dependency) during the transformation to BDD. However, eliminating all universal variables during this transformation was not much worse compared to eliminating simple ones, only a few less instances were solved.
+Table~\ref{tab:heurcomp} shows this comparison where we run every possible combination of heuristics. It shows the number of solved instances (\textbf{\#}) and from these the number of \textbf{S}atisfiable and \textbf{U}n\-sa\-ti\-sfi\-able instances. 
 
-For the heuristic that chooses the next universal variable to eliminate, it is not obvious which one is the best. The number of solved instances is pretty much the same (for a given heuristic of which quantifiers to eliminate) across all three heuristics. We can however compare the total runtimes of all solved instances. In the case of simple elimination, we get that the total runtime of solved instances by heuristic which sets the order of universal variables to eliminate at the beginning is \SI{3440.76}{s}, by heuristic which chooses the universal variable as the one with currently the lowest number of dependencies is \SI{3785.59}{s} and the one that chooses based on the number of variables in the two BDDs representing the conjuncts of universal expansion is \SI{4125.18}{s}. Obviously, from these we can see that it is best to eliminate simple quantifiers and set the order of universal variables at the beginning.
+For the choice of which quantifiers to eliminate, it is obvious that using \QEnone{} is not as good as the other two heuristics. For \QEsimple{} and \QEall{}, we examine their comparison for each heuristic for choosing the next universal variable:
+\begin{itemize}
+    \item \QUatbeginning{} -- \QEsimple{} solved all of those that were solved by \QEall{} and four more (all satisfiable), while there was only one instance which \QEall{} solved faster by more than one second (it was \SI{2.54}{s} faster),
+    \item \QUcurrentlowest{} -- \QEsimple{} solved six more instances (all satisfiable) than \QEall{}, while \QEall{} solved two more (both satisfiable) and from those that were solved by both, \QEsimple{} solved faster by more than one second four instances (by \SI{1.21}{s}, \SI{1.76}{s}, \SI{3.33}{s}, and \SI{22.68}{s}), while \QEall{} two (by \SI{5.04}{s} and \SI{7.33}{s}),
+    \item \QUvarsinconjuncts{} -- \QEsimple{} solved all except one instance (satisfiable) solved by \QEall{} with further 5 (from which one was unsatisfiable), and from those that were solved by both, \QEsimple{} solved faster by more than one second 13 instances (by up to \SI{177.31}{s}), while \QEall{} four (by up to \SI{3.36}{s}).
+\end{itemize}
+From these we can see that \QEsimple{} is better than \QEall{} and we use it in the comparison with other solvers. However, \QEall{} was not that much worse, and there were still some cases that were solved only by \QEall{}.
 
-To also show that it is better to use dynamic reordering, we run DQBDD (with simple quantifiers elimination and the order set at beginning) without dynamic reordering. We get that the run without dynamic reordering solved only 84 instances (with 37 satisfiable and 47 unsatisfiable), which is much less that the run with dynamic reordering. When we run other two heuristics for ordering, the number of solved instances was even less, for both of them it was 73.
+For the heuristic that chooses the next universal variable to eliminate, it is not obvious which one is the best. The numbers of solved instances are pretty much the same (for a given heuristic of which quantifiers to eliminate) across all three heuristics \QUatbeginning{}, \QUcurrentlowest{}, and \QUvarsinconjuncts{}. We can however compare the total runtimes of all solved instances. In the \QEsimple{} case, we get that there are 136 instances solved by all three heuristics and for these, \QUatbeginning{} took \SI{3268.9}{s} to solve, \QUcurrentlowest{} took \SI{3258.76}{s}, and \QUvarsinconjuncts{} took \SI{4018.18}{s}.
 
-\begin{table}[ht]
+\begin{table}[t]
 \centering
-\caption{Comparison of DQBDD heuristics for the choice of the next universal variable to eliminate and which quantifiers to eliminate during transformation to BDD on E19 benchmark with the total number of solved instances (\textbf{\#}) and the number of satisfiable (\textbf{S}) and unsatisfiable (\textbf{U}) from these.}
+\caption{Comparison of DQBDD heuristics for the choice of the next universal variable to eliminate (Section~\ref{sec:algelimination}) and which quantifiers to eliminate during transformation to BDD (Section~\ref{sec:algturntobdd}) on E19 benchmark with the total number of solved instances (\textbf{\#}) and the numbers of satisfiable (\textbf{S}) and unsatisfiable (\textbf{U}) from these.}
 \label{tab:heurcomp}
-\begin{tabular}{l||l|l|l|l|l|l|l|l|l}
+\makebox[\textwidth][c]{% center the table over page width
+\begin{tabular}{l||r|r|r|r|r|r|r|r|r}
 %\hline
 \multicolumn{1}{c||}{\textbf{order of the next}} & \multicolumn{9}{c}{\textbf{which quantifiers to eliminate}} \\ \hhline{~*{9}{-}} 
 \multicolumn{1}{c||}{\textbf{universal variable}} & \multicolumn{3}{c|}{\textbf{\QEnone{}}}     & \multicolumn{3}{c|}{\textbf{\QEsimple{}}}   & \multicolumn{3}{c}{\textbf{\QEall{}}} \\ \hhline{~*{9}{-}} 
-\multicolumn{1}{c||}{\textbf{to eliminate}} & \multicolumn{1}{c}{\textbf{\#}} & \multicolumn{1}{c|}{\textbf{S}} & \multicolumn{1}{c|}{\textbf{U}} & \multicolumn{1}{c|}{\textbf{\#}} & \multicolumn{1}{c|}{\textbf{S}} & \multicolumn{1}{c|}{\textbf{U}} & \multicolumn{1}{c|}{\textbf{\#}} & \multicolumn{1}{c|}{\textbf{S}} & \multicolumn{1}{c|}{\textbf{U}} \\ \hline
-\textbf{\QUatbeginning{}}    & 94 & 41 & 53 & 139 & 43 & 96 & 134 & 38 & 96 \\ %\hline
+\multicolumn{1}{c||}{\textbf{to eliminate}} & \multicolumn{1}{c|}{\textbf{\#}} & \multicolumn{1}{c|}{\textbf{S}} & \multicolumn{1}{c|}{\textbf{U}} & \multicolumn{1}{c|}{\textbf{\#}} & \multicolumn{1}{c|}{\textbf{S}} & \multicolumn{1}{c|}{\textbf{U}} & \multicolumn{1}{c|}{\textbf{\#}} & \multicolumn{1}{c|}{\textbf{S}} & \multicolumn{1}{c}{\textbf{U}} \\ \hline
+\textbf{\QUatbeginning{}}    & \phantom{0}94 & \phantom{0}41 & \phantom{0}53 & 139 & \phantom{0}43 & \phantom{0}96 & 134 & \phantom{0}38 & \phantom{0}96 \\ %\hline
 \textbf{\QUcurrentlowest{}}      & 94 & 41 & 53 & 138 & 42 & 96 & 134 & 38 & 96 \\ %\hline
 \textbf{\QUvarsinconjuncts{}}   & 94 & 41 & 53 & 139 & 43 & 96 & 135 & 40 & 95 \\ %\hline
 \end{tabular}
+}
 \end{table}
 
+\begin{sloppypar}
+Furthermore, looking at the number of instances which took at least one second faster for one heuristic to solve over another, we get that
+\begin{itemize}
+    \item \QUatbeginning{} solved 4 instance faster than \QUcurrentlowest{} (by up to \SI{16.08}{s}) and 33 faster than \QUvarsinconjuncts{} (by up to \SI{125.53}{s}),
+    \item \QUcurrentlowest{} solved 4 instances faster than \QUatbeginning{} (by up to \SI{17.28}{s}) and 32 faster than \QUvarsinconjuncts{} (by up to \SI{129.92}{s}), and 
+    \item \QUvarsinconjuncts{} solved two and one instances faster over \QUatbeginning{} and \QUcurrentlowest{} respectively (by up to \SI{15.81}{s}).
+\end{itemize}
+We can therefore decide that \QUcurrentlowest{} is not as useful as the other two. Both \QUatbeginning{} and \QUcurrentlowest{} heuristics are comparable and we have decided to use \QUatbeginning{} as it solved one instance more than \QUcurrentlowest{}.
+\end{sloppypar}
+
+To also show that it is better to use dynamic reordering of BDD variables, we run DQBDD (with the heuristics \QEsimple{} and \QUatbeginning{}) without dynamic reordering. We get that the run without dynamic reordering solved only 84 instances (with 37 satisfiable and 47 unsatisfiable), which is much less that the run with dynamic reordering. When we also run using the other two heuristics for choosing universal variable (\QUcurrentlowest{} and \QUvarsinconjuncts{}) the number of solved instances was even less, for both of them it was 73.
+
 \section{Solvers Comparison}
-We can now compare DQBDD with the chosen heuristics (simple quantifier elimination and order set at beginning) with other solvers. We show results for each benchmark set in Tables \ref{tab:PEC1}-\ref{tab:E19} which for each solver show the number of solved instances (\textbf{\#}) and the total time of solving these. They also show the number of solved \textbf{S}atisfiable and \textbf{U}n\-sa\-ti\-sfi\-able instances with the number of uniquely (\textbf{*}) solved instances. Furthermore, they show the reasons for unsolved instances where solvers either reached their \textbf{T}ime or \textbf{M}emory limit or they did not finish for some \textbf{O}ther reason. Only HQS sometimes does not finish for other reason, which is either an error during computation or a termination of computation because the set of universal variables to eliminate (to end up with QBF) cannot be computed. 
+We can now compare DQBDD with the chosen heuristics (\QEsimple{} and \QUatbeginning{}) with other solvers. We show results for each benchmark set in Tables \ref{tab:PEC1}-\ref{tab:E19} which for each solver show the number of solved instances (\textbf{\#}) and the total time of solving these. They also show the number of solved \textbf{S}atisfiable and \textbf{U}n\-sa\-ti\-sfi\-able instances with the number of uniquely (\textbf{*}) solved instances. Furthermore, they show the reasons for unsolved instances where solvers either reached their \textbf{T}ime or \textbf{M}emory limit or they did not finish for some \textbf{O}ther reason. Only HQS sometimes does not finish for other reason, which is either an error during computation or a termination of computation caused by the solver for the optimisation problem used for computing the set of universal variables to eliminate (to end up with QBF) as explained in Section~\ref{sec:HQS}.
 
 %\subsection{PEC}
 %porovnat runs zo pec benchmarku
@@ -1634,29 +1656,50 @@ We can now compare DQBDD with the chosen heuristics (simple quantifier eliminati
 %\label{tab:PEC}
 %\end{table}
 
+\subsection{PEC1}
+Table~\ref{tab:PEC1} shows the comparison of all solvers for PEC1 benchmarks that were not solved by HQSpre and Figure~\ref{fig:cactusPEC1} shows the cactus plot for PEC1 where we plot the sorted solving times for each solver. All solvers solved most of the instances, while dCAQE solved \emph{all} 433 instances. This is followed by DQBDD and iProver which did not solve only three or six instances respectively. For the three instances that DQBDD did not solve, it reached the memory limit during quantifier localisation. Furthermore, the total runtime of DQBDD for 424 instances that were solved by all three of these is \SI{18.17}{s}, while for dCAQE it is \SI{123.95}{s} and for iProver \SI{9083.85}{s}. This means that, on average, it took DQBDD \SI{0.04}{s} to solve one instance from these, while dCAQE took \SI{0.29}{s} and iProver took \SI{21.42}{s} per instance. The comparison of solving times for DQBDD and dCAQE is shown in Figure~\ref{fig:PEC1dqbddVSdcaqe}.
+
+The remaining two solvers -- HQS and iDQ -- solved 413 instances each where HQS was 249 times faster than iDQ. Also notice that even though HQS solved less instances than DQBDD, DQBDD total runtime was still significantly smaller than HQS total runtime.
+
+\begin{table}[h]
+\centering
+\caption{Comparison of solvers for PEC1 benchmark set}% with the total number of solved instances (\textbf{\#}) and the time taken to solve them, the number of solved satisfiable (\textbf{S}), unsatisfiable (\textbf{U}), and unique~(\textbf{*}) instances and the number of unsolved instances broken down to those that reached the time (\textbf{T}) or memory limit (\textbf{M}), or ended prematurely for some other reason (\textbf{O}).}
+\label{tab:PEC1}
+\begin{tabular}{|l|r|r|r|r|r|r|r|r|}
+\hline
+\multicolumn{1}{|c|}{}                                  & \multicolumn{5}{c|}{\textbf{Solved}}                                                                                                                                        & \multicolumn{3}{c|}{\textbf{Unsolved}}                                                                 \\  \hhline{~*{8}{-}}
+\multicolumn{1}{|c|}{\multirow{-2}{*}{\textbf{Solver}}} & \multicolumn{1}{c|}{\textbf{\#}} & \multicolumn{1}{c|}{\textbf{Time (s)}} & \multicolumn{1}{c|}{\textbf{S}} & \multicolumn{1}{c|}{\textbf{U}} & \multicolumn{1}{c|}{\textbf{*}} & \multicolumn{1}{c|}{\textbf{T}} & \multicolumn{1}{c|}{\textbf{M}} & \multicolumn{1}{c|}{\textbf{O}} \\ \hline
+\textbf{dCAQE} & \textbf{433} & \num{134.89} & \phantom{0}\textbf{48} & \textbf{385} & \phantom{00}\num{0} & \phantom{00}\num{0} & \phantom{00}\num{0} & \phantom{00}\num{0} \\ \hline
+\textbf{DQBDD} & \num{430} & \num{18.38} & \num{47} & \num{383} & \num{0} & \num{0} & \num{3} & \num{0} \\ \hline
+\textbf{HQS} & \num{413} & \num{68.06} & \num{44} & \num{369} & \num{0} & \num{2} & \num{0} & \num{18} \\ \hline
+\textbf{iDQ} & \num{413} & \num{16943.53} & \num{40} & \num{373} & \num{0} & \num{20} & \num{0} & \num{0} \\ \hline
+\textbf{iProver} & \num{427} & \num{9118.53} & \num{43} & \num{384} & \num{0} & \num{6} & \num{0} & \num{0} \\ \hline
+\end{tabular}
+\end{table}
+
 \begin{figure}[p]
   \centering
   \begin{subfigure}{0.48\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{figures/PEC1dqbddVSdcaqe.pdf}
+    \includegraphics[width=\linewidth]{figures/PEC1dqbddVSdcaqeSatUnsat.pdf}
     \caption{DQBDD vs dCAQE for PEC1}
     \label{fig:PEC1dqbddVSdcaqe}
   \end{subfigure}
   \begin{subfigure}{0.48\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{figures/PEC2dqbddVShqs.pdf}
+    \includegraphics[width=\linewidth]{figures/PEC2dqbddVShqsSatUnsat.pdf}
     \caption{DQBDD vs HQS for PEC2}
     \label{fig:PEC2dqbddVShqs}
   \end{subfigure}
   \begin{subfigure}{0.48\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{figures/PEC3dqbddVShqs.pdf}
+    \includegraphics[width=\linewidth]{figures/PEC3dqbddVShqsSatUnsat.pdf}
     \caption{DQBDD vs HQS for PEC3}
     \label{fig:PEC3dqbddVShqs}
   \end{subfigure}
   \begin{subfigure}{0.48\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{figures/E19dqbddVShqs.pdf}
+    \includegraphics[width=\linewidth]{figures/E19dqbddVShqsSatUnsat.pdf}
     \caption{DQBDD vs HQS for E19}
     \label{fig:E19dqbddVShqs}
   \end{subfigure}
@@ -1672,7 +1715,7 @@ We can now compare DQBDD with the chosen heuristics (simple quantifier eliminati
     \caption{DQBDD vs HQS for CSP}
     \label{fig:CSPdqbddVShqs}
   \end{subfigure}
-  \caption{Comparison of solving times in seconds}
+  \caption{Comparison of solving times in seconds, where satisfiable instances are red and unsatisfiable are blue.}
   \label{fig:runtimecomp}
 \end{figure}
 
@@ -1694,47 +1737,27 @@ We can now compare DQBDD with the chosen heuristics (simple quantifier eliminati
   \label{fig:cactusPEC12}
 \end{figure}
 
-\subsection{PEC1}
-
-\begin{table}[t]
-\centering
-\caption{Comparison of solvers for PEC1 benchmark set}% with the total number of solved instances (\textbf{\#}) and the time taken to solve them, the number of solved satisfiable (\textbf{S}), unsatisfiable (\textbf{U}), and unique~(\textbf{*}) instances and the number of unsolved instances broken down to those that reached the time (\textbf{T}) or memory limit (\textbf{M}), or ended prematurely for some other reason (\textbf{O}).}
-\label{tab:PEC1}
-\begin{tabular}{|l|r|r|r|r|r|r|r|r|}
-\hline
-\multicolumn{1}{|c|}{}                                  & \multicolumn{5}{c|}{\textbf{Solved}}                                                                                                                                        & \multicolumn{3}{c|}{\textbf{Unsolved}}                                                                 \\  \hhline{~*{8}{-}}
-\multicolumn{1}{|c|}{\multirow{-2}{*}{\textbf{Solver}}} & \multicolumn{1}{c|}{\textbf{\#}} & \multicolumn{1}{c|}{\textbf{Time (s)}} & \multicolumn{1}{c|}{\textbf{S}} & \multicolumn{1}{c|}{\textbf{U}} & \multicolumn{1}{c|}{\textbf{*}} & \multicolumn{1}{c|}{\textbf{T}} & \multicolumn{1}{c|}{\textbf{M}} & \multicolumn{1}{c|}{\textbf{O}} \\ \hline
-\textbf{dCAQE} & \textbf{433} & \num{134.89} & \textbf{48} & \textbf{385} & \num{0} & \num{0} & \num{0} & \num{0} \\ \hline
-\textbf{DQBDD} & \num{430} & \num{18.38} & \num{47} & \num{383} & \num{0} & \num{0} & \num{3} & \num{0} \\ \hline
-\textbf{HQS} & \num{413} & \num{68.06} & \num{44} & \num{369} & \num{0} & \num{2} & \num{0} & \num{18} \\ \hline
-\textbf{iDQ} & \num{413} & \num{16943.53} & \num{40} & \num{373} & \num{0} & \num{20} & \num{0} & \num{0} \\ \hline
-\textbf{iProver} & \num{427} & \num{9118.53} & \num{43} & \num{384} & \num{0} & \num{6} & \num{0} & \num{0} \\ \hline
-\end{tabular}
-\end{table}
-
-Table~\ref{tab:PEC1} shows the comparison of all solvers for PEC1 benchmarks which were not solved by HQSpre. All solvers solved most of the instances, while dCAQE solved \emph{all} 433 instances. This is followed by DQBDD and iProver which did not solve only three or six instances respectively. For the three instances that DQBDD did not solve, it reached the memory limit during quantifier localisation. Furthermore, the total runtime of DQBDD for solved instances is seven times less than dCAQE which in turn is 67 times less than iProver. On average, this means that it took DQBDD \SI{0.04}{s} to solve one instance while dCAQE took \SI{0.31}{s} and iProver took \SI{31.25}{s} per instance. The comparison of solving times for DQBDD and dCAQE is shown in Figure~\ref{fig:PEC1dqbddVSdcaqe}.
-
-The remaining two solvers -- HQS and iDQ -- solved 413 instances each where HQS was 249 times faster than iDQ. Also notice that even though HQS solved less instances than DQBDD, DQBDD total runtime was still significantly smaller than HQS total runtime.
-
 \subsection{PEC2}
-The comparison of all solvers on all 2000 benchmarks from PEC2 benchmark set (as none of them were solved by HQSpre) is shown in Table~\ref{tab:PEC2}. Here, dCAQE, iDQ and iProver solved just a few instances whereas DQBDD and HQS solved most of them. For DQBDD, there was only one unsolved instance (caused by reaching memory limit during quantifier localisation) while HQS did not solve 278. Even with this, DQBDD was still more than twice as fast compared with HQS. Figure~\ref{fig:PEC2dqbddVShqs} shows the comparison of solving times of DQBDD and HQS.
+The comparison of all solvers on all 2000 benchmarks from PEC2 benchmark set (as none of them were solved by HQSpre) is shown in Table~\ref{tab:PEC2} while Figure~\ref{fig:cactusPEC2} shows the cactus plot. Here, dCAQE, iDQ and iProver solved just a few instances whereas DQBDD and HQS solved most of them. For DQBDD, there was only one unsolved instance (caused by reaching memory limit during quantifier localisation) while HQS did not solve 278. Even with this, DQBDD was still more than twice as fast compared with HQS. Figure~\ref{fig:PEC2dqbddVShqs} shows the comparison of solving times of DQBDD and HQS.
 
-The success of DQBDD and HQS for this benchmark set could be explained by gate extraction as explained in Section~\ref{sec:preprocessing} which simplifies input formulas. This stems from the fact that PEC problems encode circuits, which means there are possibly many gates to extract which can result in much more simplified formula compared to the formula in PCNF.
+The success of DQBDD and HQS for this benchmark set could be explained by gate extraction as explained in Section~\ref{sec:preprocessing}, which simplifies input formulas. This stems from the fact that PEC problems encode circuits, which means there are possibly many gates to extract which can result in much more simplified formula compared to the formula in PCNF.
 
 \begin{table}[ht]
 \centering
 \caption{Comparison of solvers for PEC2 benchmark set}% with the total number of solved instances (\textbf{\#}) and the time taken to solve them, the number of solved satisfiable (\textbf{S}), unsatisfiable (\textbf{U}), and unique~(\textbf{*}) instances and the number of unsolved instances broken down to those that reached the time (\textbf{T}) or memory limit (\textbf{M}), or ended prematurely for some other reason (\textbf{O}).}
 \label{tab:PEC2}
+\makebox[\textwidth][c]{% center the table over page width
 \begin{tabular}{|l|r|r|r|r|r|r|r|r|}
 \hline
 \multicolumn{1}{|c|}{}                                  & \multicolumn{5}{c|}{\textbf{Solved}}                                                                                                                                        & \multicolumn{3}{c|}{\textbf{Unsolved}}                                                                 \\  \hhline{~*{8}{-}}
 \multicolumn{1}{|c|}{\multirow{-2}{*}{\textbf{Solver}}} & \multicolumn{1}{c|}{\textbf{\#}} & \multicolumn{1}{c|}{\textbf{Time (s)}} & \multicolumn{1}{c|}{\textbf{S}} & \multicolumn{1}{c|}{\textbf{U}} & \multicolumn{1}{c|}{\textbf{*}} & \multicolumn{1}{c|}{\textbf{T}} & \multicolumn{1}{c|}{\textbf{M}} & \multicolumn{1}{c|}{\textbf{O}} \\ \hline
-\textbf{dCAQE} & \num{34} & \num{134.12} & \num{0} & \num{34} & \num{0} & \num{1961} & \num{5} & \num{0} \\ \hline
+\textbf{dCAQE} & \num{34} & \num{134.12} & \phantom{000}\num{0} & \num{34} & \phantom{000}\num{0} & \num{1961} & \num{5} & \phantom{000}\num{0} \\ \hline
 \textbf{DQBDD} & \textbf{1999} & \num{19618.36} & \textbf{123} & \textbf{1876} & \textbf{278} & \num{0} & \num{1} & \num{0} \\ \hline
 \textbf{HQS} & \num{1722} & \num{51769.75} & \num{80} & \num{1642} & \num{1} & \num{246} & \num{0} & \num{32} \\ \hline
 \textbf{iDQ} & \num{4} & \num{292.66} & \num{0} & \num{4} & \num{0} & \num{1996} & \num{0} & \num{0} \\ \hline
 \textbf{iProver} & \num{41} & \num{3382.37} & \num{1} & \num{40} & \num{0} & \num{9} & \num{1950} & \num{0} \\ \hline
 \end{tabular}
+}
 \end{table}
 
 \begin{figure}
@@ -1756,7 +1779,7 @@ The success of DQBDD and HQS for this benchmark set could be explained by gate e
 \end{figure}
 
 \subsection{PEC3}
-The results for the last PEC benchmark set are shown in Table~\ref{tab:PEC3}. Again, DQBDD and HQS solved the most instances (possibly because of gate extraction) followed by dCAQE, iProver, and finally by iDQ. Furthermore, DQBDD solved \num{132} instances more than HQS, where DQBDD took on average \SI{18.19}{s} per instance while HQS took \SI{15.73}{s}. Figure~\ref{fig:PEC3dqbddVShqs} shows the comparison of their runtimes for this benchmark set.
+The results for the last PEC benchmark set are shown in Table~\ref{tab:PEC3} and in the cactus plot in Figure~\ref{fig:cactusPEC3}. Again, DQBDD and HQS solved the most instances (possibly because of gate extraction) followed by dCAQE, iProver, and finally by iDQ. Furthermore, DQBDD solved \num{132} instances more than HQS, where, on 416 instances solved by both of them, DQBDD took \SI{866.2655485}{s}, which is on average \SI{2.08}{s} per instance, while HQS took \SI{3427.753838}{s}, which is on average \SI{8.24}{s} per instance. Figure~\ref{fig:PEC3dqbddVShqs} shows the comparison of their runtimes for this benchmark set.
 
 In this benchmark there were also three discrepancies: dCAQE solved three instances as satisfiable while HQS or DQBDD solved them as unsatisfiable (each solved two of them; iDQ and iProver did not solve them). This cannot be explained by the erroneous implementation of quantifier localisation in HQS because it can only turn unsatisfiable formulas to satisfiable ones. As both HQS and DQBDD use similar techniques for solving, it is hard to tell whether there is a mistake in dCAQE or HQS and DQBDD. However, as we show in Appendix~\ref{appendix:wrongdcaqe}, we can find a simple unsatisfiable DQBF which dCAQE determines as satisfiable. Also, because dCAQE works with the result of HQSpre without gate extraction and both HQS and DQBDD work with the result with gate extraction, the mistake could also be in HQSpre. However, we tried running all three instances using DQBDD with only the preprocessing without gate extraction and it determined all three as unsatisfiable, therefore we dismiss the possibility of mistake in HQSpre. This is why we believe that these instances are unsatisfiable and dCAQE solved them incorrectly.
 
@@ -1768,7 +1791,7 @@ In this benchmark there were also three discrepancies: dCAQE solved three instan
 \hline
 \multicolumn{1}{|c|}{}                                  & \multicolumn{5}{c|}{\textbf{Solved}}                                                                                                                                        & \multicolumn{3}{c|}{\textbf{Unsolved}}                                                                 \\  \hhline{~*{8}{-}}
 \multicolumn{1}{|c|}{\multirow{-2}{*}{\textbf{Solver}}} & \multicolumn{1}{c|}{\textbf{\#}} & \multicolumn{1}{c|}{\textbf{Time (s)}} & \multicolumn{1}{c|}{\textbf{S}} & \multicolumn{1}{c|}{\textbf{U}} & \multicolumn{1}{c|}{\textbf{*}} & \multicolumn{1}{c|}{\textbf{T}} & \multicolumn{1}{c|}{\textbf{M}} & \multicolumn{1}{c|}{\textbf{O}} \\ \hline
-\textbf{dCAQE} & \num{328} & \num{19271.73} & \num{96} & \num{232} & \num{3} & \num{565} & \num{0} & \num{0} \\ \hline
+\textbf{dCAQE} & \num{328} & \num{19271.73} & \num{96} & \num{232} & \num{3} & \num{565} & \num{0} & \phantom{00}\num{0} \\ \hline
 \textbf{DQBDD} & \textbf{566} & \num{10293.71} & \textbf{193} & \textbf{373} & \textbf{169} & \num{222} & \num{105} & \num{0} \\ \hline
 \textbf{HQS} & \num{434} & \num{6825.99} & \num{142} & \num{292} & \num{29} & \num{444} & \num{0} & \num{15} \\ \hline
 \textbf{iDQ} & \num{119} & \num{4778.43} & \num{39} & \num{80} & \num{4} & \num{774} & \num{0} & \num{0} \\ \hline
@@ -1777,7 +1800,7 @@ In this benchmark there were also three discrepancies: dCAQE solved three instan
 \end{table}
 
 \subsection{CSP}
-Table~\ref{tab:CSP} shows the results for CSP benchmark set. For these, dCAQE, DQBDD, and HQS solved comparatively many instances (with dCAQE the most) while iProver and iDQ solved less. From those three, HQS was on average the fastest, spending \SI{12.01}{s} per instances, followed by DQBDD which spent \SI{17.05}{s} per instance. dCAQE was around two times slower than these two, taking on average \SI{31.21}{s} per instance. However, dCAQE runtime is dominated by one instance which took \SI{753.81}{s} to solve and was not solved by other solvers. If we remove this instance, dCAQE took on average \SI{14.41}{s}. Figures~\ref{fig:CSPdqbddVSdcaqe} and \ref{fig:CSPdqbddVShqs} show solving time comparison of DQBDD with dCAQE and HQS respectively.
+Table~\ref{tab:CSP} and Figure~\ref{fig:cactusCSP} shows the results and cactus plot for CSP benchmark set. For these, dCAQE, DQBDD, and HQS solved comparatively many instances (with dCAQE the most) while iProver and iDQ solved less. There are 31 instance solved by all three of those solvers, where dCAQE took \SI{198.56}{s} to solve them, DQBDD took \SI{211.84}{s} and HQS took \SI{318}{s}. On average, this is for dCAQE \SI{6.41}{s} per instance, for DQBDD \SI{6.83}{s} per instance and for HQS \SI{10.26}{s} per instance. Figures~\ref{fig:CSPdqbddVSdcaqe} and \ref{fig:CSPdqbddVShqs} show solving time comparison of DQBDD with dCAQE and HQS respectively.
 
 \begin{table}[ht]
 \centering
@@ -1787,7 +1810,7 @@ Table~\ref{tab:CSP} shows the results for CSP benchmark set. For these, dCAQE, D
 \hline
 \multicolumn{1}{|c|}{}                                  & \multicolumn{5}{c|}{\textbf{Solved}}                                                                                                                                        & \multicolumn{3}{c|}{\textbf{Unsolved}}                                                                 \\  \hhline{~*{8}{-}}
 \multicolumn{1}{|c|}{\multirow{-2}{*}{\textbf{Solver}}} & \multicolumn{1}{c|}{\textbf{\#}} & \multicolumn{1}{c|}{\textbf{Time (s)}} & \multicolumn{1}{c|}{\textbf{S}} & \multicolumn{1}{c|}{\textbf{U}} & \multicolumn{1}{c|}{\textbf{*}} & \multicolumn{1}{c|}{\textbf{T}} & \multicolumn{1}{c|}{\textbf{M}} & \multicolumn{1}{c|}{\textbf{O}} \\ \hline
-\textbf{dCAQE} & \textbf{44} & \num{1373.30} & \textbf{44} & \num{0} & \textbf{9} & \num{378} & \num{0} & \num{0} \\ \hline
+\textbf{dCAQE} & \phantom{0}\textbf{44} & \num{1373.30} & \phantom{0}\textbf{44} & \phantom{00}\num{0} & \phantom{00}\textbf{9} & \num{378} & \num{0} & \num{0} \\ \hline
 \textbf{DQBDD} & \num{40} & \num{681.86} & \num{40} & \num{0} & \num{2} & \num{334} & \num{48} & \num{0} \\ \hline
 \textbf{HQS} & \num{42} & \num{504.51} & \num{42} & \num{0} & \num{1} & \num{82} & \num{0} & \num{298} \\ \hline
 \textbf{iDQ} & \num{10} & \num{281.18} & \num{10} & \num{0} & \num{0} & \num{407} & \num{5} & \num{0} \\ \hline
@@ -1807,7 +1830,7 @@ The results for SAT benchmark set are in Table~\ref{tab:SAT}. This set consists 
 \hline
 \multicolumn{1}{|c|}{}                                  & \multicolumn{5}{c|}{\textbf{Solved}}                                                                                                                                        & \multicolumn{3}{c|}{\textbf{Unsolved}}                                                                 \\  \hhline{~*{8}{-}}
 \multicolumn{1}{|c|}{\multirow{-2}{*}{\textbf{Solver}}} & \multicolumn{1}{c|}{\textbf{\#}} & \multicolumn{1}{c|}{\textbf{Time (s)}} & \multicolumn{1}{c|}{\textbf{S}} & \multicolumn{1}{c|}{\textbf{U}} & \multicolumn{1}{c|}{\textbf{*}} & \multicolumn{1}{c|}{\textbf{T}} & \multicolumn{1}{c|}{\textbf{M}} & \multicolumn{1}{c|}{\textbf{O}} \\ \hline
-\textbf{dCAQE} & \num{7} & \num{2141.37} & \num{3} & \num{4} & \num{0} & \num{15} & \num{0} & \num{0} \\ \hline
+\textbf{dCAQE} & \phantom{0}\num{7} & \num{2141.37} & \phantom{0}\num{3} & \phantom{0}\num{4} & \phantom{0}\num{0} & \num{15} & \phantom{0}\num{0} & \phantom{0}\num{0} \\ \hline
 \textbf{DQBDD} & \num{0} & \num{0} & \num{0} & \num{0} & \num{0} & \num{19} & \num{3} & \num{0} \\ \hline
 \textbf{HQS} & \num{7} & \num{3030.71} & \textbf{5} & \num{2} & \textbf{2} & \num{15} & \num{0} & \num{0} \\ \hline
 \textbf{iDQ} & \textbf{9} & \num{2546.24} & \num{4} & \textbf{5} & \num{1} & \num{13} & \num{0} & \num{0} \\ \hline
@@ -1815,26 +1838,8 @@ The results for SAT benchmark set are in Table~\ref{tab:SAT}. This set consists 
 \end{tabular}
 \end{table}
 
-\begin{figure}
-  \centering
-  \begin{subfigure}{0.98\textwidth}
-    \centering
-    \includegraphics[width=\textwidth]{figures/E19cactusplot.pdf}
-    \caption{PEC1}
-    \label{fig:cactusPEC1}
-  \end{subfigure}
-  \begin{subfigure}{0.98\textwidth}
-    \centering
-    \includegraphics[width=\textwidth]{figures/E19logcactusplot.pdf}
-    \caption{PEC2}
-    \label{fig:cactusPEC2}
-  \end{subfigure}
-  \caption{Cactus plots for PEC1 and PEC2}
-  \label{fig:cactusPEC12}
-\end{figure}
-
 \subsection{E19}
-Finally, Table~\ref{tab:E19} shows the comparison of solvers for E19 benchmark set. As this set is a combination of previous sets (with also some new benchmarks), it is the most interesting for ``real'' comparison. However, this set is still dominated by PEC benchmarks, which shows up in the results: both DQBDD and HQS solved the most benchmarks, with 139 each (see Figure~\ref{fig:E19dqbddVShqs} for their runtime comparison). This is followed by dCAQE which solved 111 instances, then iProver with 50 instances, and finally iDQ with only 27 instances. Even though DQBDD solved the most, it was still the fastest, taking only \SI{3440.76}{s} for all of its solved instances. On average, this is \SI{24.75}{s} per instance, where dCAQE took \SI{39.06}{s} per instance, HQS took \SI{48.9}{s}, iDQ took \SI{136.97}{s} and iProver \SI{149.8}{s}.
+Finally, Table~\ref{tab:E19cac} shows the comparison of solvers for E19 benchmark set with the cactus plot in Figure~\ref{fig:cactusE19}. As this set is a combination of previous sets (with also some new benchmarks), it is the most interesting for ``real'' comparison. However, this set is still dominated by PEC benchmarks, which shows up in the results: both DQBDD and HQS solved the most benchmarks, with 139 each (see Figure~\ref{fig:E19dqbddVShqs} for their runtime comparison). This is followed by dCAQE which solved 111 instances, then iProver with 50 instances, and finally iDQ with only 27 instances. Even though DQBDD solved the most, it was still the fastest, taking only \SI{3440.76}{s} for all of its solved instances. On average, this is \SI{24.75}{s} per instance, where dCAQE took \SI{39.06}{s} per instance, HQS took \SI{48.9}{s}, iDQ took \SI{136.97}{s} and iProver \SI{149.8}{s}.
 
 There was also a discrepancy in this benchmark set. One instance, which is not in other benchmark sets, was deemed satisfiable by dCAQE while HQS claimed its unsatisfiability. Again, we believe that dCAQE solved it incorrectly.
 
@@ -1846,7 +1851,7 @@ There was also a discrepancy in this benchmark set. One instance, which is not i
 \hline
 \multicolumn{1}{|c|}{}                                  & \multicolumn{5}{c|}{\textbf{Solved}}                                                                                                                                        & \multicolumn{3}{c|}{\textbf{Unsolved}}                                                                 \\  \hhline{~*{8}{-}}
 \multicolumn{1}{|c|}{\multirow{-2}{*}{\textbf{Solver}}} & \multicolumn{1}{c|}{\textbf{\#}} & \multicolumn{1}{c|}{\textbf{Time (s)}} & \multicolumn{1}{c|}{\textbf{S}} & \multicolumn{1}{c|}{\textbf{U}} & \multicolumn{1}{c|}{\textbf{*}} & \multicolumn{1}{c|}{\textbf{T}} & \multicolumn{1}{c|}{\textbf{M}} & \multicolumn{1}{c|}{\textbf{O}} \\ \hline
-\textbf{dCAQE} & \num{111} & \num{4335.81} & \num{37} & \num{74} & \num{1} & \num{135} & \num{0} & \num{0} \\ \hline
+\textbf{dCAQE} & \num{111} & \num{4335.81} & \phantom{0}\num{37} & \phantom{0}\num{74} & \phantom{00}\num{1} & \num{135} & \num{0} & \phantom{00}\num{0} \\ \hline
 \textbf{DQBDD} & \textbf{139} & \num{3440.76} & \num{43} & \textbf{96} & \textbf{14} & \num{90} & \num{17} & \num{0} \\ \hline
 \textbf{HQS} & \textbf{139} & \num{6796.64} & \textbf{51} & \num{88} & \num{5} & \num{53} & \num{0} & \num{54} \\ \hline
 \textbf{iDQ} & \num{27} & \num{3698.26} & \num{13} & \num{14} & \num{1} & \num{218} & \num{1} & \num{0} \\ \hline
@@ -1854,7 +1859,23 @@ There was also a discrepancy in this benchmark set. One instance, which is not i
 \end{tabular}
 \end{table}
 
-%\subsection{Results Discussion???}
+\begin{figure}
+  \centering
+  %\begin{subfigure}{0.98\textwidth}
+  %  \centering
+  %  \includegraphics[width=\textwidth]{figures/E19cactusplot.pdf}
+  %  \caption{E19nolog}
+  %  %\label{fig:cactusE19nolog}
+  %\end{subfigure}
+  %\begin{subfigure}{0.98\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figures/E19logcactusplot.pdf}
+  %  \caption{E19log}
+  %  %\label{fig:cactusPEC2}
+  %\end{subfigure}
+  \caption{Cactus plot for E19}
+  \label{fig:cactusE19}
+\end{figure}
 
 \chapter{Conclusion}
 In this thesis, we have proposed and implemented a DQBF solver DQBDD that uses binary decision diagrams as an underlying representation of formulas. This solver is based on quantifier elimination and uses quantifier localisation which we have corrected and enhanced by adding a possibility to eliminate universal variables in subformulas.
@@ -2032,7 +2053,7 @@ where the terminal symbols \verb|EOL| and \verb|EOF| stand for the end-of-line a
     \item The second \verb|<pnum>| in \verb|<problem_line>| corresponds to the number of clauses appearing in the matrix, i.e., the number of <clause> expressions which <matrix> is comprised of.
     \item Each atom in the prefix must appear in the matrix.
     \item It is not possible to have two \verb|<quant_set>| after each other, where both have \verb|a| or both have \verb|e| as \verb|<quantifier>|.
-    \item The same atom cannot appear in the prefix more than once except for atoms occurring in the second and further place of \verb|atom_set| with \verb|d| as \verb|<quantifier>|. All these atoms have to appear somewhere before in the prefix in \verb|<quant_set>| with \verb|a| quantifier.
+    \item The same atom cannot appear in the prefix more than once except for atoms occurring in the second and further place of \verb|atom_set| with \verb|d| as \verb|<quantifier>|. These atoms have to appear somewhere before in the prefix in \verb|<quant_set>| with \verb|a| quantifier.
 \end{itemize}
 
 \section{Semantics}
