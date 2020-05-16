@@ -1186,6 +1186,7 @@ The set $vChildren$ is then for existential variable, by the rule~\eqref{loc:exb
   \caption{After pushing $y_1$ and $x_3$}
   \label{fig:localise:disj1push}
   \end{subfigure}
+  \caption{An example of localisation}
 \end{figure}%
 \begin{figure}\ContinuedFloat
   \begin{subfigure}{0.98\textwidth}%{0.48\textwidth}
@@ -1255,7 +1256,7 @@ The set $vChildren$ is then for existential variable, by the rule~\eqref{loc:exb
   \caption{The final tree}
   \label{fig:localise:end}
   \end{subfigure}
-  \caption{An example of localisation}
+  \caption{An example of localisation (cont.)}
   \label{fig:localise}
 \end{figure}
 
@@ -1596,7 +1597,7 @@ For the heuristic that chooses the next universal variable to eliminate, it is n
 \makebox[\textwidth][c]{% center the table over page width
 \begin{tabular}{l||r|r|r|r|r|r|r|r|r}
 %\hline
-\multicolumn{1}{c||}{\textbf{order of the next}} & \multicolumn{9}{c}{\textbf{which quantifiers to eliminate}} \\ \hhline{~*{9}{-}} 
+\multicolumn{1}{c||}{\textbf{Order of the next}} & \multicolumn{9}{c}{\textbf{Quantifiers to eliminate in Alogrithm~\ref{alg:turntobdd}}} \\ \hhline{~*{9}{-}} 
 \multicolumn{1}{c||}{\textbf{universal variable}} & \multicolumn{3}{c|}{\textbf{\QEnone{}}}     & \multicolumn{3}{c|}{\textbf{\QEsimple{}}}   & \multicolumn{3}{c}{\textbf{\QEall{}}} \\ \hhline{~*{9}{-}} 
 \multicolumn{1}{c||}{\textbf{to eliminate}} & \multicolumn{1}{c|}{\textbf{\#}} & \multicolumn{1}{c|}{\textbf{S}} & \multicolumn{1}{c|}{\textbf{U}} & \multicolumn{1}{c|}{\textbf{\#}} & \multicolumn{1}{c|}{\textbf{S}} & \multicolumn{1}{c|}{\textbf{U}} & \multicolumn{1}{c|}{\textbf{\#}} & \multicolumn{1}{c|}{\textbf{S}} & \multicolumn{1}{c}{\textbf{U}} \\ \hline
 \textbf{\QUatbeginning{}}    & \phantom{0}94 & \phantom{0}41 & \phantom{0}53 & 139 & \phantom{0}43 & \phantom{0}96 & 134 & \phantom{0}38 & \phantom{0}96 \\ %\hline
@@ -1763,7 +1764,7 @@ The success of DQBDD and HQS for this benchmark set could be explained by gate e
 \end{figure}
 
 \subsection{PEC3}
-The results for the last PEC benchmark set are shown in Table~\ref{tab:PEC3} and in the cactus plot in Figure~\ref{fig:cactusPEC3}. Again, DQBDD and HQS solved the most instances (possibly because of gate extraction) followed by dCAQE, iProver, and finally by iDQ. Furthermore, DQBDD solved \num{132} instances more than HQS, where, on 416 instances solved by both of them, DQBDD took \SI{866.2655485}{s}, which is on average \SI{2.08}{s} per instance, while HQS took \SI{3427.753838}{s}, which is on average \SI{8.24}{s} per instance. Figure~\ref{fig:PEC3dqbddVShqs} shows the comparison of their runtimes for this benchmark set.
+The results for the last PEC benchmark set are shown in Table~\ref{tab:PEC3} and in the cactus plot in Figure~\ref{fig:cactusPEC3}. Again, DQBDD and HQS solved the most instances (possibly because of gate extraction) followed by dCAQE, iProver, and finally by iDQ. Furthermore, DQBDD solved \num{132} instances more than HQS, where, on 416 instances solved by both of them, DQBDD took \SI{866.27}{s}, which is on average \SI{2.08}{s} per instance, while HQS took \SI{3427.75}{s}, which is on average \SI{8.24}{s} per instance. Figure~\ref{fig:PEC3dqbddVShqs} shows the comparison of their runtimes for this benchmark set.
 
 In this benchmark there were also three discrepancies: dCAQE solved three instances as satisfiable while HQS or DQBDD solved them as unsatisfiable (each solved two of them; iDQ and iProver did not solve them). This cannot be explained by the erroneous implementation of quantifier localisation in HQS because it can only turn unsatisfiable formulas to satisfiable ones. As both HQS and DQBDD use similar techniques for solving, it is hard to tell whether there is a mistake in dCAQE or HQS and DQBDD. However, as we show in Appendix~\ref{appendix:wrongdcaqe}, we can find a simple unsatisfiable DQBF which dCAQE determines as satisfiable. Also, because dCAQE works with the result of HQSpre without gate extraction and both HQS and DQBDD work with the result with gate extraction, the mistake could also be in HQSpre. However, we tried running all three instances using DQBDD with only the preprocessing without gate extraction and it determined all three as unsatisfiable, therefore we dismiss the possibility of mistake in HQSpre. This is why we believe that these instances are unsatisfiable and dCAQE solved them incorrectly.
 
@@ -1823,7 +1824,9 @@ The results for SAT benchmark set are in Table~\ref{tab:SAT}. This set consists 
 \end{table}
 
 \subsection{E19}
-Finally, Table~\ref{tab:E19} shows the comparison of solvers for E19 benchmark set with the cactus plot in Figure~\ref{fig:cactusE19}. As this set is a combination of previous sets (with also some new benchmarks), it is the most interesting for ``real'' comparison. However, this set is still dominated by PEC benchmarks, which shows up in the results: both DQBDD and HQS solved the most benchmarks, with 139 each (see Figure~\ref{fig:E19dqbddVShqs} for their runtime comparison). This is followed by dCAQE which solved 111 instances, then iProver with 50 instances, and finally iDQ with only 27 instances. Even though DQBDD solved the most, it was still the fastest, taking only \SI{3440.76}{s} for all of its solved instances. On average, this is \SI{24.75}{s} per instance, where dCAQE took \SI{39.06}{s} per instance, HQS took \SI{48.9}{s}, iDQ took \SI{136.97}{s} and iProver \SI{149.8}{s}.
+Finally, Table~\ref{tab:E19} shows the comparison of solvers for E19 benchmark set with the cactus plot in Figure~\ref{fig:cactusE19}. As this set is a combination of previous sets (with also some new benchmarks), it is the most interesting for ``real'' comparison. However, this set is still dominated by PEC benchmarks, which shows up in the results: both DQBDD and HQS solved the most benchmarks, with 139 each (see Figure~\ref{fig:E19dqbddVShqs} for their runtime comparison). This is followed by dCAQE which solved 111 instances, then iProver with 50 instances, and finally iDQ with only 27 instances.
+
+Even though DQBDD (with HQS) solved the most, it was still the fastest, taking only \SI{3440.76}{s} for all of its solved instances. Looking at the 120 instances solved by both DQBDD and HQS, we get that DQBDD took \SI{1405.04}{s} to solve them with \SI{11.71}{s} on average while HQS took \SI{2479.87}{s} with \SI{20.67}{s} on average.
 
 There was also a discrepancy in this benchmark set. One instance, which is not in other benchmark sets, was deemed satisfiable by dCAQE while HQS claimed its unsatisfiability. Again, we believe that dCAQE solved it incorrectly.
 
@@ -1860,6 +1863,13 @@ There was also a discrepancy in this benchmark set. One instance, which is not i
   \caption{Cactus plot for E19}
   \label{fig:cactusE19}
 \end{figure}
+
+\section{Discussion}
+The heuristics comparison shows that for the choice of which quantifiers to eliminate it is best to use \QEsimple{} heuristic and for the choice of the next universal variable to eliminate, it is (just a slightly) better to use \QUatbeginning{} heuristic. 
+
+The results also show that for PEC benchmarks, DQBDD is in the terms of total times and total solved instances (except for PEC1 benchmark set, where it solved only three instances less than dCAQE) the best solver. For CSP benchmark set, dCAQE is clearly the winner, with HQS and DQBDD not too far behind. The SAT benchmark set, where DQBDD was not able to solve anything, shows that BDD based approach has its limits. Finally, DQBDD and HQS solved the most instances for the E19 benchmark set, with DQBDD being faster.
+
+There were also some discrepancies between dCAQE and other solvers (three in PEC3 and one in E19) which we believe were caused by a bug in dCAQE. Furthermore, the error caused by pushing existential variables (as explained in Section~\ref{sec:quantLocalisation}) for HQS~\cite{HQSquantifierLocalisation} was not detected in the experiments. We believe that this was caused by the data structures used in HQS, where they have something similar to quantifier trees (quantifier graphs), which can share children. They also do not push quantifier if all parents of the same child do not contain it, therefore the possible wrong pushes are limited. Note that for DQBFs in PCNF, the problem cannot occur, it can only be caused by gate extraction and usually, extracted gates have multiple parents.
 
 \chapter{Conclusion}
 In this thesis, we have proposed and implemented a DQBF solver DQBDD that uses binary decision diagrams as an underlying representation of formulas. This solver is based on quantifier elimination and uses quantifier localisation which we have corrected and enhanced by adding a possibility to eliminate universal variables in subformulas.
@@ -1966,7 +1976,8 @@ For the option \verb|--uvar-choice| we have:
     \item 1 -- the variable with the currently lowest number of dependencies is chosen (\QUcurrentlowest{}),
     \item 2 -- the order is based on the number of variables in conjuncts of universal expansion (\QUvarsinconjuncts{}).
 \end{itemize}
-If the formula is satisfiable, the return value is 10, otherwise it is 20.
+
+After finishing, DQBDD outputs \verb|SAT| with exitcode 10 for satisfiable formula and \verb|UNSAT| with exitcode 20 for unsatisfiable one.
 
 \section{Examples}
 Running DQBDD as
@@ -2063,7 +2074,22 @@ represents DQBF
 
 \chapter{DQBF Wrongly Solved by dCAQE}
 \label{appendix:wrongdcaqe}
-Solver dCAQE deems a DQBF, which in \DQDIMACS{} format has the form
+The DQBF
+\begin{equation*} 
+\begin{split}
+    \forall x_1 \forall x_2 \forall x_3 \forall x_6 \exists y_4 & (x_1,x_2,x_3) \exists y_5 (x_1,x_2,x_3) \exists y_7 (x_6) \exists y_8 (x_6) \\
+    & ((\neg x_1 \lor x_2 \lor x_3 \lor y_4 \lor y_5) \\ 
+    {} & \land (\neg x_1 \lor x_2 \lor x_3 \lor \neg y_4) \\ 
+    {} & \land (\neg x_1 \lor x_2 \lor x_3 \lor \neg y_5 \lor y_7) \\
+    {} & \land (x_1 \lor \neg x_2 \lor x_3 \lor y_4 \lor y_5) \\
+    {} & \land (x_1 \lor \neg x_2 \lor x_3 \lor \neg y_4 \lor y_8) \\
+    {} & \land (x_1 \lor \neg x_2 \lor x_3 \lor\neg y_5) \\
+    {} & \land (x_1 \lor x_2 \lor x_3 \lor y_4 \lor y_5) \\
+    {} & \land (x_1 \lor x_2 \lor x_3 \lor \neg y_4 \lor \neg x_6 \lor \neg y_7) \\
+    {} & \land (x_1 \lor x_2 \lor x_3 \lor \neg y_5 \lor x_6 \lor \neg y_8))
+\end{split}
+\end{equation*}
+which in \DQDIMACS{} format has the form
 \begin{verbatim}
 
  p cnf 8 9
@@ -2083,8 +2109,11 @@ Solver dCAQE deems a DQBF, which in \DQDIMACS{} format has the form
   1  2 3    -5  6     -8 0
  
 \end{verbatim}
-as satisfiable. However, this formula is not satisfiable. This is because the first three clauses force $x_7$ to be true no matter what $x_6$ is evaluated to. The fourth to sixth clauses force $x_8$ to be true too. The last three clauses then say that $x_4$ and $x_5$ would need to be dependent on $x_6$, which is not the case.
-
+is deemed as satisfiable by dCAQE. However, it is not satisfiable, as
+\begin{itemize}
+    \item the first three clauses force $x_7$ to be true no matter what $x_6$ is evaluated to,
+    \item the fourth to sixth clauses force $x_8$ to be true too, and \item the last three clauses then say that $x_4$ and $x_5$ would need to be dependent on $x_6$, which is not the case.
+\end{itemize}
 Other solvers (DQBDD, HQS, iDQ, iProver, and also preprocessor HQSpre) correctly decide its unsatisfiability.
 
 \end{document}
