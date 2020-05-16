@@ -1888,9 +1888,9 @@ For future work there are multiple things possible to do:
 \label{appendix:attachments}
 As a part of this thesis, these attachments, which can be found in the Information System of Masaryk University as well as linked github repositories, are included:
 \begin{itemize}
-    \item src\footnote{\url{https://github.com/jurajsic/DQBDD}} TODO
-    \item benchmarks\footnote{\url{https://github.com/jurajsic/DQBFbenchmarks}} TODO
-    \item docs github??? TODO
+    \item \verb|dqbdd.zip|\footnote{\url{https://github.com/jurajsic/DQBDD}} -- the source code of DQBDD,
+    \item \verb|benchmarks.zip|\footnote{\url{https://github.com/jurajsic/DQBFbenchmarks}} -- the used benchmark sets, benchmarks definitions for BenchExec, and raw results,
+    \item \verb|thesis.zip|\footnote{\url{https://github.com/jurajsic/mastersthesis}} -- the \LaTeX{} source of this thesis.
 \end{itemize}
 
 \chapter{Documentation for DQBDD}
@@ -2083,7 +2083,7 @@ Solver dCAQE deems a DQBF, which in \DQDIMACS{} format has the form
   1  2 3    -5  6     -8 0
  
 \end{verbatim}
-is satisfiable. However, this formula is not satisfiable. This is because the first three clauses force $x_7$ to be true no matter what $x_6$ is evaluated to. The fourth to sixth clauses force $x_8$ to be true too. The last three clauses then say that $x_4$ and $x_5$ would need to be dependent on $x_6$, which is not the case.
+as satisfiable. However, this formula is not satisfiable. This is because the first three clauses force $x_7$ to be true no matter what $x_6$ is evaluated to. The fourth to sixth clauses force $x_8$ to be true too. The last three clauses then say that $x_4$ and $x_5$ would need to be dependent on $x_6$, which is not the case.
 
 Other solvers (DQBDD, HQS, iDQ, iProver, and also preprocessor HQSpre) correctly decide its unsatisfiability.
 

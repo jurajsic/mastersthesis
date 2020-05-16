@@ -1,0 +1,568 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+
+\usepackage{tikz}
+%\usetikzlibrary{arrows.meta,automata,positioning}
+% so tikzpictures are not recomputed each compulation
+\usetikzlibrary{external}
+\tikzexternalize%[prefix=tikz/]
+
+\usepackage{pgfplots}
+\pgfplotsset{compat=newest} 
+
+
+% names of heuristics:
+% - for which quantifiers to eliminate
+\newcommand{\QEnone}{\textbf{None}}
+\newcommand{\QEsimple}{\textbf{Simple}}
+\newcommand{\QEall}{\textbf{All}}
+% - for the order of univ. vars to eliminate
+\newcommand{\QUatbeginning}{\textbf{At\-Be\-gin\-ning}}
+\newcommand{\QUcurrentlowest}{\textbf{CurrentLowest}}
+\newcommand{\QUvarsinconjuncts}{\textbf{VarsInConjuncts}}
+
+\begin{document}
+
+\section{Graphs}
+
+% THESE ARE WRONG, OUT OF MEMORY ONES ARE ALSO THERE!!!!!!
+\tikzsetnextfilename{DQBDDatbeginningvsvarinconjuncts}
+\begin{tikzpicture}
+  \begin{loglogaxis}[enlargelimits=false,xlabel={Set at beginning},ylabel={Variables in conjuncts}]
+    \addplot[mark=none,black] coordinates {(0.025,0.025) (900,900)};
+    \addplot+[only marks,] table[col sep=comma,x=atbeginning,y=varsinconjuncts]{DQBDDquantelimheur.csv};
+  \end{loglogaxis}
+\end{tikzpicture}
+
+% THESE ARE WRONG, OUT OF MEMORY ONES ARE ALSO THERE!!!!!!
+\tikzsetnextfilename{DQBDDatbeginningvscontinuous}
+\begin{tikzpicture}
+  \begin{loglogaxis}[enlargelimits=false,xlabel={Set at beginning},ylabel={Current lowest}]
+    \addplot[mark=none,black] coordinates {(0.025,0.025) (900,900)};
+    \addplot+[only marks,] table[col sep=comma,x=atbeginning,y=continuous]{DQBDDquantelimheur.csv};
+  \end{loglogaxis}
+\end{tikzpicture}
+
+% THESE ARE WRONG, OUT OF MEMORY ONES ARE ALSO THERE!!!!!!
+\tikzsetnextfilename{DQBDDcontinuousvsvarinconjuncts}
+\begin{tikzpicture}
+  \begin{loglogaxis}[enlargelimits=false,xlabel={Curent lowest},ylabel={Variables in conjuncts}]
+    \addplot[mark=none,black] coordinates {(0.025,0.025) (900,900)};
+    \addplot+[only marks,] table[col sep=comma,x=continuous,y=varsinconjuncts]{DQBDDquantelimheur.csv};
+  \end{loglogaxis}
+\end{tikzpicture}
+
+%\tikzsetnextfilename{DQBDDsimplevsall}
+%\begin{figure}
+%  \centering
+%  \begin{tikzpicture}
+%    \begin{loglogaxis}[
+ %     enlargelimits=false,
+  %  ]
+   % \addplot+[
+    %  only marks,]
+      %mark=,
+      %mark size=2.9pt]
+     % table[col sep=comma]{DQBDDsimpleallcomparison.csv};
+%    \end{loglogaxis}
+ % \end{tikzpicture}
+%  \caption{Caption}
+%  \label{fig:my_label}
+%\end{figure}
+
+\newpage
+
+\tikzsetnextfilename{PEC1dqbddVSdcaqe}
+\begin{tikzpicture}
+  \begin{loglogaxis}[enlargelimits=false,xlabel={DQBDD},ylabel={dCAQE},]
+    \addplot[mark=none,black] coordinates {(0.001,0.001) (100,100)};
+    \addplot+[only marks,mark=x,mark size=2.9pt] table[col sep=comma,x={DQBDD 1.1},y={dCAQE 4.0.1}]{PEC1dcaqevsdqbdd.csv};
+  \end{loglogaxis}
+\end{tikzpicture}
+
+\tikzsetnextfilename{PEC1dqbddVSdcaqeSatUnsat}
+\begin{tikzpicture}
+  \begin{loglogaxis}[enlargelimits=false,xlabel={DQBDD},ylabel={dCAQE},]
+    \addplot[mark=none,black] coordinates {(0.001,0.001) (100,100)};
+    \addplot+[color=blue,only marks,mark=x,mark size=2.9pt] table[col sep=comma,x={DQBDD 1.1},y={dCAQE 4.0.1}]{PEC1dcaqevsdqbddunsat.csv};
+    \addplot+[color=red,only marks,mark=x,mark size=2.9pt] table[col sep=comma,x={DQBDD 1.1},y={dCAQE 4.0.1}]{PEC1dcaqevsdqbddsat.csv};
+  \end{loglogaxis}
+\end{tikzpicture}
+
+\tikzsetnextfilename{PEC2dqbddVShqs}
+\begin{tikzpicture}
+  \begin{loglogaxis}[enlargelimits=false,xlabel={DQBDD},ylabel={HQS},]
+    \addplot[mark=none,black] coordinates {(0.1,0.1) (900,900)};
+    \addplot+[only marks,mark=x,mark size=2.9pt] table[col sep=comma,x={DQBDD 1.1},y={HQS 2}]{PEC2hqsvsdqbdd.csv};
+  \end{loglogaxis}
+\end{tikzpicture}
+
+\tikzsetnextfilename{PEC2dqbddVShqsSatUnsat}
+\begin{tikzpicture}
+  \begin{loglogaxis}[enlargelimits=false,xlabel={DQBDD},ylabel={HQS},]
+    \addplot[mark=none,black] coordinates {(0.1,0.1) (900,900)};
+    \addplot+[color=blue,only marks,mark=x,mark size=2.9pt] table[col sep=comma,x={DQBDD 1.1},y={HQS 2}]{PEC2hqsvsdqbddunsat.csv};
+    \addplot+[color=red,only marks,mark=x,mark size=2.9pt] table[col sep=comma,x={DQBDD 1.1},y={HQS 2}]{PEC2hqsvsdqbddsat.csv};
+  \end{loglogaxis}
+\end{tikzpicture}
+
+\tikzsetnextfilename{PEC3dqbddVShqs}
+\begin{tikzpicture}
+  \begin{loglogaxis}[enlargelimits=false,xlabel={DQBDD},ylabel={HQS},]
+    \addplot[mark=none,black] coordinates {(0.1,0.1) (900,900)};
+    \addplot+[only marks,mark=x,mark size=2.9pt] table[col sep=comma,x={DQBDD 1.1},y={HQS 2}]{PEC3hqsvsdqbdd.csv};
+  \end{loglogaxis}
+\end{tikzpicture}
+
+\tikzsetnextfilename{PEC3dqbddVShqsSatUnsat}
+\begin{tikzpicture}
+  \begin{loglogaxis}[enlargelimits=false,xlabel={DQBDD},ylabel={HQS},]
+    \addplot[mark=none,black] coordinates {(0.1,0.1) (900,900)};
+    \addplot+[color=blue,only marks,mark=x,mark size=2.9pt] table[col sep=comma,x={DQBDD 1.1},y={HQS 2}]{PEC3hqsvsdqbddunsat.csv};
+    \addplot+[color=red,only marks,mark=x,mark size=2.9pt] table[col sep=comma,x={DQBDD 1.1},y={HQS 2}]{PEC3hqsvsdqbddsat.csv};
+  \end{loglogaxis}
+\end{tikzpicture}
+
+\tikzsetnextfilename{E19dqbddVShqs}
+\begin{tikzpicture}
+  \begin{loglogaxis}[enlargelimits=false,xlabel={DQBDD},ylabel={HQS},]
+    \addplot[mark=none,black] coordinates {(0.01,0.01) (900,900)};
+    \addplot+[only marks,mark=x,mark size=2.9pt] table[col sep=comma,x={DQBDD 1.1},y={HQS 2}]{E19hqsvsdqbdd.csv};
+  \end{loglogaxis}
+\end{tikzpicture}
+
+\tikzsetnextfilename{E19dqbddVShqsSatUnsat}
+\begin{tikzpicture}
+  \begin{loglogaxis}[enlargelimits=false,xlabel={DQBDD},ylabel={HQS},]
+    \addplot[mark=none,black] coordinates {(0.01,0.01) (900,900)};
+    \addplot+[only marks,mark=x,mark size=2.9pt] table[col sep=comma,x={DQBDD 1.1},y={HQS 2}]{E19hqsvsdqbddsat.csv};
+    \addplot+[color=blue,only marks,mark=x,mark size=2.9pt] table[col sep=comma,x={DQBDD 1.1},y={HQS 2}]{E19hqsvsdqbddunsat.csv};
+  \end{loglogaxis}
+\end{tikzpicture}
+
+\tikzsetnextfilename{CSPdqbddVSdcaqe}
+\begin{tikzpicture}
+  \begin{loglogaxis}[enlargelimits=false,xlabel={DQBDD},ylabel={dCAQE},]
+    \addplot[mark=none,black] coordinates {(0.01,0.01) (900,900)};
+    \addplot+[only marks,mark=x,mark size=2.9pt] table[col sep=comma,x={DQBDD 1.1},y={dCAQE 4.0.1}]{CSPdcaqevshqsvsdqbdd.csv};
+  \end{loglogaxis}
+\end{tikzpicture}
+
+\tikzsetnextfilename{CSPdqbddVShqs}
+\begin{tikzpicture}
+  \begin{loglogaxis}[enlargelimits=false,xlabel={DQBDD},ylabel={HQS},]
+    \addplot[mark=none,black] coordinates {(0.01,0.01) (900,900)};
+    \addplot+[only marks,mark=x,mark size=2.9pt] table[col sep=comma,x={DQBDD 1.1},y={HQS 2}]{CSPdcaqevshqsvsdqbdd.csv};
+  \end{loglogaxis}
+\end{tikzpicture}
+
+
+\pgfplotsset{
+    width = \linewidth,
+    height = 7cm, 
+}
+
+\tikzsetnextfilename{E19cactusplot}
+\begin{tikzpicture}
+  \begin{axis}
+  [
+    enlargelimits=false,
+    xlabel={Number of solved instances},
+    ylabel={CPU time (s)},
+    xmax=150, 
+    ymax=900,
+    %ymax=1000,
+    %ymode=log,
+    no markers,
+    every axis plot/.append style={ultra thick},
+    legend style={at={(0.5,0.97)},anchor=north},
+    cycle list name=color list
+]
+    \addplot+%[mark=x,mark size=2.9pt]
+    table[col sep=comma,x expr=\coordindex+1,y={dCAQE 4.0.1}]{E19sortedtimes.csv};
+    \addplot+%[mark=x,mark size=2.9pt]
+    table[col sep=comma,x expr=\coordindex+1,y={DQBDD 1.1}]{E19sortedtimes.csv};
+    \addplot+%[mark=x,mark size=2.9pt] 
+    table[col sep=comma,x expr=\coordindex+1,y={HQS 2}]{E19sortedtimes.csv};
+    \addplot+%[mark=x,mark size=2.9pt]
+    table[col sep=comma,x expr=\coordindex+1,y={iDQ 1.0}]{E19sortedtimes.csv};
+    \addplot+%[mark=x,mark size=2.9pt]
+    table[col sep=comma,x expr=\coordindex+1,y={iProver v3.1 (CASC-27)}]{E19sortedtimes.csv};
+    \legend{dCAQE,DQBDD,HQS,iDQ,iProver}
+  \end{axis}
+\end{tikzpicture}
+
+\tikzsetnextfilename{CSPcactusplot}
+\begin{tikzpicture}
+  \begin{axis}
+  [
+    enlargelimits=false,
+    xlabel={Number of solved instances},
+    ylabel={CPU time (s)},
+    xmax=45, 
+    ymax=900,
+    %ymax=1000,
+    %ymode=log,
+    no markers,
+    every axis plot/.append style={ultra thick},
+    legend pos=north west,
+    cycle list name=color list
+]
+    \addplot+%[mark=x,mark size=2.9pt]
+    table[col sep=comma,x expr=\coordindex+1,y={dCAQE 4.0.1}]{CSPsortedtimes.csv};
+    \addplot+%[mark=x,mark size=2.9pt]
+    table[col sep=comma,x expr=\coordindex+1,y={DQBDD 1.1}]{CSPsortedtimes.csv};
+    \addplot+%[mark=x,mark size=2.9pt] 
+    table[col sep=comma,x expr=\coordindex+1,y={HQS 2}]{CSPsortedtimes.csv};
+    \addplot+%[mark=x,mark size=2.9pt]
+    table[col sep=comma,x expr=\coordindex+1,y={iDQ 1.0}]{CSPsortedtimes.csv};
+    \addplot+%[mark=x,mark size=2.9pt]
+    table[col sep=comma,x expr=\coordindex+1,y={iProver v3.1 (CASC-27)}]{CSPsortedtimes.csv};
+    \legend{dCAQE,DQBDD,HQS,iDQ,iProver}
+  \end{axis}
+\end{tikzpicture}
+
+
+\tikzsetnextfilename{PEC1cactusplot}
+\begin{tikzpicture}
+  \begin{axis}
+  [
+    enlargelimits=false,
+    xlabel={Number of solved instances},
+    ylabel={CPU time (s)},
+    xmax=450, 
+    ymax=900,
+    %ymax=1000,
+    %ymode=log,
+    no markers,
+    every axis plot/.append style={ultra thick},
+    %legend style={at={(0.5,0.97)},anchor=north},
+    legend pos=north west,
+    cycle list name=color list
+]
+    \addplot+%[mark=x,mark size=2.9pt]
+    table[col sep=comma,x expr=\coordindex+1,y={dCAQE 4.0.1}]{PEC1sortedtimes.csv};
+    \addplot+%[mark=x,mark size=2.9pt]
+    table[col sep=comma,x expr=\coordindex+1,y={DQBDD 1.1}]{PEC1sortedtimes.csv};
+    \addplot+%[mark=x,mark size=2.9pt] 
+    table[col sep=comma,x expr=\coordindex+1,y={HQS 2}]{PEC1sortedtimes.csv};
+    \addplot+%[mark=x,mark size=2.9pt]
+    table[col sep=comma,x expr=\coordindex+1,y={iDQ 1.0}]{PEC1sortedtimes.csv};
+    \addplot+%[mark=x,mark size=2.9pt]
+    table[col sep=comma,x expr=\coordindex+1,y={iProver v3.1 (CASC-27)}]{PEC1sortedtimes.csv};
+    \legend{dCAQE,DQBDD,HQS,iDQ,iProver}
+  \end{axis}
+\end{tikzpicture}
+
+\tikzsetnextfilename{PEC2cactusplot}
+\begin{tikzpicture}
+  \begin{axis}
+  [
+    enlargelimits=false,
+    xlabel={Number of solved instances},
+    ylabel={CPU time (s)},
+    xmax=2000, 
+    ymax=900,
+    %ymax=1000,
+    %ymode=log,
+    no markers,
+    every axis plot/.append style={ultra thick},
+    legend pos=north west,
+    %legend style={at={(0.5,0.97)},anchor=north},
+    cycle list name=color list
+]
+    \addplot+%[mark=x,mark size=2.9pt]
+    table[col sep=comma,x expr=\coordindex+1,y={dCAQE 4.0.1}]{PEC2sortedtimes.csv};
+    \addplot+%[mark=x,mark size=2.9pt]
+    table[col sep=comma,x expr=\coordindex+1,y={DQBDD 1.1}]{PEC2sortedtimes.csv};
+    \addplot+%[mark=x,mark size=2.9pt] 
+    table[col sep=comma,x expr=\coordindex+1,y={HQS 2}]{PEC2sortedtimes.csv};
+    \addplot+%[mark=x,mark size=2.9pt]
+    table[col sep=comma,x expr=\coordindex+1,y={iDQ 1.0}]{PEC2sortedtimes.csv};
+    \addplot+%[mark=x,mark size=2.9pt]
+    table[col sep=comma,x expr=\coordindex+1,y={iProver v3.1 (CASC-27)}]{PEC2sortedtimes.csv};
+    \legend{dCAQE,DQBDD,HQS,iDQ,iProver}
+  \end{axis}
+\end{tikzpicture}
+
+\tikzsetnextfilename{PEC3cactusplot}
+\begin{tikzpicture}
+  \begin{axis}
+  [
+    enlargelimits=false,
+    xlabel={Number of solved instances},
+    ylabel={CPU time (s)},
+    xmax=600, 
+    ymax=900,
+    %ymax=1000,
+    %ymode=log,
+    no markers,
+    every axis plot/.append style={ultra thick},
+    %legend style={at={(0.5,0.97)},anchor=north},
+    legend pos=north west,
+    cycle list name=color list
+]
+    \addplot+%[mark=x,mark size=2.9pt]
+    table[col sep=comma,x expr=\coordindex+1,y={dCAQE 4.0.1}]{PEC3sortedtimes.csv};
+    \addplot+%[mark=x,mark size=2.9pt]
+    table[col sep=comma,x expr=\coordindex+1,y={DQBDD 1.1}]{PEC3sortedtimes.csv};
+    \addplot+%[mark=x,mark size=2.9pt] 
+    table[col sep=comma,x expr=\coordindex+1,y={HQS 2}]{PEC3sortedtimes.csv};
+    \addplot+%[mark=x,mark size=2.9pt]
+    table[col sep=comma,x expr=\coordindex+1,y={iDQ 1.0}]{PEC3sortedtimes.csv};
+    \addplot+%[mark=x,mark size=2.9pt]
+    table[col sep=comma,x expr=\coordindex+1,y={iProver v3.1 (CASC-27)}]{PEC3sortedtimes.csv};
+    \legend{dCAQE,DQBDD,HQS,iDQ,iProver}
+  \end{axis}
+\end{tikzpicture}
+
+\tikzsetnextfilename{E19logcactusplot}
+\begin{tikzpicture}
+  \begin{axis}
+  [
+    enlargelimits=false,
+    xlabel={Number of solved instances},
+    ylabel={CPU time (s)},
+    xmax=150, 
+    %ymax=900,
+    ymax=1000,
+    ymode=log,
+    no markers,
+    every axis plot/.append style={ultra thick},
+    %legend style={at={(0.5,0.97)},anchor=north},
+    legend pos = {south east},
+    cycle list name=color list
+]
+    \addplot+%[mark=x,mark size=2.9pt]
+    table[col sep=comma,x expr=\coordindex+1,y={dCAQE 4.0.1}]{E19sortedtimes.csv};
+    \addplot+%[mark=x,mark size=2.9pt]
+    table[col sep=comma,x expr=\coordindex+1,y={DQBDD 1.1}]{E19sortedtimes.csv};
+    \addplot+%[mark=x,mark size=2.9pt] 
+    table[col sep=comma,x expr=\coordindex+1,y={HQS 2}]{E19sortedtimes.csv};
+    \addplot+%[mark=x,mark size=2.9pt]
+    table[col sep=comma,x expr=\coordindex+1,y={iDQ 1.0}]{E19sortedtimes.csv};
+    \addplot+%[mark=x,mark size=2.9pt]
+    table[col sep=comma,x expr=\coordindex+1,y={iProver v3.1 (CASC-27)}]{E19sortedtimes.csv};
+    \legend{dCAQE,DQBDD,HQS,iDQ,iProver}
+  \end{axis}
+\end{tikzpicture}
+
+\tikzsetnextfilename{CSPlogcactusplot}
+\begin{tikzpicture}
+  \begin{axis}
+  [
+    enlargelimits=false,
+    xlabel={Number of solved instances},
+    ylabel={CPU time (s)},
+    xmax=45, 
+    %ymax=900,
+    ymax=1000,
+    ymode=log,
+    no markers,
+    every axis plot/.append style={ultra thick},
+    legend pos=south east,
+    cycle list name=color list
+]
+    \addplot+%[mark=x,mark size=2.9pt]
+    table[col sep=comma,x expr=\coordindex+1,y={dCAQE 4.0.1}]{CSPsortedtimes.csv};
+    \addplot+%[mark=x,mark size=2.9pt]
+    table[col sep=comma,x expr=\coordindex+1,y={DQBDD 1.1}]{CSPsortedtimes.csv};
+    \addplot+%[mark=x,mark size=2.9pt] 
+    table[col sep=comma,x expr=\coordindex+1,y={HQS 2}]{CSPsortedtimes.csv};
+    \addplot+%[mark=x,mark size=2.9pt]
+    table[col sep=comma,x expr=\coordindex+1,y={iDQ 1.0}]{CSPsortedtimes.csv};
+    \addplot+%[mark=x,mark size=2.9pt]
+    table[col sep=comma,x expr=\coordindex+1,y={iProver v3.1 (CASC-27)}]{CSPsortedtimes.csv};
+    \legend{dCAQE,DQBDD,HQS,iDQ,iProver}
+  \end{axis}
+\end{tikzpicture}
+
+
+\tikzsetnextfilename{PEC1logcactusplot}
+\begin{tikzpicture}
+  \begin{axis}
+  [
+    enlargelimits=false,
+    xlabel={Number of solved instances},
+    ylabel={CPU time (s)},
+    xmax=450, 
+    %ymax=900,
+    ymax=1000,
+    ymode=log,
+    no markers,
+    every axis plot/.append style={ultra thick},
+    %legend style={at={(0.5,0.97)},anchor=north},
+    legend pos=north west,
+    cycle list name=color list
+]
+    \addplot+%[mark=x,mark size=2.9pt]
+    table[col sep=comma,x expr=\coordindex+1,y={dCAQE 4.0.1}]{PEC1sortedtimes.csv};
+    \addplot+%[mark=x,mark size=2.9pt]
+    table[col sep=comma,x expr=\coordindex+1,y={DQBDD 1.1}]{PEC1sortedtimes.csv};
+    \addplot+%[mark=x,mark size=2.9pt] 
+    table[col sep=comma,x expr=\coordindex+1,y={HQS 2}]{PEC1sortedtimes.csv};
+    \addplot+%[mark=x,mark size=2.9pt]
+    table[col sep=comma,x expr=\coordindex+1,y={iDQ 1.0}]{PEC1sortedtimes.csv};
+    \addplot+%[mark=x,mark size=2.9pt]
+    table[col sep=comma,x expr=\coordindex+1,y={iProver v3.1 (CASC-27)}]{PEC1sortedtimes.csv};
+    \legend{dCAQE,DQBDD,HQS,iDQ,iProver}
+  \end{axis}
+\end{tikzpicture}
+
+\tikzsetnextfilename{PEC2logcactusplot}
+\begin{tikzpicture}
+  \begin{axis}
+  [
+    enlargelimits=false,
+    xlabel={Number of solved instances},
+    ylabel={CPU time (s)},
+    xmax=2000, 
+    %ymax=900,
+    ymax=1000,
+    ymode=log,
+    no markers,
+    every axis plot/.append style={ultra thick},
+    %legend pos=north west,
+    legend style={at={(0.14,0.97)},anchor=north},
+    cycle list name=color list
+]
+    \addplot+%[mark=x,mark size=2.9pt]
+    table[col sep=comma,x expr=\coordindex+1,y={dCAQE 4.0.1}]{PEC2sortedtimes.csv};
+    \addplot+%[mark=x,mark size=2.9pt]
+    table[col sep=comma,x expr=\coordindex+1,y={DQBDD 1.1}]{PEC2sortedtimes.csv};
+    \addplot+%[mark=x,mark size=2.9pt] 
+    table[col sep=comma,x expr=\coordindex+1,y={HQS 2}]{PEC2sortedtimes.csv};
+    \addplot+%[mark=x,mark size=2.9pt]
+    table[col sep=comma,x expr=\coordindex+1,y={iDQ 1.0}]{PEC2sortedtimes.csv};
+    \addplot+%[mark=x,mark size=2.9pt]
+    table[col sep=comma,x expr=\coordindex+1,y={iProver v3.1 (CASC-27)}]{PEC2sortedtimes.csv};
+    \legend{dCAQE,DQBDD,HQS,iDQ,iProver}
+  \end{axis}
+\end{tikzpicture}
+
+\tikzsetnextfilename{PEC3logcactusplot}
+\begin{tikzpicture}
+  \begin{axis}
+  [
+    enlargelimits=false,
+    xlabel={Number of solved instances},
+    ylabel={CPU time (s)},
+    xmax=600, 
+    %ymax=900,
+    ymax=1000,
+    ymode=log,
+    no markers,
+    every axis plot/.append style={ultra thick},
+    %legend style={at={(0.5,0.97)},anchor=north},
+    legend pos=south east,
+    cycle list name=color list
+]
+    \addplot+%[mark=x,mark size=2.9pt]
+    table[col sep=comma,x expr=\coordindex+1,y={dCAQE 4.0.1}]{PEC3sortedtimes.csv};
+    \addplot+%[mark=x,mark size=2.9pt]
+    table[col sep=comma,x expr=\coordindex+1,y={DQBDD 1.1}]{PEC3sortedtimes.csv};
+    \addplot+%[mark=x,mark size=2.9pt] 
+    table[col sep=comma,x expr=\coordindex+1,y={HQS 2}]{PEC3sortedtimes.csv};
+    \addplot+%[mark=x,mark size=2.9pt]
+    table[col sep=comma,x expr=\coordindex+1,y={iDQ 1.0}]{PEC3sortedtimes.csv};
+    \addplot+%[mark=x,mark size=2.9pt]
+    table[col sep=comma,x expr=\coordindex+1,y={iProver v3.1 (CASC-27)}]{PEC3sortedtimes.csv};
+    \legend{dCAQE,DQBDD,HQS,iDQ,iProver}
+  \end{axis}
+\end{tikzpicture}
+
+\tikzsetnextfilename{SATcactusplot}
+\begin{tikzpicture}
+  \begin{axis}
+  [
+    enlargelimits=false,
+    xlabel={Number of solved instances},
+    ylabel={CPU time (s)},
+    %xmax=600, 
+    ymax=900,
+    %ymode=log,
+    no markers,
+    every axis plot/.append style={ultra thick},
+    legend style={at={(0.5,0.97)},anchor=north},
+    cycle list name=color list
+]
+    \addplot+%[mark=x,mark size=2.9pt]
+    table[col sep=comma,x expr=\coordindex+1,y={dCAQE 4.0.1}]{SATsortedtimes.csv};
+    %\addplot+%[mark=x,mark size=2.9pt]
+    %table[col sep=comma,x expr=\coordindex+1,y={DQBDD 1.1}]{SATsortedtimes.csv};
+    \addplot+%[mark=x,mark size=2.9pt] 
+    table[col sep=comma,x expr=\coordindex+1,y={HQS 2}]{SATsortedtimes.csv};
+    \addplot+%[mark=x,mark size=2.9pt]
+    table[col sep=comma,x expr=\coordindex+1,y={iDQ 1.0}]{SATsortedtimes.csv};
+    \addplot+%[mark=x,mark size=2.9pt]
+    table[col sep=comma,x expr=\coordindex+1,y={iProver v3.1 (CASC-27)}]{SATsortedtimes.csv};
+    \legend{dCAQE,DQBDD,HQS,iDQ,iProver}
+  \end{axis}
+\end{tikzpicture}
+
+\tikzsetnextfilename{SATtimecomparison}
+\begin{tikzpicture}
+  \begin{axis}
+  [
+    enlargelimits=false,
+    xlabel={Number of solved instances},
+    ylabel={CPU time (s)},
+    %xmax=600, 
+    ymax=900,
+    %ymode=log,
+    every axis plot/.append style={ultra thick},
+    legend pos = south east,
+    cycle list name=color list
+]
+    \addplot+%[only marks]
+    table[col sep=comma,x expr=\coordindex+1,y={dCAQE 4.0.1}]{SATtimescomparison.csv};
+    \addplot+%[only marks]
+    table[col sep=comma,x expr=\coordindex+1,y={HQS 2}]{SATtimescomparison.csv};
+    \addplot+%[only marks]
+    table[col sep=comma,x expr=\coordindex+1,y={iDQ 1.0}]{SATtimescomparison.csv};
+    \addplot+%[only marks]
+    table[col sep=comma,x expr=\coordindex+1,y={iProver v3.1 (CASC-27)}]{SATtimescomparison.csv};
+    \legend{dCAQE,DQBDD,HQS,iDQ,iProver}
+  \end{axis}
+\end{tikzpicture}
+
+
+\tikzsetnextfilename{E19heuristicscactusplot}
+\begin{tikzpicture}
+  \begin{axis}
+  [
+    enlargelimits=false,
+    xlabel={Number of solved instances},
+    ylabel={CPU time (s)},
+    xmax=151, 
+    ymax=1000,
+    ymode=log,
+    every axis plot/.append style={ultra thick},
+    legend style={at={(0.5,-0.2)},anchor=north},
+    cycle list name=color list
+]
+    %\addplot+ table[col sep=comma,x expr=\coordindex+1,y={simple-atbeginning.dqbf19}]{E19dqbddheuristicssortedtimes.csv};
+    %\addplot+ table[col sep=comma,x expr=\coordindex+1,y={simple-continuous.dqbf19}]{E19dqbddheuristicssortedtimes.csv};
+    %\addplot+% table[col sep=comma,x expr=\coordindex+1,y={simple-varsinconjuncts.dqbf19}]{E19dqbddheuristicssortedtimes.csv};
+    \addplot+%[only marks]
+    table[col sep=comma,x expr=\coordindex+1,y={tree-simpleelimination-atbeginning.dqbf19}]{E19dqbddheuristicssortedtimes.csv};
+    \addplot+ table[col sep=comma,x expr=\coordindex+1,y={tree-simpleelimination-continuous.dqbf19}]{E19dqbddheuristicssortedtimes.csv};
+    \addplot+ table[col sep=comma,x expr=\coordindex+1,y={tree-simpleelimination-varsinconjuncts.dqbf19}]{E19dqbddheuristicssortedtimes.csv};
+    %\addplot+ table[col sep=comma,x expr=\coordindex+1,y={tree-fullelimination-atbeginning.dqbf19}]{E19dqbddheuristicssortedtimes.csv};
+    %\addplot+ table[col sep=comma,x expr=\coordindex+1,y={tree-fullelimination-continuous.dqbf19}]{E19dqbddheuristicssortedtimes.csv};
+    %\addplot+ table[col sep=comma,x expr=\coordindex+1,y={tree-fullelimination-varsinconjuncts.dqbf19}]{E19dqbddheuristicssortedtimes.csv};
+    \legend{
+      %\QEnone{} and \QUatbeginning{},
+      %\QEnone{} and \QUcurrentlowest{},
+      %\QEnone{} and \QUvarsinconjuncts{},
+      \QEsimple{} and \QUatbeginning{},
+      \QEsimple{} and \QUcurrentlowest{},
+      \QEsimple{} and \QUvarsinconjuncts{},
+      %\QEall{} and \QUatbeginning{},
+      %\QEall{} and \QUcurrentlowest{},
+      %\QEall{} and \QUvarsinconjuncts{}
+    }
+  \end{axis}
+\end{tikzpicture}
+
+\end{document}
