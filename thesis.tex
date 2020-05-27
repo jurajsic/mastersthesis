@@ -810,7 +810,7 @@ which becomes satisfiable. The problem here is that $x_1$ and $x_2$ are in $(\ne
   
   Now, assume that $s' \in \seman{\psi'}$. In the rest of the proof, for every valuation $v \in \valtns{\uvars{\psi}}$ (where it also holds that $v \in \valtns{\uvars{\psi'}}$, because $\uvars{\psi} = \uvars{\psi'}$) we use $v_{D_y}$ to denote the restriction of $v$ to $D_y$. Let $s$ be a Skolem function mapping of $\psi$ such that for $v \in \valtns{\uvars{\psi}}$ 
   \begin{itemize}
-      \item $s(y)(v) = s'(y)(v)$ if for all valuations $v' \in \valtns{\uvars{\psi}}$, for which it holds that $v'_{D_y} = v_{D_y}$ and $s'(\psi')$ depends on the subformula $s'(\phi')$ in $v$, we have $v(s'(\psi_1)) = 1$,
+      \item $s(y)(v) = s'(y)(v)$ if for all valuations $v' \in \valtns{\uvars{\psi}}$, for which it holds that $v'_{D_y} = v_{D_y}$ and $s'(\psi')$ depends on the subformula $s'(\phi')$ in $v'$, we have $v'(s'(\psi_1)) = 1$,
       \item $s(y)(v) = s'(y')(v)$ otherwise.
   \end{itemize}
   For other variables, $s$ maps to the same Skolem function as $s'$. We show that $s \in \seman{\psi}$.
@@ -820,9 +820,9 @@ which becomes satisfiable. The problem here is that $x_1$ and $x_2$ are in $(\ne
   Because 
   \[s'(\phi') = s'(\exists y(D_y) \itholds \psi_1 \lor \exists y'(D_y) \itholds \psi_2\substitute{y}{y'}) = s'(\psi_1) \lor s'(\psi_2\substitute{y}{y'})\] is a disjunction, it has to hold that $v(s'(\psi_1)) = 1$ or $v(s'(\psi_2\substitute{y}{y'})) = 1$.
   If they are both equal to 1, then it does not matter whether $s(y)(v) = s'(y)(v)$ or $s(y)(v) = s'(y')(v)$, it will always hold that $v(s(\phi)) = 1$.
-  If we have $v(s'(\psi_1)) = 0$ and $v(s'(\psi_2\substitute{y}{y'})) = 1$, then from the definition of $s$, we get $s(y)(v) = s'(y')(v)$ and so $v(s(\psi_2)) = v(s(\psi_2\substitute{y}{y'})) = 1$ and therefore $v(s(\phi)) = 1$.
+  If we have $v(s'(\psi_1)) = 0$ and $v(s'(\psi_2\substitute{y}{y'})) = 1$, then from the definition of $s$, we get $s(y)(v) = s'(y')(v)$ and so $v(s(\psi_2)) = v(s'(\psi_2\substitute{y}{y'})) = 1$ and therefore $v(s(\phi)) = 1$.
   
-  For the last case, $v(s'(\psi_1)) = 1$ and $v(s'(\psi_2\substitute{y}{y'})) = 0$, we need to show that $s(y)(v) = s'(y)(v)$, because then $v(s(\psi_1)) = v(s'(\psi_1)) = 1$ therefore $v(s(\phi)) = 1$. For that, we need to show that for each valuation $v' \in \valtns{\uvars{\psi}}$ where $v'_{D_y} = v_{D_y}$ and $s'(\psi')$ depends on $s'(\phi')$ in $v$, it holds $v'(s'(\psi_1)) = 1$. Assume that this does not hold meaning that there exists some $v'$ fulfilling these conditions where $v'(s'(\psi_1)) = 0$. We now show contradiction.
+  For the last case, $v(s'(\psi_1)) = 1$ and $v(s'(\psi_2\substitute{y}{y'})) = 0$, we need to show that $s(y)(v) = s'(y)(v)$, because then $v(s(\psi_1)) = v(s'(\psi_1)) = 1$ therefore $v(s(\phi)) = 1$. For that, we need to show that for each valuation $v' \in \valtns{\uvars{\psi}}$ where $v'_{D_y} = v_{D_y}$ and $s'(\psi')$ depends on $s'(\phi')$ in $v'$, it holds $v'(s'(\psi_1)) = 1$. Assume that this does not hold meaning that there exists some $v'$ fulfilling these conditions where $v'(s'(\psi_1)) = 0$. We now show contradiction.
   
   Let $v'' \in \valtns{\uvars{\psi}}$ be a valuation such that $v''(x) = v'(x)$ for all $x \in A_{\psi_1}$ and $v''(x) = v(x)$ otherwise. This means that $v''_{D_y} = v_{D_y} = v'_{D_y}$. Because $s'(\psi_1)$ contains only variables from $A_{\psi_1} \cup D_y$ we have $v''(s'(\psi_1)) = v'(s'(\psi_1)) = 0$. Moreover, because $A_{\psi_1} \cap A_{\psi_2} = \emptyset$ (from the assumption of the theorem) and $s'(\psi_2\substitute{y}{y'})$ contains only variables from $A_{\psi_2} \cup D_y$, we have $v''(s'(\psi_2\substitute{y}{y'})) = v(s'(\psi_2\substitute{y}{y'})) = 0$. Together, this means $v''(s'(\phi')) = 0$.
   
