@@ -8,5 +8,6 @@ There are some mistakes in the thesis which were found after the submition (than
 - end of p. 21: it should be `depends on the subformula s'(\Phi') in v', we have v'(s'(\psi_1)) = 1` instead of `depends on the subformula s'(\Phi') in v, we have v(s'(\psi_1)) = 1` (added two single quotation marks),
 - page 22, line 15: `v(s'(\psi_2[y'/y]))` instead of `v(s(\psi_2[y'/y]))`,
 - page 22, line 20: `depends on s'(\Phi') in v'` instead of `depends on s'(\Phi') in v`.
+- page 19, 
 
 These mistakes are corrected in this repository.

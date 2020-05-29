@@ -764,12 +764,12 @@ Next, we prove a lemma that says that if $\phi$ depends on its subformula $\phi'
   
   We show that $\seman{\psi} \not= \emptyset$ iff $\seman{\psi'} \not= \emptyset$. First, let $s \in \seman{\psi}$. We now show that for $s'$, where 
   \begin{itemize}
-      \item $s'(y) = s(y)\substitute{x}{x'}$\footnote{By $s(y)\substitute{x}{x'}$ we mean the BF representing $s(y)$ in which every occurrence of $x$ is replaced by $x'$ and to $s(y')$ we assign Boolean function that $s(y)\substitute{x}{x'}$ represents} for $y \in \evars{\psi_2}$ and
+      \item $s'(y) = s(y)\substitute{x}{x'}$\footnote{By $s(y)\substitute{x}{x'}$ we mean the BF representing $s(y)$ in which every occurrence of $x$ is replaced by $x'$ and to $s(y')$ we assign Boolean function that $s(y)\substitute{x}{x'}$ represents.} for $y \in \evars{\psi_2}$ and
       \item $s'(y) = s(y)$ otherwise,
   \end{itemize}
   it holds $s' \in \seman{\psi'}$. Note that for $y \in \evars{\psi_1}$ we have $s'(y) = s(y)$ as, according to the way DQBFs are defined, $\psi_1$ and $\psi_2$ cannot share the same quantification, therefore $\evars{\psi_1} \cap \evars{\psi_2} = \emptyset$.
   
-  Let $v \in \valtns{\uvars{\psi'}}$. We need to show that $v(s'(\psi')) = 1$. Because $s \in \seman{\psi}$, it holds that $v(s(\psi)) = 1$. For the case that $v(x') = v(x)$ we get $v(s(\psi)) = v(s'(\psi'))$, because BFs $s(\psi)$ and $s(\psi')$ differ only in some replacements of $x$ by $x'$. Therefore we assume that $v(x') \not= v(x)$. We know that $\psi$ and $\psi'$ differ only in the formulas $\phi$ and $\phi'$, therefore we can only focus on the case where $s(\psi)$ depends on $s(\phi)$ in $v$ (otherwise $v(s(\psi)) = v(s'(\psi'))$). %(that is the value of $v(s(\psi))$ would change if the value of $v(s(\phi))$ changed). 
+  Let $v \in \valtns{\uvars{\psi'}}$. We need to show that $v(s'(\psi')) = 1$. Because $s \in \seman{\psi}$, it holds that $v(s(\psi)) = 1$. For the case that $v(x') = v(x)$ we get $v(s(\psi)) = v(s'(\psi'))$, because BFs $s(\psi)$ and $s'(\psi')$ differ only in some replacements of $x$ by $x'$. Therefore we assume that $v(x') \not= v(x)$. We know that $\psi$ and $\psi'$ differ only in the formulas $\phi$ and $\phi'$, therefore we can only focus on the case where $s(\psi)$ depends on $s(\phi)$ in $v$ (otherwise $v(s(\psi)) = v(s'(\psi'))$). %(that is the value of $v(s(\psi))$ would change if the value of $v(s(\phi))$ changed). 
   Also, $\psi$ is in NNF, which means that in the tree of operations, negation cannot be before $\phi$. We can then apply Lemma~\ref{lemma:nonegdepends} and we get $v(s(\phi)) = 1$.
   This means we need to show that $v(s'(\phi')) = 1$.
   
